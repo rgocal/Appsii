@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2015. Appsi Mobile
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        style="?attr/appsiToolbarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="12dp"
+            android:layout_marginStart="16dp"
+            android:gravity="bottom"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            android:textColor="?android:attr/textColorPrimary"
+            />
+    </android.support.v7.widget.Toolbar>
+
+
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="What\'s new"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="?attr/colorPrimary"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:text="The features described below have recently been added to Appsii. Feel free to test them!"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                />
+
+
+            <TextView
+                style="?attr/appsiActionBarTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="Improved home editor"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?attr/colorAccent"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:text="The home editor has been upgraded. It is now a lot easier to change the layout and resize items."
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                />
+
+            <TextView
+                style="?attr/appsiActionBarTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="Apps page improvements"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?attr/colorAccent"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:text="Changed the size of the font in the app tiles. They are now the same size as those on the home page"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                />
+
+            <TextView
+                style="?attr/appsiActionBarTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="Unlocking pages with Appsi plugins"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?attr/colorAccent"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:text="You can now unlock pages using Appsi plugins if you bought the in the past."
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                />
+
+            <TextView
+                style="?attr/appsiActionBarTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="In app purchases for the pages"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?attr/colorAccent"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:text="Pages can now be bought from the pages menu"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                />
+
+            <TextView
+                style="?attr/appsiActionBarTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="New structure"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?attr/colorAccent"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:text="Several screens have been moved around to make everything much more logical"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                />
+
+            <TextView
+                style="?attr/appsiActionBarTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="Shortcuts in Home"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?attr/colorAccent"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:text="As indicated below you can now add shortcuts to the home screen, this allows Appsii to integrate perfectly with other apps and start anything the expose."
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                />
+
+            <TextView
+                style="?attr/appsiActionBarTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="Multiple home pages"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?attr/colorAccent"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:text="You can now create additional home pages and add them to your hotspots. Go to pages and click Manage Home Pages to set this up."
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                />
+
+            <TextView
+                style="?attr/appsiActionBarTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="App launchers"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?attr/colorAccent"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:text="App launchers can now be edited and added to the home screen. This allows you to pick an app or shortcut. In advanced mode you can do things like running shell commands (as root if you like), send broadcasts and run services."
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                />
+
+            <TextView
+                style="?attr/appsiActionBarTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="New hotspot preferences editor"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?attr/colorAccent"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:text="The hotspot preferences page was completely rewritten to allow the flexibility present in Appsii to be used to it's full extend. The screen has been made clearer and easier to use"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                />
+
+            <TextView
+                style="?attr/appsiActionBarTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="Pages per hotspot"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?attr/colorAccent"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:text="You can now select the pages to show for each of the hotspots and reorder them as you like."
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                />
+
+            <TextView
+                style="?attr/appsiActionBarTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="Home layout editor"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?attr/colorAccent"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:text="This editor allows you to change almost everything about the home screen. You can add rows, set height and widths and change the widgets shown."
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                />
+
+            <TextView
+                style="?attr/appsiActionBarTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="Home"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?attr/colorAccent"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:text="Home is now completely implemented and customizable."
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                />
+
+            <TextView
+                style="?attr/appsiActionBarTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="Theme picker"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?attr/colorAccent"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:text="You can now choose from several themes in the Look &amp; Feel menu. The new themes aren't completely final and may change."
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                />
+
+            <TextView
+                style="?attr/appsiActionBarTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="Custom header images"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?attr/colorAccent"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:text="You can replace the header images with your own. Simply put a new image in the appsii folder on the internal sd-card with the right name. The proper file names are header_apps.png, header_agenda.png, header_calls.png and header_people.png."
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                />
+
+            <TextView
+                style="?attr/appsiActionBarTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="New look for the agenda"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?attr/colorAccent"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:text="A new look for the agenda page was added. With this look it looks the same as the google calendar schedule view. If you like the old look better, just enable it in the menu on top of the agenda page."
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                />
+
+            <TextView
+                style="?attr/appsiActionBarTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="Date-picker for the agenda"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?attr/colorAccent"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:text="Pressing the title of the agenda page now reveals a date picker. You can use this to quickly navigate to a different date. A go to today button was also added to quickly jump to today."
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                />
+
+            <TextView
+                style="?attr/appsiActionBarTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="Editable tags and list-mode"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?attr/colorAccent"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:text="A new settings button was added above the tags. By tapping this button you can change the name of the tag and choose configure if it should be expanded by default. In this menu you can also choose to display the items in the tag as a list"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                />
+
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

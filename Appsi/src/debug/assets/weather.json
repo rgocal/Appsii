@@ -1,0 +1,315 @@
+// select * from weather.forecast where woeid in (727971, 555, 729189)
+{
+  "query": {
+    "count": 3,
+    "created": "2015-01-21T16:02:04Z",
+    "lang": "en-US",
+    "results": {
+      "channel": [
+        {
+          "title": "Yahoo! Weather - Breda, NL",
+          "link": "http://us.rd.yahoo.com/dailynews/rss/weather/Breda__NL/*http://weather.yahoo.com/forecast/NLXX0004_f.html",
+          "description": "Yahoo! Weather for Breda, NL",
+          "language": "en-us",
+          "lastBuildDate": "Wed, 21 Jan 2015 4:28 pm CET",
+          "ttl": "60",
+          "location": {
+            "city": "Breda",
+            "country": "Netherlands",
+            "region": "NB"
+          },
+          "units": {
+            "distance": "mi",
+            "pressure": "in",
+            "speed": "mph",
+            "temperature": "F"
+          },
+          "wind": {
+            "chill": "34",
+            "direction": "80",
+            "speed": "3"
+          },
+          "atmosphere": {
+            "humidity": "81",
+            "pressure": "29.85",
+            "rising": "0",
+            "visibility": "6.21"
+          },
+          "astronomy": {
+            "sunrise": "8:34 am",
+            "sunset": "5:11 pm"
+          },
+          "image": {
+            "title": "Yahoo! Weather",
+            "width": "142",
+            "height": "18",
+            "link": "http://weather.yahoo.com",
+            "url": "http://l.yimg.com/a/i/brand/purplelogo//uh/us/news-wea.gif"
+          },
+          "item": {
+            "title": "Conditions for Breda, NL at 4:28 pm CET",
+            "lat": "51.59",
+            "long": "4.77",
+            "link": "http://us.rd.yahoo.com/dailynews/rss/weather/Breda__NL/*http://weather.yahoo.com/forecast/NLXX0004_f.html",
+            "pubDate": "Wed, 21 Jan 2015 4:28 pm CET",
+            "condition": {
+              "code": "26",
+              "date": "Wed, 21 Jan 2015 4:28 pm CET",
+              "temp": "34",
+              "text": "Cloudy"
+            },
+            "description": "\n<img src=\"http://l.yimg.com/a/i/us/we/52/26.gif\"/><br />\n<b>Current Conditions:</b><br />\nCloudy, 34 F<BR />\n<BR /><b>Forecast:</b><BR />\nWed - Partly Cloudy. High: 36 Low: 28<br />\nThu - Partly Cloudy. High: 37 Low: 27<br />\nFri - Mostly Sunny. High: 35 Low: 28<br />\nSat - AM Rain/Snow. High: 43 Low: 33<br />\nSun - Mostly Sunny. High: 43 Low: 31<br />\n<br />\n<a href=\"http://us.rd.yahoo.com/dailynews/rss/weather/Breda__NL/*http://weather.yahoo.com/forecast/NLXX0004_f.html\">Full Forecast at Yahoo! Weather</a><BR/><BR/>\n(provided by <a href=\"http://www.weather.com\" >The Weather Channel</a>)<br/>\n",
+            "forecast": [
+              {
+                "code": "29",
+                "date": "21 Jan 2015",
+                "day": "Wed",
+                "high": "36",
+                "low": "28",
+                "text": "Partly Cloudy"
+              },
+              {
+                "code": "30",
+                "date": "22 Jan 2015",
+                "day": "Thu",
+                "high": "37",
+                "low": "27",
+                "text": "Partly Cloudy"
+              },
+              {
+                "code": "34",
+                "date": "23 Jan 2015",
+                "day": "Fri",
+                "high": "35",
+                "low": "28",
+                "text": "Mostly Sunny"
+              },
+              {
+                "code": "5",
+                "date": "24 Jan 2015",
+                "day": "Sat",
+                "high": "43",
+                "low": "33",
+                "text": "AM Rain/Snow"
+              },
+              {
+                "code": "34",
+                "date": "25 Jan 2015",
+                "day": "Sun",
+                "high": "43",
+                "low": "31",
+                "text": "Mostly Sunny"
+              }
+            ],
+            "guid": {
+              "isPermaLink": "false",
+              "content": "NLXX0004_2015_01_25_7_00_CET"
+            }
+          }
+        },
+        {
+          "title": "Yahoo! Weather - Garden River, CA",
+          "link": "http://us.rd.yahoo.com/dailynews/rss/weather/Garden_River__CA/*http://weather.yahoo.com/forecast/CAXX1502_f.html",
+          "description": "Yahoo! Weather for Garden River, CA",
+          "language": "en-us",
+          "lastBuildDate": "Wed, 21 Jan 2015 9:53 am EST",
+          "ttl": "60",
+          "location": {
+            "city": "Garden River",
+            "country": "Canada",
+            "region": "ON"
+          },
+          "units": {
+            "distance": "mi",
+            "pressure": "in",
+            "speed": "mph",
+            "temperature": "F"
+          },
+          "wind": {
+            "chill": "7",
+            "direction": "60",
+            "speed": "3"
+          },
+          "atmosphere": {
+            "humidity": "57",
+            "pressure": "30.13",
+            "rising": "1",
+            "visibility": "10"
+          },
+          "astronomy": {
+            "sunrise": "8:11 am",
+            "sunset": "5:24 pm"
+          },
+          "image": {
+            "title": "Yahoo! Weather",
+            "width": "142",
+            "height": "18",
+            "link": "http://weather.yahoo.com",
+            "url": "http://l.yimg.com/a/i/brand/purplelogo//uh/us/news-wea.gif"
+          },
+          "item": {
+            "title": "Conditions for Garden River, CA at 9:53 am EST",
+            "lat": "46.55",
+            "long": "-84.18",
+            "link": "http://us.rd.yahoo.com/dailynews/rss/weather/Garden_River__CA/*http://weather.yahoo.com/forecast/CAXX1502_f.html",
+            "pubDate": "Wed, 21 Jan 2015 9:53 am EST",
+            "condition": {
+              "code": "26",
+              "date": "Wed, 21 Jan 2015 9:53 am EST",
+              "temp": "7",
+              "text": "Cloudy"
+            },
+            "description": "\n<img src=\"http://l.yimg.com/a/i/us/we/52/26.gif\"/><br />\n<b>Current Conditions:</b><br />\nCloudy, 7 F<BR />\n<BR /><b>Forecast:</b><BR />\nWed - Partly Cloudy. High: 23 Low: 10<br />\nThu - Partly Cloudy. High: 25 Low: 16<br />\nFri - Snow Showers. High: 31 Low: 28<br />\nSat - AM Clouds/PM Sun. High: 30 Low: 4<br />\nSun - Mostly Sunny. High: 17 Low: 1<br />\n<br />\n<a href=\"http://us.rd.yahoo.com/dailynews/rss/weather/Garden_River__CA/*http://weather.yahoo.com/forecast/CAXX1502_f.html\">Full Forecast at Yahoo! Weather</a><BR/><BR/>\n(provided by <a href=\"http://www.weather.com\" >The Weather Channel</a>)<br/>\n",
+            "forecast": [
+              {
+                "code": "30",
+                "date": "21 Jan 2015",
+                "day": "Wed",
+                "high": "23",
+                "low": "10",
+                "text": "Partly Cloudy"
+              },
+              {
+                "code": "30",
+                "date": "22 Jan 2015",
+                "day": "Thu",
+                "high": "25",
+                "low": "16",
+                "text": "Partly Cloudy"
+              },
+              {
+                "code": "14",
+                "date": "23 Jan 2015",
+                "day": "Fri",
+                "high": "31",
+                "low": "28",
+                "text": "Snow Showers"
+              },
+              {
+                "code": "30",
+                "date": "24 Jan 2015",
+                "day": "Sat",
+                "high": "30",
+                "low": "4",
+                "text": "AM Clouds/PM Sun"
+              },
+              {
+                "code": "34",
+                "date": "25 Jan 2015",
+                "day": "Sun",
+                "high": "17",
+                "low": "1",
+                "text": "Mostly Sunny"
+              }
+            ],
+            "guid": {
+              "isPermaLink": "false",
+              "content": "CAXX1502_2015_01_25_7_00_EST"
+            }
+          }
+        },
+        {
+          "title": "Yahoo! Weather - Etten-Leur, NL",
+          "link": "http://us.rd.yahoo.com/dailynews/rss/weather/Etten-Leur__NL/*http://weather.yahoo.com/forecast/NLXX0035_f.html",
+          "description": "Yahoo! Weather for Etten-Leur, NL",
+          "language": "en-us",
+          "lastBuildDate": "Wed, 21 Jan 2015 4:28 pm CET",
+          "ttl": "60",
+          "location": {
+            "city": "Etten-Leur",
+            "country": "Netherlands",
+            "region": "NB"
+          },
+          "units": {
+            "distance": "mi",
+            "pressure": "in",
+            "speed": "mph",
+            "temperature": "F"
+          },
+          "wind": {
+            "chill": "34",
+            "direction": "80",
+            "speed": "3"
+          },
+          "atmosphere": {
+            "humidity": "81",
+            "pressure": "29.85",
+            "rising": "0",
+            "visibility": "6.21"
+          },
+          "astronomy": {
+            "sunrise": "8:34 am",
+            "sunset": "5:11 pm"
+          },
+          "image": {
+            "title": "Yahoo! Weather",
+            "width": "142",
+            "height": "18",
+            "link": "http://weather.yahoo.com",
+            "url": "http://l.yimg.com/a/i/brand/purplelogo//uh/us/news-wea.gif"
+          },
+          "item": {
+            "title": "Conditions for Etten-Leur, NL at 4:28 pm CET",
+            "lat": "51.57",
+            "long": "4.64",
+            "link": "http://us.rd.yahoo.com/dailynews/rss/weather/Etten-Leur__NL/*http://weather.yahoo.com/forecast/NLXX0035_f.html",
+            "pubDate": "Wed, 21 Jan 2015 4:28 pm CET",
+            "condition": {
+              "code": "26",
+              "date": "Wed, 21 Jan 2015 4:28 pm CET",
+              "temp": "34",
+              "text": "Cloudy"
+            },
+            "description": "\n<img src=\"http://l.yimg.com/a/i/us/we/52/26.gif\"/><br />\n<b>Current Conditions:</b><br />\nCloudy, 34 F<BR />\n<BR /><b>Forecast:</b><BR />\nWed - Partly Cloudy. High: 35 Low: 27<br />\nThu - Partly Cloudy. High: 38 Low: 27<br />\nFri - Partly Cloudy. High: 37 Low: 28<br />\nSat - AM Rain/Snow. High: 43 Low: 33<br />\nSun - Partly Cloudy. High: 44 Low: 31<br />\n<br />\n<a href=\"http://us.rd.yahoo.com/dailynews/rss/weather/Etten-Leur__NL/*http://weather.yahoo.com/forecast/NLXX0035_f.html\">Full Forecast at Yahoo! Weather</a><BR/><BR/>\n(provided by <a href=\"http://www.weather.com\" >The Weather Channel</a>)<br/>\n",
+            "forecast": [
+              {
+                "code": "29",
+                "date": "21 Jan 2015",
+                "day": "Wed",
+                "high": "35",
+                "low": "27",
+                "text": "Partly Cloudy"
+              },
+              {
+                "code": "30",
+                "date": "22 Jan 2015",
+                "day": "Thu",
+                "high": "38",
+                "low": "27",
+                "text": "Partly Cloudy"
+              },
+              {
+                "code": "30",
+                "date": "23 Jan 2015",
+                "day": "Fri",
+                "high": "37",
+                "low": "28",
+                "text": "Partly Cloudy"
+              },
+              {
+                "code": "5",
+                "date": "24 Jan 2015",
+                "day": "Sat",
+                "high": "43",
+                "low": "33",
+                "text": "AM Rain/Snow"
+              },
+              {
+                "code": "30",
+                "date": "25 Jan 2015",
+                "day": "Sun",
+                "high": "44",
+                "low": "31",
+                "text": "Partly Cloudy"
+              }
+            ],
+            "guid": {
+              "isPermaLink": "false",
+              "content": "NLXX0035_2015_01_25_7_00_CET"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

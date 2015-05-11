@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2015. Appsi Mobile
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- quickactions -->
+
+    <style name="AppsiLight" parent="@android:style/Theme.Light"/>
+
+    <style name="ErrorDialog" parent="EnHomeDialog">
+        <item name="android:layout_width">240dp</item>
+    </style>
+
+    <style name="PrimaryColorButton">
+        <item name="android:background">@drawable/button_bg_teal</item>
+        <item name="android:textColor">@android:color/primary_text_dark</item>
+        <item name="android:layout_marginEnd">6dp</item>
+        <item name="android:layout_marginBottom">2dp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:padding">16dp</item>
+    </style>
+
+    <style name="PrimaryColorButtonBorderless" parent="Appsi.Dialog.Button.Borderless">
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:layout_marginEnd">6dp</item>
+        <item name="android:layout_marginBottom">2dp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:padding">16dp</item>
+    </style>
+
+
+    <style name="OverFlow" parent="@android:style/Widget.Holo.Light.ActionButton.Overflow">
+        <item name="android:src">?attr/appsiOverflowButton</item>
+    </style>
+
+
+    <style name="EnHomeStyle" parent="@android:style/Theme.Holo.Wallpaper.NoTitleBar">
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:background">@null</item>
+    </style>
+
+    <style name="EnSettingsHomeStyle" parent="@android:style/Theme.Holo.Wallpaper.NoTitleBar">
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowBackground">@drawable/widget_bg</item>
+    </style>
+
+    <style name="EnHomeDialog" parent="@android:style/Theme.Holo.Dialog"/>
+
+
+    <style name="sectionHeader" parent="@android:style/Widget.Holo.TextView">
+        <item name="android:drawablePadding">4dp</item>
+        <item name="android:textSize">@dimen/font_small</item>
+    </style>
+
+    <style name="favoritesSectionHeaderText" parent="@android:style/Widget.Holo.TextView">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/emphasis</item>
+        <item name="android:textSize">@dimen/font_micro</item>
+    </style>
+
+    <style name="TextAppearance"/>
+
+    <style name="TextAppearance.Appsi"/>
+
+    <style name="TextAppearance.Appsi.Holo" parent="TextAppearance.AppCompat"/>
+
+    <style name="TextAppearance.Appsi.Holo.Medium" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+
+    <style name="TextAppearance.Appsi.Material"/>
+
+    <style name="TextAppearance.Appsi.Material.Title" parent="TextAppearance.Appsi.Holo.Medium">
+        <item name="android:textSize">20sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
+    </style>
+
+    <style name="TextAppearance.Appsi.Material.DialogWindowTitle" parent="TextAppearance.Appsi.Material.Title"/>
+
+    <style name="TextAppearance.Appsi.Material.DialogWindowContent" parent="TextAppearance.Appsi.Material.Title">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+
+    <style name="TextAppearance.Appsi.Holo.List.Line1" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
+    <style name="TextAppearance.Appsi.Holo.List.Line2" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="TextAppearance.Appsi.Holo.Small" parent="TextAppearance.AppCompat.Small">
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="TextAppearance.Appsi.Holo.Large" parent="TextAppearance.AppCompat.Large"/>
+
+    <style name="TextAppearance.Appsi.Holo.Inverse" parent="TextAppearance.AppCompat.Inverse"/>
+
+    <style name="TextAppearance.Appsi.Holo.Medium.Inverse" parent="TextAppearance.AppCompat.Medium.Inverse"/>
+
+    <style name="TextAppearance.Appsi.Holo.Small.Inverse" parent="TextAppearance.AppCompat.Small.Inverse"/>
+
+    <style name="TextAppearance.Appsi.Holo.Large.Inverse" parent="TextAppearance.AppCompat.Large.Inverse"/>
+
+    <style name="TextAppearance.Appsi.Holo.Medium.Light" parent="TextAppearance.Appsi.Holo.Medium">
+        <!--<item name="android:fontFamily">sans-serif-light</item>-->
+    </style>
+
+    <style name="TextAppearance.Appsi.Holo.Large.Light" parent="TextAppearance.Appsi.Holo.Large">
+        <!--<item name="android:fontFamily">sans-serif-light</item>-->
+    </style>
+
+    <style name="TextAppearance.Appsi.Holo.Small.Light" parent="TextAppearance.Appsi.Holo.Small">
+        <!--<item name="android:fontFamily">sans-serif-light</item>-->
+    </style>
+
+    <style name="AppsiToolbar">
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Dark</item>
+        <item name="theme">@style/ThemeOverlay.AppCompat.Light</item>
+    </style>
+
+    <style name="AppsiToolbar.Dark">
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="theme">@style/ThemeOverlay.AppCompat.Dark</item>
+    </style>
+
+    <style name="TextAppearance.Appsi.Holo.Medium.Condensed" parent="TextAppearance.Appsi.Holo.Medium">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+    </style>
+
+    <style name="TextAppearance.Appsi.Holo.Large.Condensed" parent="TextAppearance.Appsi.Holo.Large">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+    </style>
+
+    <style name="TextAppearance.Appsi.Holo.Small.Condensed" parent="TextAppearance.Appsi.Holo.Small">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+    </style>
+
+    <style name="TextAppearance.Appsi.Holo.Medium.Condensed.Inverse" parent="TextAppearance.Appsi.Holo.Medium.Inverse">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+    </style>
+
+    <style name="TextAppearance.Appsi.Holo.Large.Condensed.Inverse" parent="TextAppearance.Appsi.Holo.Large.Inverse">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+    </style>
+
+    <style name="TextAppearance.Appsi.Holo.Small.Condensed.Inverse" parent="TextAppearance.Appsi.Holo.Small.Inverse">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+    </style>
+
+    <style name="AppsiSpinnerStyle" parent="@style/Widget.AppCompat.Spinner">
+        <!--<item name="android:background">@drawable/spinner_mtrl</item>-->
+        <!--<item name="android:dropDownSelector">@null</item>-->
+        <!--<item name="android:popupBackground">@drawable/dialog_bottom_holo_dark</item>-->
+    </style>
+
+    <style name="AppsiExpandableListView" parent="@android:style/Widget.Holo.ExpandableListView">
+        <item name="android:groupIndicator">@null</item>
+        <item name="android:indicatorLeft">?android:attr/expandableListPreferredItemIndicatorLeft
+        </item>
+        <item name="android:indicatorRight">
+            ?android:attr/expandableListPreferredItemIndicatorRight
+        </item>
+        <item name="android:childDivider">?android:attr/listDivider</item>
+    </style>
+
+    <style name="Appsi.Dialog"/>
+
+    <style name="Appsi.Dialog.ButtonBar"/>
+
+    <style name="Appsi.Dialog.Button"/>
+
+    <style name="Appsi.Dialog.ButtonBar.AlertDialog">
+        <item name="android:background">@null</item>
+    </style>
+    <!-- Borderless ink button -->
+    <style name="Appsi.Dialog.Button.Borderless">
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+    </style>
+
+    <style name="TextAppearance.Appsi.Hour" parent="TextAppearance.Appsi.Holo.Medium.Light">
+        <item name="android:textSize">16dp</item>
+    </style>
+
+    <style name="TextAppearance.Appsi.Minute" parent="TextAppearance.Appsi.Holo.Small.Light">
+        <item name="android:textSize">10dp</item>
+    </style>
+
+    <style name="TextAppearance.Appsi.AmPm" parent="TextAppearance.Appsi.Holo.Small">
+        <item name="android:textSize">8dp</item>
+    </style>
+
+    <style name="font_family_thin">
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+</resources>

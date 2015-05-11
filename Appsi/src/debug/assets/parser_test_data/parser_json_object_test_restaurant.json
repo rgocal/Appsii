@@ -1,0 +1,43 @@
+{
+  "id": 11,
+  "name": "E-sites cafe",
+  "phone": "0768880088",
+  "tripadvisorUrl": "Nice wifi and free beer",
+  "checkinCount": 0,
+  "reservationCount": 0,
+  "location": {
+    "lat": "51.5906127",
+    "long": "4.7622492",
+    "streetNumber": "29",
+    "zipcode": "4814",
+    "timezone": "Europe/Amsterdam",
+    "streetName": {
+      "id": 8,
+      "name": "Reduitlaan"
+    },
+    "city": {
+      "id": 2,
+      "name": "Breda"
+    },
+    "country": {
+      "id": 1,
+      "name": "Netherlands, The",
+      "code": "NL"
+    }
+  },
+  "images": [
+    "587842d46c97195e5dd28c8c3593059c.jpg",
+    null,
+    null
+  ],
+  "kitchen": {
+    "id": 2,
+    "name": "Arabic"
+  },
+  "checkins": {
+    "items": []
+  },
+  "reservations": {
+    "items": []
+  }
+}

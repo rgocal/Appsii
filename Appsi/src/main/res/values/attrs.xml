@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2015. Appsi Mobile
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <declare-styleable name="SeekPreference">
+        <attr name="leftText" format="string"/>
+        <attr name="rightText" format="string"/>
+        <attr name="minValue" format="integer"/>
+        <attr name="valueVisible" format="boolean"/>
+    </declare-styleable>
+
+    <declare-styleable name="SidebarItemStates">
+        <attr name="state_hide_divider" format="boolean"/>
+        <attr name="state_show_divider" format="boolean"/>
+    </declare-styleable>
+
+    <declare-styleable name="ParallaxListViewHeader">
+        <attr name="parallaxDrawable"/>
+        <attr name="customDrawableFileName"/>
+    </declare-styleable>
+
+    <attr name="colorToolbarTitleText" format="reference|color"/>
+    <attr name="colorPrimaryDarkStatusBar" format="reference|color"/>
+    <attr name="customDrawableFileName" format="reference|string"/>
+    <attr name="parallaxDrawable" format="reference"/>
+    <attr name="appsiActionbarBackground" format="reference"/>
+    <attr name="appsiTextStyleSmall" format="reference"/>
+    <attr name="appsiTextStyleMedium" format="reference"/>
+    <attr name="appsiTextStyleLarge" format="reference"/>
+    <attr name="appsiActionBarTextStyle" format="reference"/>
+    <attr name="appsiAgendaTitleTextStyle" format="reference"/>
+    <attr name="appsiOverflowButton" format="reference"/>
+    <attr name="appsiOverflowButtonInverse" format="reference"/>
+    <attr name="appsiOverflowButtonHorizontal" format="reference"/>
+
+    <attr name="appsiDividerColor" format="reference|color"/>
+    <attr name="appsiSidebarBackground" format="reference|color"/>
+    <attr name="appsiTextBackground" format="reference|color"/>
+    <attr name="appsiTextShadow" format="reference|color"/>
+    <attr name="appsiTileBackground" format="reference|color"/>
+    <attr name="appsiMenuItemTint" format="reference|color"/>
+    <attr name="appsiMonthPickerDayColor" format="reference|color"/>
+    <attr name="appsiHomeWidgetPrimaryColor" format="reference|color"/>
+
+    <attr name="forceSquareDimensions" format="boolean"/>
+
+    <attr name="appsiDialogTitle" format="reference"/>
+    <attr name="appsiDialogContent" format="reference"/>
+
+    <attr name="appsiIconToday" format="reference"/>
+
+    <attr name="appsiIconUnlock36" format="reference"/>
+
+    <attr name="appsiIconClose18" format="reference"/>
+    <attr name="appsiIconClose24" format="reference"/>
+    <attr name="appsiIconClose36" format="reference"/>
+    <attr name="appsiIconClose48" format="reference"/>
+    <attr name="appsiIconClose18Inverse" format="reference"/>
+    <attr name="appsiIconClose24Inverse" format="reference"/>
+    <attr name="appsiIconClose36Inverse" format="reference"/>
+    <attr name="appsiIconClose48Inverse" format="reference"/>
+
+    <attr name="appsiIconSearch" format="reference"/>
+    <attr name="searchPageBackground" format="reference|color"/>
+
+    <attr name="appsiIconAdd18" format="reference"/>
+    <attr name="appsiIconAdd24" format="reference"/>
+    <attr name="appsiIconAdd36" format="reference"/>
+    <attr name="appsiIconAdd48" format="reference"/>
+    <attr name="appsiIconAdd18Inverse" format="reference"/>
+    <attr name="appsiIconAdd24Inverse" format="reference"/>
+    <attr name="appsiIconAdd36Inverse" format="reference"/>
+    <attr name="appsiIconAdd48Inverse" format="reference"/>
+    <attr name="appsiAppWidgetCardBackground" format="reference|color"/>
+
+    <attr name="appsiRecentIcon" format="reference"/>
+
+    <attr name="appsiToolbarStyle" format="reference"/>
+
+    <attr name="monthViewStyle" format="reference"/>
+    <attr name="appsiButtonBackground" format="reference"/>
+
+</resources>

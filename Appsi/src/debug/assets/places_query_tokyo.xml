@@ -1,0 +1,51 @@
+<!--
+  ~ /*
+  ~  * Copyright 2015. Appsi Mobile
+  ~  *
+  ~  * Licensed under the Apache License, Version 2.0 (the "License");
+  ~  * you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  *     http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
+  -->
+
+<places xmlns="http://where.yahooapis.com/v1/schema.rng"
+        xmlns:yahoo="http://www.yahooapis.com/v1/base.rng" yahoo:count="1" yahoo:start="0"
+        yahoo:total="6">
+    <place xml:lang="en-US" yahoo:uri="http://where.yahooapis.com/v1/place/1118370">
+        <woeid>1118370</woeid>
+        <placeTypeName code="7">Town</placeTypeName>
+        <name>Tokyo</name>
+        <country code="JP" type="Country" woeid="23424856">Japan</country>
+        <admin1 code="JP-13" type="Prefecture" woeid="2345889">Tokyo Prefecture</admin1>
+        <admin2/>
+        <admin3/>
+        <locality1 type="Town" woeid="1118370">Tokyo</locality1>
+        <locality2/>
+        <postal/>
+        <centroid>
+            <latitude>35.670479</latitude>
+            <longitude>139.740921</longitude>
+        </centroid>
+        <boundingBox>
+            <southWest>
+                <latitude>35.523449</latitude>
+                <longitude>139.562881</longitude>
+            </southWest>
+            <northEast>
+                <latitude>35.817490</latitude>
+                <longitude>139.918961</longitude>
+            </northEast>
+        </boundingBox>
+        <areaRank>6</areaRank>
+        <popRank>13</popRank>
+        <timezone type="Time Zone" woeid="28350861">Asia/Tokyo</timezone>
+    </place>
+</places>

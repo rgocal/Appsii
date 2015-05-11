@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2015. Appsi Mobile
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        style="?attr/appsiToolbarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/action_bar_size_x2"
+        android:background="?attr/colorPrimary"
+        android:elevation="8dp"
+        app:navigationIcon="@drawable/ic_arrow_back_white_24dp"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            android:gravity="top"
+            android:text="@string/theme"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            android:textColor="?android:attr/textColorPrimary"
+            />
+    </android.support.v7.widget.Toolbar>
+
+
+    <TextView
+        android:id="@+id/header"
+        style="@style/sectionHeader"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:gravity="center_vertical"
+        android:text="@string/theme_colors"
+        android:textColor="?attr/colorPrimary"
+        />
+
+
+    <RelativeLayout
+        android:id="@+id/base_theme"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:background="?attr/selectableItemBackground"
+        >
+
+        <ImageView
+            android:id="@+id/base_theme_preview"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="16dp"
+            android:src="@drawable/color_shape"
+            android:tint="#CC333333"
+            />
+
+        <TextView
+            android:id="@+id/theme_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="72dp"
+            android:layout_marginTop="18dp"
+            android:text="@string/base_theme"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            />
+
+
+        <TextView
+            android:id="@+id/theme_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/theme_header"
+            android:layout_gravity="top"
+            android:layout_marginStart="72dp"
+            android:hint="@string/empty"
+            android:minWidth="84dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="?android:attr/textColorSecondary"
+            tools:text="Dark"
+            />
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/primary_color"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:background="?attr/selectableItemBackground"
+        >
+
+        <ImageView
+            android:id="@+id/primary_color_preview"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="16dp"
+            android:src="@drawable/color_shape"
+            android:tint="@color/material_deep_teal_500"
+            />
+
+        <TextView
+            android:id="@+id/primary_color_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="72dp"
+            android:layout_marginTop="18dp"
+            android:text="@string/primary_color"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            />
+
+
+        <TextView
+            android:id="@+id/primary_color_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/primary_color_header"
+            android:layout_gravity="top"
+            android:layout_marginStart="72dp"
+            android:hint="@string/empty"
+            android:minWidth="84dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="?android:attr/textColorSecondary"
+            tools:text="Teal"
+            />
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/accent_color_container"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:background="?attr/selectableItemBackground"
+        >
+
+        <ImageView
+            android:id="@+id/accent_color_preview"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="16dp"
+            android:src="@drawable/color_shape"
+            android:tint="#FF9100"
+            />
+
+        <TextView
+            android:id="@+id/accent_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="72dp"
+            android:layout_marginTop="18dp"
+            android:text="@string/accent_color"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            />
+
+
+        <TextView
+            android:id="@+id/accent_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/accent_header"
+            android:layout_gravity="top"
+            android:layout_marginStart="72dp"
+            android:hint="@string/empty"
+            android:minWidth="84dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="?android:attr/textColorSecondary"
+            tools:text="Orange"
+            />
+    </RelativeLayout>
+
+
+</LinearLayout>

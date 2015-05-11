@@ -1,0 +1,632 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2015. Appsi Mobile
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+
+    <style name="Appsi"/>
+
+    <style name="Appsi.Sidebar.Material.Base" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!--<item name="android:actionBarStyle">@style/Widget.Styled.ActionBar</item>-->
+        <item name="android:textAppearanceMedium">?attr/appsiTextStyleMedium</item>
+        <item name="android:textAppearanceLarge">?attr/appsiTextStyleLarge</item>
+        <item name="android:textAppearanceSmall">?attr/appsiTextStyleSmall</item>
+        <item name="android:titleTextStyle">?attr/appsiTextStyleMedium</item>
+        <item name="android:actionOverflowButtonStyle">@style/OverFlow</item>
+        <item name="android:expandableListViewStyle">@style/AppsiExpandableListView</item>
+        <item name="android:textAppearanceListItem">@style/TextAppearance.Appsi.Holo.List.Line1
+        </item>
+        <item name="android:textAppearanceListItemSmall">
+            @style/TextAppearance.Appsi.Holo.List.Line2
+        </item>
+        <item name="android:spinnerStyle">@style/AppsiSpinnerStyle</item>
+        <item name="android:editTextStyle">@style/EditTextStyle</item>
+
+    </style>
+
+    <style name="Appsi.Sidebar.Material.Base.Dark" parent="Theme.AppCompat">
+        <!--<item name="android:actionBarStyle">@style/Widget.Styled.ActionBar</item>-->
+        <item name="android:textAppearanceMedium">?attr/appsiTextStyleMedium</item>
+        <item name="android:textAppearanceLarge">?attr/appsiTextStyleLarge</item>
+        <item name="android:textAppearanceSmall">?attr/appsiTextStyleSmall</item>
+        <item name="android:titleTextStyle">?attr/appsiTextStyleMedium</item>
+        <item name="android:actionOverflowButtonStyle">@style/OverFlow</item>
+        <item name="android:expandableListViewStyle">@style/AppsiExpandableListView</item>
+        <item name="android:textAppearanceListItem">@style/TextAppearance.Appsi.Holo.List.Line1
+        </item>
+        <item name="android:textAppearanceListItemSmall">
+            @style/TextAppearance.Appsi.Holo.List.Line2
+        </item>
+        <item name="android:spinnerStyle">@style/AppsiSpinnerStyle</item>
+        <item name="android:editTextStyle">@style/EditTextStyle</item>
+    </style>
+
+    <style name="Appsi.Sidebar.Material.LightBase" parent="Appsi.Sidebar.Material.Base">
+        <!--<item name="android:textColorPrimary">@android:color/primary_text_light</item>-->
+        <!--<item name="android:textColorSecondary">@android:color/secondary_text_light</item>-->
+        <!--<item name="android:textColorTertiary">@android:color/tertiary_text_light</item>-->
+        <!--<item name="android:textColorPrimaryInverse">@android:color/primary_text_dark</item>-->
+        <!--<item name="android:textColorSecondaryInverse">@android:color/secondary_text_dark</item>-->
+        <!--<item name="android:textColorTertiaryInverse">@android:color/tertiary_text_dark</item>-->
+        <!--<item name="android:textAppearanceInverse">@android:style/TextAppearance.Inverse-->
+        <!--</item>-->
+        <!--<item name="android:textAppearanceLargeInverse">@android:style/TextAppearance.Inverse-->
+        <!--</item>-->
+        <!--<item name="android:textAppearanceMediumInverse">-->
+        <!--@android:style/TextAppearance.Medium.Inverse-->
+        <!--</item>-->
+        <!--<item name="android:textAppearanceSmallInverse">@android:style/TextAppearance.Small.Inverse-->
+        <!--</item>-->
+
+        <item name="android:spinnerStyle">@style/AppsiSpinnerStyle</item>
+        <item name="appsiIconClose18Inverse">@drawable/ic_close_white_18dp</item>
+        <item name="appsiIconClose24Inverse">@drawable/ic_close_white_24dp</item>
+        <item name="appsiIconClose36Inverse">@drawable/ic_close_white_36dp</item>
+        <item name="appsiIconClose48Inverse">@drawable/ic_close_white_48dp</item>
+        <item name="appsiIconClose18">@drawable/ic_close_grey600_18dp</item>
+        <item name="appsiIconClose24">@drawable/ic_close_grey600_24dp</item>
+        <item name="appsiIconClose36">@drawable/ic_close_grey600_36dp</item>
+        <item name="appsiIconClose48">@drawable/ic_close_grey600_48dp</item>
+        <item name="appsiIconAdd18Inverse">@drawable/ic_add_box_grey600_18dp</item>
+        <item name="appsiIconAdd24Inverse">@drawable/ic_add_box_grey600_24dp</item>
+        <item name="appsiIconAdd36Inverse">@drawable/ic_add_box_grey600_36dp</item>
+        <item name="appsiIconAdd48Inverse">@drawable/ic_add_box_grey600_48dp</item>
+        <item name="appsiIconAdd18">@drawable/ic_add_box_grey600_18dp</item>
+        <item name="appsiIconAdd24">@drawable/ic_add_box_grey600_24dp</item>
+        <item name="appsiIconAdd36">@drawable/ic_add_box_grey600_36dp</item>
+        <item name="appsiIconAdd48">@drawable/ic_add_box_grey600_48dp</item>
+        <item name="appsiIconToday">@drawable/ic_today_white_24dp</item>
+        <item name="appsiIconUnlock36">@drawable/ic_lock_open_white_36dp</item>
+        <item name="monthViewStyle">@style/MonthViewStyle</item>
+        <item name="appsiMonthPickerDayColor">#66000000</item>
+        <item name="appsiHomeWidgetPrimaryColor">#FF3F3F3F</item>
+        <item name="appsiIconSearch">@drawable/ic_search_black_24dp</item>
+        <item name="appsiRecentIcon">@drawable/ic_schedule_grey600_24dp</item>
+        <item name="searchPageBackground">#18000000</item>
+        <item name="appsiDividerColor">#33000000</item>
+        <item name="appsiAppWidgetCardBackground">#E9E9E9</item>
+
+        <item name="actionModeBackground">@color/action_mode_color</item>
+    </style>
+
+    <style name="Appsi.Sidebar.Material.DarkBase" parent="Appsi.Sidebar.Material.Base.Dark">
+        <!--<item name="android:textColorPrimary">@android:color/primary_text_dark</item>-->
+        <!--<item name="android:textColorSecondary">@android:color/secondary_text_dark</item>-->
+        <!--<item name="android:textColorTertiary">@android:color/tertiary_text_dark</item>-->
+        <!--<item name="android:textColorPrimaryInverse">@android:color/primary_text_light</item>-->
+        <!--<item name="android:textColorSecondaryInverse">@android:color/secondary_text_light</item>-->
+        <!--<item name="android:textColorTertiaryInverse">@android:color/tertiary_text_light</item>-->
+
+        <item name="appsiIconClose18">@drawable/ic_close_white_18dp</item>
+        <item name="appsiIconClose24">@drawable/ic_close_white_24dp</item>
+        <item name="appsiIconClose36">@drawable/ic_close_white_36dp</item>
+        <item name="appsiIconClose48">@drawable/ic_close_white_48dp</item>
+        <item name="appsiIconClose18Inverse">@drawable/ic_close_grey600_18dp</item>
+        <item name="appsiIconClose24Inverse">@drawable/ic_close_grey600_24dp</item>
+        <item name="appsiIconClose36Inverse">@drawable/ic_close_grey600_36dp</item>
+        <item name="appsiIconClose48Inverse">@drawable/ic_close_grey600_48dp</item>
+        <item name="android:spinnerStyle">@style/AppsiSpinnerStyle</item>
+        <item name="appsiIconAdd18Inverse">@drawable/ic_add_box_grey600_18dp</item>
+        <item name="appsiIconAdd24Inverse">@drawable/ic_add_box_grey600_24dp</item>
+        <item name="appsiIconAdd36Inverse">@drawable/ic_add_box_grey600_36dp</item>
+        <item name="appsiIconAdd48Inverse">@drawable/ic_add_box_grey600_48dp</item>
+        <item name="appsiIconAdd18">@drawable/ic_add_box_grey600_18dp</item>
+        <item name="appsiIconAdd24">@drawable/ic_add_box_grey600_24dp</item>
+        <item name="appsiIconAdd36">@drawable/ic_add_box_grey600_36dp</item>
+        <item name="appsiIconAdd48">@drawable/ic_add_box_grey600_48dp</item>
+        <item name="appsiIconUnlock36">@drawable/ic_lock_open_white_36dp</item>
+        <item name="monthViewStyle">@style/MonthViewStyle</item>
+        <item name="appsiMonthPickerDayColor">#66FFFFFF</item>
+        <item name="appsiHomeWidgetPrimaryColor">#FFCCCCCC</item>
+        <item name="appsiToolbarStyle">@style/AppsiToolbar.Dark</item>
+        <item name="appsiIconSearch">@drawable/ic_search_white_24dp</item>
+        <item name="appsiRecentIcon">@drawable/ic_schedule_grey600_24dp</item>
+        <item name="searchPageBackground">#18FFFFFF</item>
+        <item name="appsiDividerColor">#33FFFFFF</item>
+        <item name="appsiAppWidgetCardBackground">#282828</item>
+
+    </style>
+
+    <style name="Appsi.Sidebar.Material.Light" parent="Appsi.Sidebar.Material.LightBase">
+        <item name="appsiTextStyleMedium">@style/TextAppearance.Appsi.Holo.Medium.Light</item>
+        <item name="appsiTextStyleSmall">@style/TextAppearance.Appsi.Holo.Small.Light</item>
+        <item name="appsiTextStyleLarge">@style/TextAppearance.Appsi.Holo.Large.Light</item>
+        <item name="appsiDialogTitle">@style/TextAppearance.Appsi.Material.DialogWindowTitle</item>
+        <item name="appsiDialogContent">@style/TextAppearance.Appsi.Material.DialogWindowContent
+        </item>
+        <item name="colorControlNormal">#99333333</item>
+        <item name="appsiSidebarBackground">#ffffffff</item>
+        <item name="appsiTextBackground">#20cccccc</item>
+        <item name="appsiTextShadow">#20333333</item>
+        <item name="appsiActionBarTextStyle">
+            @style/TextAppearance.Appsi.Holo.Medium.Condensed.Inverse
+        </item>
+        <item name="appsiAgendaTitleTextStyle">
+            @style/TextAppearance.Appsi.Holo.Medium.Condensed.Inverse
+        </item>
+        <item name="appsiOverflowButtonInverse">@drawable/ic_action_overflow_round_lt</item>
+        <item name="appsiOverflowButtonHorizontal">
+            @drawable/ic_action_overflow_round_horizontal_lt
+        </item>
+        <item name="appsiTileBackground">@drawable/tile_material</item>
+
+        <item name="appsiOverflowButton">@drawable/ic_action_overflow_round_lt</item>
+        <item name="appsiToolbarStyle">@style/AppsiToolbar</item>
+        <item name="colorToolbarTitleText">#FF000000</item>
+        <item name="appsiMenuItemTint">#FF000000</item>
+        <item name="appsiIconToday">@drawable/ic_today_black_24dp</item>
+
+    </style>
+
+    <style name="Appsi.Sidebar.Material.Dark" parent="Appsi.Sidebar.Material.DarkBase">
+        <item name="appsiTextStyleMedium">@style/TextAppearance.Appsi.Holo.Medium</item>
+        <item name="appsiTextStyleSmall">@style/TextAppearance.Appsi.Holo.Small</item>
+        <item name="appsiTextStyleLarge">@style/TextAppearance.Appsi.Holo.Large</item>
+        <item name="appsiDialogTitle">@style/TextAppearance.Appsi.Material.DialogWindowTitle</item>
+        <item name="appsiDialogContent">@style/TextAppearance.Appsi.Material.DialogWindowContent
+        </item>
+        <!-- TODO: make this stand out more from the popup background -->
+        <item name="appsiSidebarBackground">#ff333333</item>
+        <item name="appsiTextBackground">#20ffffff</item>
+        <item name="appsiTextShadow">#20000000</item>
+        <item name="appsiActionBarTextStyle">
+            @style/TextAppearance.Appsi.Holo.Medium.Condensed
+        </item>
+        <item name="appsiAgendaTitleTextStyle">
+            @style/TextAppearance.Appsi.Holo.Medium.Condensed.Inverse
+        </item>
+        <item name="appsiOverflowButtonInverse">@drawable/ic_action_overflow_round</item>
+        <item name="appsiOverflowButtonHorizontal">
+            @drawable/ic_action_overflow_round_horizontal
+        </item>
+
+        <item name="appsiTileBackground">@drawable/tile_material_dk</item>
+
+        <item name="appsiIconToday">@drawable/ic_today_white_24dp</item>
+        <item name="appsiOverflowButton">@drawable/ic_action_overflow_round</item>
+        <item name="colorToolbarTitleText">#FFFFFFFF</item>
+        <item name="appsiMenuItemTint">#FF000000</item>
+
+    </style>
+
+    <style name="Appsi.Sidebar.Material.DarkLightActionBar" parent="Appsi.Sidebar.Material.Dark">
+        <item name="appsiIconToday">@drawable/ic_today_black_24dp</item>
+        <item name="colorToolbarTitleText">#FF000000</item>
+        <item name="appsiMenuItemTint">#FF000000</item>
+        <item name="appsiToolbarStyle">@style/AppsiToolbar</item>
+        <item name="appsiOverflowButton">@drawable/ic_action_overflow_round_lt</item>
+    </style>
+
+    <style name="Appsi.Sidebar.Material.LightDarkActionBar" parent="Appsi.Sidebar.Material.Light">
+        <item name="appsiIconToday">@drawable/ic_today_white_24dp</item>
+        <item name="appsiOverflowButton">@drawable/ic_action_overflow_round</item>
+        <item name="colorToolbarTitleText">#FFFFFFFF</item>
+        <item name="appsiMenuItemTint">#FF000000</item>
+        <item name="appsiToolbarStyle">@style/AppsiToolbar.Dark</item>
+    </style>
+
+    <style name="Appsi.Sidebar.Material.Teal" parent="Appsi.Sidebar.Material.LightDarkActionBar">
+        <item name="colorPrimary">#ff009688</item>
+        <item name="colorPrimaryDark">#ff00695c</item>
+        <item name="colorPrimaryDarkStatusBar">#6600695c</item>
+        <item name="colorAccent">#ffff3d00</item>
+        <item name="appsiButtonBackground">@drawable/button_bg_teal</item>
+    </style>
+
+    <style name="Appsi.Sidebar.Material.LightGreen" parent="Appsi.Sidebar.Material.DarkLightActionBar">
+        <item name="colorPrimary">#8BC34A</item>
+        <item name="colorPrimaryDark">#558B2F</item>
+        <item name="colorPrimaryDarkStatusBar">#66558B2F</item>
+        <item name="colorAccent">#FFFF00</item>
+        <item name="appsiButtonBackground">@drawable/button_bg_lightgreen</item>
+    </style>
+
+    <style name="Appsi.Sidebar.Material.Teal.Dark" parent="Appsi.Sidebar.Material.Dark">
+        <item name="colorPrimary">#ff009688</item>
+        <item name="colorPrimaryDark">#ff00695c</item>
+        <item name="colorPrimaryDarkStatusBar">#6600695c</item>
+        <item name="colorAccent">#FFFF6E40</item>
+        <item name="appsiButtonBackground">@drawable/button_bg_teal</item>
+    </style>
+
+    <style name="Appsi.Sidebar.Material.BlueGrey.Dark" parent="Appsi.Sidebar.Material.Dark">
+        <item name="colorPrimary">#FF607D8B</item>
+        <item name="colorPrimaryDark">#ff37474F</item>
+        <item name="colorPrimaryDarkStatusBar">#6637474F</item>
+        <item name="colorAccent">#FFFF6D00</item>
+        <item name="appsiButtonBackground">@drawable/button_bg_bluegrey</item>
+    </style>
+
+    <style name="Appsi.Sidebar.Material.Orange" parent="Appsi.Sidebar.Material.Light">
+        <item name="colorPrimary">#FFFF9800</item>
+        <item name="colorPrimaryDark">#ffEF6C00</item>
+        <item name="colorPrimaryDarkStatusBar">#66EF6C00</item>
+        <item name="colorAccent">#FF651FFF</item>
+        <item name="appsiButtonBackground">@drawable/button_bg_orange</item>
+    </style>
+
+    <style name="Appsi.Sidebar.Material.Teal.NoActionBar" parent="Appsi.Sidebar.Material.Teal">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
+    <style name="Appsi.Sidebar.Material.Teal.NoActionBarTranslucentNavigation" parent="Appsi.Sidebar.Material.Teal.NoActionBar">
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+
+    <style name="Appsi.Sidebar.Material.Teal.NoAppBarShadow" parent="Appsi.Sidebar.Material.Teal">
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+
+    <style name="AppsiNoActionbarTranslucent" parent="AppsiNoActionbar">
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+    <style name="AppsiNoActionbar" parent="android:Theme.Holo">
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    </style>
+
+    <style name="Theme"/>
+
+    <style name="Theme.Appsi"/>
+
+    <style name="Theme.Appsi.Dialog" parent="Theme.AppCompat.Dialog">
+        <item name="colorPrimary">#ff009688</item>
+        <item name="colorPrimaryDark">#ff00695c</item>
+        <item name="colorPrimaryDarkStatusBar">#6600695c</item>
+        <item name="colorAccent">#ffff3d00</item>
+
+        <item name="appsiTextStyleMedium">@style/TextAppearance.Appsi.Holo.Medium</item>
+        <item name="appsiTextStyleSmall">@style/TextAppearance.Appsi.Holo.Small</item>
+        <item name="appsiTextStyleLarge">@style/TextAppearance.Appsi.Holo.Large</item>
+
+        <item name="android:textAppearanceMedium">?attr/appsiTextStyleMedium</item>
+        <item name="android:textAppearanceLarge">?attr/appsiTextStyleLarge</item>
+        <item name="android:textAppearanceSmall">?attr/appsiTextStyleSmall</item>
+        <item name="android:titleTextStyle">?attr/appsiTextStyleMedium</item>
+        <item name="android:actionOverflowButtonStyle">@style/OverFlow</item>
+        <item name="android:expandableListViewStyle">@style/AppsiExpandableListView</item>
+        <item name="android:textAppearanceListItem">@style/TextAppearance.Appsi.Holo.List.Line1
+        </item>
+        <item name="android:textAppearanceListItemSmall">
+            @style/TextAppearance.Appsi.Holo.List.Line2
+        </item>
+        <item name="appsiDialogTitle">@style/TextAppearance.Appsi.Material.DialogWindowTitle</item>
+        <item name="appsiDialogContent">@style/TextAppearance.Appsi.Material.DialogWindowContent
+        </item>
+
+        <!--<item name="android:textViewStyle">@android:style/Widget.Holo.Light.TextView</item>-->
+        <!--<item name="android:editTextStyle">@style/Widget.AppCompat.EditText</item>-->
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowTitleStyle">
+            @style/TextAppearance.Appsi.Material.DialogWindowTitle
+        </item>
+        <item name="android:windowBackground">@drawable/dialog_background_shadow_material</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowAnimationStyle">@android:anim/fade_in</item>
+        <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+
+        <item name="android:buttonBarStyle">@style/Appsi.Dialog.ButtonBar.AlertDialog</item>
+        <item name="android:borderlessButtonStyle">@style/Appsi.Dialog.Button.Borderless</item>
+
+        <item name="android:textAppearance">@style/TextAppearance.Appsi.Holo.Medium</item>
+        <item name="android:textAppearanceInverse">@style/TextAppearance.Appsi.Holo.Medium.Inverse
+        </item>
+
+        <item name="android:listPreferredItemPaddingLeft">16dip</item>
+        <item name="android:listPreferredItemPaddingRight">16dip</item>
+        <item name="android:listPreferredItemPaddingStart">16dip</item>
+        <item name="android:listPreferredItemPaddingEnd">16dip</item>
+
+
+        <item name="android:textColorPrimary">@android:color/primary_text_dark</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_dark</item>
+        <item name="android:textColorTertiary">@android:color/tertiary_text_dark</item>
+        <item name="android:textColorPrimaryInverse">@android:color/primary_text_light</item>
+        <item name="android:textColorSecondaryInverse">@android:color/secondary_text_light</item>
+        <item name="android:textColorTertiaryInverse">@android:color/tertiary_text_light</item>
+        <item name="android:textColorPrimaryDisableOnly">@android:color/primary_text_dark</item>
+        <item name="android:textColorPrimaryInverseDisableOnly">@android:color/primary_text_light
+        </item>
+        <item name="android:textColorPrimaryNoDisable">@android:color/primary_text_dark_nodisable
+        </item>
+        <item name="android:textColorSecondaryNoDisable">
+            @android:color/secondary_text_dark_nodisable
+        </item>
+        <item name="android:textColorPrimaryInverseNoDisable">
+            @android:color/primary_text_light_nodisable
+        </item>
+        <item name="android:textColorSecondaryInverseNoDisable">
+            @android:color/secondary_text_light_nodisable
+        </item>
+        <item name="android:textColorHint">#77000000</item>
+        <item name="android:textColorHintInverse">#77000000</item>
+    </style>
+
+    <style name="EditTextStyle" parent="Widget.AppCompat.EditText">
+        <item name="android:background">?attr/editTextBackground</item>
+        <item name="android:textColor">?attr/editTextColor</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceMediumInverse</item>
+    </style>
+
+    <style name="Palette"/>
+
+    <style name="Palette.Primary"/>
+
+    <style name="Palette.Accent"/>
+
+    <!-- Light palettes -->
+    <style name="Palette.Primary.Red">
+        <item name="colorPrimary">#F44336</item>
+        <item name="colorPrimaryDark">#D32F2F</item>
+        <item name="colorPrimaryDarkStatusBar">#66D32F2F</item>
+    </style>
+
+    <style name="Palette.Primary.Pink">
+        <item name="colorPrimary">#E91E63</item>
+        <item name="colorPrimaryDark">#C2185B</item>
+        <item name="colorPrimaryDarkStatusBar">#66C2185B</item>
+    </style>
+
+    <style name="Palette.Primary.Purple">
+        <item name="colorPrimary">#9C27B0</item>
+        <item name="colorPrimaryDark">#7B1FA2</item>
+        <item name="colorPrimaryDarkStatusBar">#667B1FA2</item>
+    </style>
+
+    <style name="Palette.Primary.DeepPurple">
+        <item name="colorPrimary">#673AB7</item>
+        <item name="colorPrimaryDark">#512DA8</item>
+        <item name="colorPrimaryDarkStatusBar">#66512DA8</item>
+    </style>
+
+    <style name="Palette.Primary.Indigo">
+        <item name="colorPrimary">#3F51B5</item>
+        <item name="colorPrimaryDark">#303F9F</item>
+        <item name="colorPrimaryDarkStatusBar">#66303F9F</item>
+    </style>
+
+    <style name="Palette.Primary.Blue">
+        <item name="colorPrimary">#2196F3</item>
+        <item name="colorPrimaryDark">#1976D2</item>
+        <item name="colorPrimaryDarkStatusBar">#661976D2</item>
+    </style>
+
+    <style name="Palette.Primary.LightBlue">
+        <item name="colorPrimary">#03A9F4</item>
+        <item name="colorPrimaryDark">#0288D1</item>
+        <item name="colorPrimaryDarkStatusBar">#660288D1</item>
+    </style>
+
+    <style name="Palette.Primary.Cyan">
+        <item name="colorPrimary">#00BCD4</item>
+        <item name="colorPrimaryDark">#0097A7</item>
+        <item name="colorPrimaryDarkStatusBar">#660097A7</item>
+    </style>
+
+    <style name="Palette.Primary.Teal">
+        <item name="colorPrimary">#009688</item>
+        <item name="colorPrimaryDark">#00796B</item>
+        <item name="colorPrimaryDarkStatusBar">#6600796B</item>
+    </style>
+
+    <style name="Palette.Primary.Green">
+        <item name="colorPrimary">#4CAF50</item>
+        <item name="colorPrimaryDark">#388E3C</item>
+        <item name="colorPrimaryDarkStatusBar">#66388E3C</item>
+    </style>
+
+    <!-- dark -->
+    <style name="Palette.Primary.LightGreen">
+        <item name="colorPrimary">#8BC34A</item>
+        <item name="colorPrimaryDark">#689F38</item>
+        <item name="colorPrimaryDarkStatusBar">#66689F38</item>
+    </style>
+
+    <style name="Palette.Primary.Lime">
+        <item name="colorPrimary">#CDDC39</item>
+        <item name="colorPrimaryDark">#AFB42B</item>
+        <item name="colorPrimaryDarkStatusBar">#66AFB42B</item>
+    </style>
+
+    <style name="Palette.Primary.Yellow">
+        <item name="colorPrimary">#FFEB3B</item>
+        <item name="colorPrimaryDark">#FBC02D</item>
+        <item name="colorPrimaryDarkStatusBar">#66FBC02D</item>
+    </style>
+
+    <style name="Palette.Primary.Amber">
+        <item name="colorPrimary">#FFC107</item>
+        <item name="colorPrimaryDark">#FFA000</item>
+        <item name="colorPrimaryDarkStatusBar">#66FFA000</item>
+    </style>
+
+    <style name="Palette.Primary.Orange">
+        <item name="colorPrimary">#FF9800</item>
+        <item name="colorPrimaryDark">#F57C00</item>
+        <item name="colorPrimaryDarkStatusBar">#66F57C00</item>
+    </style>
+
+    <!-- Light -->
+    <style name="Palette.Primary.DeepOrange">
+        <item name="colorPrimary">#FF5722</item>
+        <item name="colorPrimaryDark">#E64A19</item>
+        <item name="colorPrimaryDarkStatusBar">#66E64A19</item>
+    </style>
+
+    <style name="Palette.Primary.Brown">
+        <item name="colorPrimary">#795548</item>
+        <item name="colorPrimaryDark">#5D4037</item>
+        <item name="colorPrimaryDarkStatusBar">#665D4037</item>
+    </style>
+
+    <style name="Palette.Primary.Grey">
+        <item name="colorPrimary">#9E9E9E</item>
+        <item name="colorPrimaryDark">#616161</item>
+        <item name="colorPrimaryDarkStatusBar">#66616161</item>
+    </style>
+
+    <style name="Palette.Primary.BlueGrey">
+        <item name="colorPrimary">#607D8B</item>
+        <item name="colorPrimaryDark">#455A64</item>
+        <item name="colorPrimaryDarkStatusBar">#66455A64</item>
+    </style>
+
+    <style name="Palette.Accent.Red">
+        <item name="colorAccent">#FF1744</item>
+    </style>
+
+    <style name="Palette.Accent.Red100">
+        <item name="colorAccent">#FF8A80</item>
+    </style>
+
+    <style name="Palette.Accent.Pink">
+        <item name="colorAccent">#F50057</item>
+    </style>
+
+    <style name="Palette.Accent.Pink100">
+        <item name="colorAccent">#FF80AB</item>
+    </style>
+
+    <style name="Palette.Accent.Purple">
+        <item name="colorAccent">#D500F9</item>
+    </style>
+
+    <style name="Palette.Accent.Purple100">
+        <item name="colorAccent">#EA80FC</item>
+    </style>
+
+    <style name="Palette.Accent.DeepPurple">
+        <item name="colorAccent">#651FFF</item>
+    </style>
+
+    <style name="Palette.Accent.DeepPurple100">
+        <item name="colorAccent">#B388FF</item>
+    </style>
+
+    <style name="Palette.Accent.Indigo">
+        <item name="colorAccent">#3D5AFE</item>
+    </style>
+
+    <style name="Palette.Accent.Indigo100">
+        <item name="colorAccent">#8C9EFF</item>
+    </style>
+
+    <style name="Palette.Accent.Blue">
+        <item name="colorAccent">#2979FF</item>
+    </style>
+
+    <style name="Palette.Accent.Blue100">
+        <item name="colorAccent">#82B1FF</item>
+    </style>
+
+    <style name="Palette.Accent.LightBlue">
+        <item name="colorAccent">#0091EA</item>
+    </style>
+
+    <style name="Palette.Accent.LightBlue400">
+        <item name="colorAccent">#00B0FF</item>
+    </style>
+
+    <style name="Palette.Accent.Cyan">
+        <item name="colorAccent">#00B8D4</item>
+    </style>
+
+    <style name="Palette.Accent.Cyan700">
+        <item name="colorAccent">#00E5FF</item>
+    </style>
+
+    <style name="Palette.Accent.Teal">
+        <item name="colorAccent">#00BFA5</item>
+    </style>
+
+    <style name="Palette.Accent.Teal400">
+        <item name="colorAccent">#1DE9B6</item>
+    </style>
+
+    <style name="Palette.Accent.Green">
+        <item name="colorAccent">#00C853</item>
+    </style>
+
+    <style name="Palette.Accent.Green400">
+        <item name="colorAccent">#00E676</item>
+    </style>
+
+    <style name="Palette.Accent.LightGreen">
+        <item name="colorAccent">#64DD17</item>
+    </style>
+
+    <style name="Palette.Accent.LightGreen400">
+        <item name="colorAccent">#76FF03</item>
+    </style>
+
+    <style name="Palette.Accent.Lime">
+        <item name="colorAccent">#AEEA00</item>
+    </style>
+
+    <style name="Palette.Accent.Lime400">
+        <item name="colorAccent">#C6FF00</item>
+    </style>
+
+    <style name="Palette.Accent.Yellow">
+        <item name="colorAccent">#FFD600</item>
+    </style>
+
+    <style name="Palette.Accent.Yellow400">
+        <item name="colorAccent">#FFEA00</item>
+    </style>
+
+    <style name="Palette.Accent.Amber">
+        <item name="colorAccent">#FFAB00</item>
+    </style>
+
+    <style name="Palette.Accent.Amber400">
+        <item name="colorAccent">#FFC400</item>
+    </style>
+
+    <style name="Palette.Accent.Orange">
+        <item name="colorAccent">#FF9100</item>
+    </style>
+
+    <style name="Palette.Accent.Orange700">
+        <item name="colorAccent">#FF6D00</item>
+    </style>
+
+    <style name="Palette.Accent.DeepOrange">
+        <item name="colorAccent">#FF3D00</item>
+    </style>
+
+    <style name="Palette.Accent.DeepOrange200">
+        <item name="colorAccent">#FF6E40</item>
+    </style>
+
+</resources>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2015. Appsi Mobile
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<PreferenceScreen
+    >
+
+    <!--<PreferenceCategory-->
+    <!--android:title="@string/apps_pref_recent_section">-->
+    <!--<CheckBoxPreference-->
+    <!--android:key="apps_pref_show_recent"-->
+    <!--android:title="@string/apps_pref_show_recent_title"-->
+    <!--android:defaultValue="true"-->
+    <!--android:summaryOn="@string/apps_pref_show_recent_sum_on"-->
+    <!--android:summaryOff="@string/apps_pref_show_recent_sum_off"/>-->
+    <!--<CheckBoxPreference-->
+    <!--android:key="apps_pref_hide_current"-->
+    <!--android:title="@string/apps_pref_hide_current_title"-->
+    <!--android:defaultValue="true"-->
+    <!--android:summaryOn="@string/apps_pref_hide_current_sum_on"-->
+    <!--android:summaryOff="@string/apps_pref_hide_current_sum_off"/>-->
+    <!--<CheckBoxPreference-->
+    <!--android:key="pref_show_launchers_in_recent"-->
+    <!--android:title="@string/apps_pref_show_launchers_in_recent_title"-->
+    <!--android:defaultValue="false"-->
+    <!--android:summaryOn="@string/apps_pref_show_launchers_in_recent_sum_on"-->
+    <!--android:summaryOff="@string/apps_pref_show_launchers_in_recent_sum_off"/>-->
+    <!--<com.appsimobile.appsii.module.apps.SeekPreference-->
+    <!--android:key="apps_pref_recent_count"-->
+    <!--android:title="@string/apps_pref_recent_count_title"-->
+    <!--android:summary="@string/apps_pref_recent_count_summary"-->
+    <!--android:persistent="true"-->
+    <!--android:dependency="apps_pref_show_recent"-->
+    <!--android:defaultValue="5"-->
+    <!--appsi:minValue="1"-->
+    <!--appsi:leftText="1"-->
+    <!--appsi:rightText="16"-->
+    <!--appsi:valueVisible="true"-->
+    <!--android:max="16"-->
+    <!--appsi:dialogMessage="@string/apps_pref_recent_count_title"-->
+    <!--/>-->
+
+    <!--</PreferenceCategory>-->
+    <!--<PreferenceCategory-->
+    <!--android:title="@string/apps_pref_allapps_section">-->
+    <!--<CheckBoxPreference-->
+    <!--android:key="apps_pref_show_allapps"-->
+    <!--android:title="@string/apps_pref_show_allapps_title"-->
+    <!--android:defaultValue="true"-->
+    <!--android:summaryOn="@string/apps_pref_show_allapps_sum_on"-->
+    <!--android:summaryOff="@string/apps_pref_show_allapps_sum_off"/>-->
+    <!--</PreferenceCategory>-->
+    <!--<CheckBoxPreference-->
+    <!--android:key="apps_pref_enable_halo"-->
+    <!--android:title="@string/apps_pref_enable_halo_title"-->
+    <!--android:defaultValue="false"-->
+    <!--android:summary="@string/apps_pref_enable_halo_summary"-->
+    <!--/>-->
+
+</PreferenceScreen>

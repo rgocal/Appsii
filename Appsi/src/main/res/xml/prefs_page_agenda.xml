@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2015. Appsi Mobile
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<PreferenceScreen
+    >
+
+    <!--<PreferenceCategory-->
+    <!--android:title="@string/pref_general_section">-->
+    <!--<com.appsimobile.appsii.module.appsiagenda.SeekPreference-->
+    <!--android:key="pref_day_count"-->
+    <!--android:title="@string/pref_day_count_title"-->
+    <!--android:summary="@string/pref_day_count_summary"-->
+    <!--android:persistent="true"-->
+    <!--android:defaultValue="200"-->
+    <!--appsi:minValue="25"-->
+    <!--appsi:leftText="25"-->
+    <!--appsi:rightText="500"-->
+    <!--appsi:valueVisible="true"-->
+    <!--android:max="500"-->
+    <!--appsi:dialogMessage="@string/pref_day_count_title"-->
+    <!--/>-->
+    <!--<CheckBoxPreference-->
+    <!--android:key="pref_limit_event_count"-->
+    <!--android:title="@string/pref_limit_event_count_title"-->
+    <!--android:defaultValue="false"-->
+    <!--android:summaryOn="@string/pref_limit_event_count_sum_on"-->
+    <!--android:summaryOff="@string/pref_limit_event_count_sum_off"/>-->
+    <!--<com.appsimobile.appsii.module.appsiagenda.SeekPreference-->
+    <!--android:key="pref_event_count"-->
+    <!--android:dependency="pref_limit_event_count"-->
+    <!--android:title="@string/pref_event_count_title"-->
+    <!--android:summary="@string/pref_event_count_summary"-->
+    <!--android:persistent="true"-->
+    <!--android:defaultValue="50"-->
+    <!--appsi:minValue="10"-->
+    <!--appsi:leftText="10"-->
+    <!--appsi:rightText="250"-->
+    <!--appsi:valueVisible="true"-->
+    <!--android:max="250"-->
+    <!--appsi:dialogMessage="@string/pref_day_count_title"-->
+    <!--/>-->
+    <!--<CheckBoxPreference-->
+    <!--android:key="pref_show_calendar_icons"-->
+    <!--android:title="@string/pref_show_calendar_icons_name"-->
+    <!--android:defaultValue="true"-->
+    <!--android:summary="@string/pref_show_calendar_icons_summary"/>-->
+    <!--<CheckBoxPreference-->
+    <!--android:key="pref_show_month_names"-->
+    <!--android:title="@string/pref_show_month_names_title"-->
+    <!--android:defaultValue="true"-->
+    <!--android:summaryOn="@string/pref_show_month_names_sum_on"-->
+    <!--android:summaryOff="@string/pref_show_month_names_sum_off"/>-->
+    <!--<CheckBoxPreference-->
+    <!--android:key="pref_show_week_numbers"-->
+    <!--android:title="@string/pref_show_week_numbers_title"-->
+    <!--android:defaultValue="false"-->
+    <!--android:summaryOn="@string/pref_show_week_numbers_sum_on"-->
+    <!--android:summaryOff="@string/pref_show_week_numbers_sum_off"/>-->
+    <!--<CheckBoxPreference-->
+    <!--android:key="pref_show_day_headers"-->
+    <!--android:title="@string/pref_show_day_headers_title"-->
+    <!--android:defaultValue="false"-->
+    <!--android:summary="@string/pref_show_day_headers_summary"/>-->
+    <!--<CheckBoxPreference-->
+    <!--android:key="pref_show_empty_days"-->
+    <!--android:title="@string/pref_show_empty_days_title"-->
+    <!--android:dependency="pref_show_day_headers"-->
+    <!--android:defaultValue="false"-->
+    <!--android:summary="@string/pref_show_empty_days_summary"/>-->
+    <!--<Preference-->
+    <!--android:key="pref_custom_calendars"-->
+    <!--android:persistent="false"-->
+    <!--android:title="@string/pref_custom_calendars_title"-->
+    <!--android:summary="@string/pref_custom_calendars_summary"-->
+    <!--/>-->
+    <!--</PreferenceCategory>-->
+</PreferenceScreen>

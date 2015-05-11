@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2015. Appsi Mobile
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="16dp"
+        android:paddingTop="16dp"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minWidth="320dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:text="@string/import_from_appsi"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textColor="?attr/colorPrimary"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/unlock_instruction"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                />
+
+            <Button
+                android:id="@+id/download_apks"
+                style="@style/PrimaryColorButton"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="4dp"
+                android:text="@string/download_apks"
+                />
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="4dp"
+                android:indeterminate="true"
+                android:visibility="invisible"
+                />
+
+
+            <TextView
+                android:id="@+id/agenda_unlocked"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:background="?attr/selectableItemBackground"
+                android:drawablePadding="16dp"
+                android:drawableStart="@drawable/ic_lock_outline_black_24dp"
+                android:gravity="center_vertical"
+                android:minHeight="48dp"
+                android:text="@string/appsi_calendar_plugin"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                />
+
+            <TextView
+                android:id="@+id/calls_unlocked"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:background="?attr/selectableItemBackground"
+                android:drawablePadding="16dp"
+                android:drawableStart="@drawable/ic_lock_outline_black_24dp"
+                android:gravity="center_vertical"
+                android:minHeight="48dp"
+                android:text="@string/appsi_calls_plugin"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                />
+
+            <TextView
+                android:id="@+id/sms_unlocked"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:background="?attr/selectableItemBackground"
+                android:drawablePadding="16dp"
+                android:drawableStart="@drawable/ic_lock_outline_black_24dp"
+                android:gravity="center_vertical"
+                android:minHeight="48dp"
+                android:text="@string/appsi_sms_plugin"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                />
+
+            <TextView
+                android:id="@+id/settings_unlocked"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:background="?attr/selectableItemBackground"
+                android:drawablePadding="16dp"
+                android:drawableStart="@drawable/ic_lock_outline_black_24dp"
+                android:gravity="center_vertical"
+                android:minHeight="48dp"
+                android:text="@string/appsi_settings_plugin"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                />
+
+            <TextView
+                android:id="@+id/contacts_unlocked"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:background="?attr/selectableItemBackground"
+                android:drawablePadding="16dp"
+                android:drawableStart="@drawable/ic_lock_outline_black_24dp"
+                android:gravity="center_vertical"
+                android:minHeight="48dp"
+                android:text="@string/appsi_contacts_plugin"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                />
+
+            <TextView
+                android:id="@+id/powerpack_unlocked"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:background="?attr/selectableItemBackground"
+                android:drawablePadding="16dp"
+                android:drawableStart="@drawable/ic_lock_outline_black_24dp"
+                android:gravity="center_vertical"
+                android:minHeight="48dp"
+                android:text="@string/appsi_powerpack_plugin"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:drawablePadding="16dp"
+                android:gravity="center_vertical"
+                android:text="@string/unlock_disclaimer"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+</FrameLayout>

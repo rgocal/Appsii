@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright 2015. Appsi Mobile
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+    >
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        style="?attr/appsiToolbarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/action_bar_size_x2"
+        android:background="?attr/colorPrimary"
+        app:navigationIcon="@drawable/ic_arrow_back_white_24dp"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="12dp"
+            android:layout_marginStart="16dp"
+            android:gravity="bottom"
+            android:text="@string/feature_title_weather"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textColor="?android:attr/textColorPrimary"
+
+            />
+    </android.support.v7.widget.Toolbar>
+
+    <TextView
+        android:id="@+id/header"
+        style="@style/sectionHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_below="@id/toolbar"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/weather_options_header"
+        android:textColor="?attr/colorPrimary"
+        />
+
+
+    <RelativeLayout
+        android:id="@+id/location_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/header"
+        android:layout_marginTop="8dp"
+        android:background="?attr/selectableItemBackground"
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp"
+        >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="16dp"
+            android:src="@drawable/ic_place_grey600_24dp"
+            />
+
+        <TextView
+            android:id="@+id/location_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="72dp"
+            android:text="@string/weather_location"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            />
+
+
+        <TextView
+            android:id="@+id/weather_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/location_header"
+            android:layout_gravity="top"
+            android:layout_marginStart="72dp"
+            android:hint="@string/empty"
+            android:minWidth="84dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="?android:attr/textColorSecondary"
+            tools:text="Location"
+            />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/unit_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/location_container"
+        android:layout_marginTop="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp"
+        >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="16dp"
+            android:src="@drawable/ic_swap_vert_circle_grey600_24dp"
+            />
+
+        <TextView
+            android:id="@+id/unit_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="72dp"
+            android:text="@string/weather_unit"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            />
+
+
+        <TextView
+            android:id="@+id/weather_unit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/unit_header"
+            android:layout_gravity="top"
+            android:layout_marginStart="72dp"
+            android:hint="@string/empty"
+            android:minWidth="84dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="?android:attr/textColorSecondary"
+            tools:text="@string/degrees_c"
+            />
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/title_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/unit_container"
+        android:layout_marginTop="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp"
+        >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="16dp"
+            android:src="@drawable/ic_weather_title"
+            />
+
+        <TextView
+            android:id="@+id/title_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="72dp"
+            android:text="@string/title_type"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            />
+
+
+        <TextView
+            android:id="@+id/title_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/title_header"
+            android:layout_gravity="top"
+            android:layout_marginStart="72dp"
+            android:hint="@string/empty"
+            android:minWidth="84dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="?android:attr/textColorSecondary"
+            tools:text="Location name / Condition name"
+            />
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/background_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/title_container"
+        android:layout_marginTop="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp"
+        >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="16dp"
+            android:src="@drawable/ic_image_grey600_24dp"
+            />
+
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/location_image_switch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="72dp"
+            android:text="@string/use_location_image_as_backgroud"
+            />
+
+
+    </RelativeLayout>
+</RelativeLayout>

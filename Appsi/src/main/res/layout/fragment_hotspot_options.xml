@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2015. Appsi Mobile
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/title_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/title"
+        android:textColor="?attr/colorPrimary"
+        />
+
+    <EditText
+        android:id="@+id/hotspot_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/title_view"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        />
+
+    <android.support.v7.widget.SwitchCompat
+        android:id="@+id/remember_last_switch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/hotspot_title"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/reopen_last_plugin"
+        />
+
+    <LinearLayout
+        android:id="@+id/buttons"
+        style="?attr/buttonBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="16dp"
+        android:gravity="end"
+        >
+
+        <Button
+            android:id="@+id/ok_button"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@android:string/ok"
+            android:textAllCaps="true"
+            android:textColor="?attr/colorPrimary"
+            />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/sort_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/remember_last_switch"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/pages"
+        android:textColor="?attr/colorPrimary"
+        />
+
+    <com.mobeta.android.dslv.DragSortListView
+        android:id="@+id/sort_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/buttons"
+        android:layout_below="@id/sort_title"
+        android:layout_marginTop="16dp"
+        android:divider="@null"
+        app:drag_handle_id="@+id/drag_handle"
+        app:float_background_color="@android:color/transparent"
+        app:remove_enabled="false"
+        app:track_drag_sort="true"
+        app:use_default_controller="true"
+        />
+
+
+</RelativeLayout>

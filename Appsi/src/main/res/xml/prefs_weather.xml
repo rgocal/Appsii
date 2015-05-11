@@ -1,0 +1,80 @@
+<!--
+  ~ Copyright 2015. Appsi Mobile
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+
+    <PreferenceCategory
+        android:title="@string/pref_category_general">
+
+        <!--
+          - This is the default value for the units to use.
+          - Although it is using c and f, it actually maps to
+          - Imperial and Metric.
+        -->
+        <ListPreference
+            android:defaultValue="c"
+            android:entries="@array/weather_units"
+            android:entryValues="@array/weather_unit_values"
+            android:key="weather_default_unit"
+            android:summary="%s"
+            android:title="Default weather unit"
+            />
+
+        <!--
+        The default type for the title of weather cells.
+        Either location or current condition
+        -->
+        <ListPreference
+            android:defaultValue="location"
+            android:entries="@array/weather_title_types"
+            android:entryValues="@array/weather_title_values"
+            android:key="weather_default_title_type"
+            android:summary="%s"
+            android:title="Default weather title"
+            />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="weather_sync_when_roaming"
+            android:title="Sync when roaming"
+            />
+
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/city_images">
+
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="weather_use_flickr_images"
+            android:title="Download images from Flickr (experimental)"/>
+
+        <SwitchPreference
+            android:defaultValue="true"
+            android:dependency="weather_use_flickr_images"
+            android:key="weather_flickr_wifi_only"
+            android:title="Using WIFI networks only"/>
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:dependency="weather_use_flickr_images"
+            android:key="weather_flickr_roaming"
+            android:title="When roaming"/>
+
+
+    </PreferenceCategory>
+</PreferenceScreen>

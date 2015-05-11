@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright 2015. Appsi Mobile
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:minHeight="500dp"
+    >
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/apps_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:divider="@null"
+        android:gravity="center_vertical"
+        android:listSelector="@android:color/transparent"
+        />
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        style="?attr/appsiToolbarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:paddingTop="24dp"
+        />
+
+    <FrameLayout
+        android:id="@+id/bottom_sheet_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#33000000"
+        android:visibility="invisible"
+        tools:visibility="visible"
+        />
+
+    <include
+        android:id="@+id/bottom_sheet"
+        layout="@layout/page_apps_bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:visibility="invisible"
+        tools:visibility="visible"
+        />
+
+    <com.appsimobile.appsii.StatusbarUnderlay
+        android:id="@+id/underlay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimaryDarkStatusBar"
+        android:minHeight="24dp"
+        />
+
+</FrameLayout>

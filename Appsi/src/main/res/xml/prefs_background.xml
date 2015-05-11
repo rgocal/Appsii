@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2015. Appsi Mobile
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<PreferenceScreen
+    >
+
+    <!-- screen looks as follows: -->
+    <!-- background picker -->
+    <!-- background tilemode x -->
+    <!-- background tilemode y -->
+    <!-- background alpha -->
+    <!--<CheckBoxPreference-->
+    <!--android:key="pref_sidebar_custom_background"-->
+    <!--android:title="@string/pref_enable_background_title"-->
+    <!--android:defaultValue="false"-->
+    <!--android:summary="@string/pref_enable_background_description"-->
+    <!--/>-->
+
+
+    <!--<com.appsimobile.appsii.preference.ImagePreference-->
+    <!--android:title="@string/pref_use_custom_background_title"-->
+    <!--android:summary="@string/pref_use_custom_background_description"-->
+    <!--android:key="pref_sidebar_background_image"-->
+    <!--android:dependency="pref_sidebar_custom_background"-->
+    <!-->-->
+    <!--</com.appsimobile.appsii.preference.ImagePreference>-->
+
+    <!--<com.appsimobile.appsii.preference.AppsiListPreference-->
+    <!--android:entries="@array/tilemode_names"-->
+    <!--android:entryValues="@array/tilemode_codes"-->
+    <!--android:title="@string/pref_horizontal_tile_title"-->
+    <!--android:summary="@string/pref_tile_description"-->
+    <!--android:key="pref_sidebar_background_horizontal_repeat"-->
+    <!--android:defaultValue="repeat"-->
+    <!--android:dependency="pref_sidebar_custom_background"-->
+    <!--/>-->
+
+    <!--<com.appsimobile.appsii.preference.AppsiListPreference-->
+    <!--android:entries="@array/tilemode_names"-->
+    <!--android:entryValues="@array/tilemode_codes"-->
+    <!--android:title="@string/pref_vertical_tile_title"-->
+    <!--android:summary="@string/pref_tile_description"-->
+    <!--android:key="pref_sidebar_background_vertical_repeat"-->
+    <!--android:defaultValue="repeat"-->
+    <!--android:dependency="pref_sidebar_custom_background"-->
+    <!--/>-->
+
+    <!--<com.appsimobile.appsii.SeekPreference-->
+    <!--android:key="pref_sidebar_background_x_pos"-->
+    <!--android:title="@string/pref_background_x_pos_title"-->
+    <!--android:summary="@string/seekpreference_value_only_summary"-->
+    <!--android:persistent="true"-->
+    <!--android:defaultValue="0"-->
+    <!--appsi:minValue="0"-->
+    <!--appsi:leftText="0"-->
+    <!--appsi:rightText="100"-->
+    <!--appsi:valueVisible="true"-->
+    <!--android:max="100"-->
+    <!--android:dialogMessage="@string/pref_background_x_pos_title"-->
+    <!--android:dependency="pref_sidebar_custom_background"-->
+    <!--/>-->
+    <!--<com.appsimobile.appsii.SeekPreference-->
+    <!--android:key="pref_sidebar_background_y_pos"-->
+    <!--android:title="@string/pref_background_y_pos_title"-->
+    <!--android:summary="@string/seekpreference_value_only_summary"-->
+    <!--android:persistent="true"-->
+    <!--android:defaultValue="0"-->
+    <!--appsi:minValue="0"-->
+    <!--appsi:leftText="0"-->
+    <!--appsi:rightText="100"-->
+    <!--appsi:valueVisible="true"-->
+    <!--android:max="100"-->
+    <!--android:dialogMessage="@string/pref_background_y_pos_title"-->
+    <!--android:dependency="pref_sidebar_custom_background"-->
+    <!--/>-->
+
+
+    <!--<com.appsimobile.appsii.SeekPreference-->
+    <!--android:key="pref_sidebar_background_transparency"-->
+    <!--android:title="@string/pref_background_transparency_name"-->
+    <!--android:summary="@string/pref_background_transparency_description"-->
+    <!--android:persistent="true"-->
+    <!--android:defaultValue="0"-->
+    <!--appsi:minValue="0"-->
+    <!--appsi:leftText="0"-->
+    <!--appsi:rightText="100"-->
+    <!--appsi:valueVisible="true"-->
+    <!--android:max="100"-->
+    <!--android:dialogMessage="@string/pref_transparency_name"-->
+    <!--android:dependency="pref_sidebar_custom_background"-->
+    <!--/>-->
+
+
+</PreferenceScreen>

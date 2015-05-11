@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ /*
+  ~  * Copyright 2015. Appsi Mobile
+  ~  *
+  ~  * Licensed under the Apache License, Version 2.0 (the "License");
+  ~  * you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  *     http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
+  -->
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:orientation="vertical"
+             android:background="#80CBC4"
+    >
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:elevation="8dp"
+        >
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/tablet_toolbar"
+            style="?attr/appsiToolbarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/action_bar_size_x4"
+            app:contentInsetStart="72dp"
+            android:gravity="top"
+            app:navigationIcon="@drawable/ic_arrow_back_white_24dp"
+            >
+
+            <TextView
+                android:id="@+id/toolbar_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:gravity="top"
+                tools:text="@string/hotspots_and_pages"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="?android:attr/textColorPrimary"
+                />
+
+        </android.support.v7.widget.Toolbar>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/tablet_settings_shadow"
+            android:layout_gravity="bottom"
+            />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/content_view"
+        android:layout_marginStart="96dp"
+        android:layout_marginEnd="96dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#F5F5F5"
+        android:elevation="8dp"
+        android:layout_marginTop="@dimen/action_bar_size_x3"
+        />
+
+    <ImageButton
+        android:id="@+id/wrapper_fab"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginTop="@dimen/action_bar_size_x4_fab_offset"
+        android:layout_gravity="end"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/fab"
+        tools:background="?attr/colorAccent"
+        android:elevation="8dp"
+        android:outlineProvider="background"
+        android:src="@drawable/ic_add_white_24dp"
+        />
+
+
+</FrameLayout>

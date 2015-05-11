@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2015. Appsi Mobile
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+    >
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="5"
+            android:orientation="vertical"
+            >
+
+            <RelativeLayout
+                android:id="@+id/current_weather_container"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/action_bar_size_x2"
+                android:layout_alignParentBottom="true"
+                android:background="?attr/colorPrimary"
+                android:elevation="8dp">
+
+                <ImageView
+                    android:id="@+id/current_weather"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="8dp"
+                    android:src="@drawable/ic_weather_rain_night"
+                    />
+
+                <TextView
+                    android:id="@+id/condition"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="72dp"
+                    android:layout_marginTop="12dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                    android:textColor="?android:attr/textColorPrimary"
+                    tools:text="Rainy"
+                    />
+
+
+                <TextView
+                    android:id="@+id/feels_like"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/condition"
+                    android:layout_marginStart="72dp"
+                    android:layout_marginTop="4dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                    android:textColor="?android:attr/textColorPrimary"
+                    tools:text="Feels like 21C"
+                    />
+
+                <TextView
+                    android:id="@+id/wind"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/feels_like"
+                    android:layout_marginStart="72dp"
+                    android:layout_marginTop="4dp"
+                    android:drawableStart="@drawable/ic_wind_16dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:textColor="?android:attr/textColorPrimary"
+                    tools:text="12km/h"
+                    />
+
+                <TextView
+                    android:id="@+id/temp_max"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginTop="16dp"
+                    android:drawableStart="@drawable/ic_max_temp_16dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                    android:textColor="?android:attr/textColorPrimary"
+                    tools:text="28"
+                    />
+
+                <TextView
+                    android:id="@+id/temp_min"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_toStartOf="@id/temp_max"
+                    android:drawableStart="@drawable/ic_min_temp_16dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                    android:textColor="?android:attr/textColorPrimary"
+                    tools:text="12"
+                    />
+
+                <TextView
+                    android:id="@+id/temperature"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="72dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Display3"
+                    android:textColor="?android:attr/textColorPrimary"
+                    tools:text="7C"
+                    />
+
+
+            </RelativeLayout>
+
+
+            <ImageView
+                android:id="@+id/weather_background"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@id/current_weather_container"
+                android:scaleType="centerCrop"
+                tools:src="@drawable/rain"
+                />
+
+            <TextView
+                android:id="@+id/location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/weather_background"
+                android:layout_alignParentStart="true"
+                android:layout_marginBottom="8dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display2"
+                android:textColor="?android:attr/textColorPrimary"
+                tools:text="Etten-Leur"
+                />
+
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_marginTop="24dp"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="4"
+            android:orientation="vertical"
+            >
+
+
+            <TextView
+                android:id="@+id/forecast_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/forecast"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                android:textColor="?attr/colorPrimary"
+                />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/forecast_header"
+                android:clipToPadding="true"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</RelativeLayout>

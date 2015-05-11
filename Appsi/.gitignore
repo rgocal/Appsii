@@ -1,0 +1,5 @@
+build
+crashlytics.properties
+release.properties
+/*.iml
+/src/main/res/values/com_crashlytics_export_strings.xml

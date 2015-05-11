@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2015. Appsi Mobile
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<PreferenceScreen
+    >
+
+    <!--<PreferenceCategory-->
+    <!--android:title="@string/calls_pref_action_section">-->
+    <!--<ListPreference-->
+    <!--android:key="calls_pref_tap_action"-->
+    <!--android:title="@string/calls_pref_tap_action_title"-->
+    <!--android:summary="@string/calls_pref_tap_action_summary"-->
+    <!--android:defaultValue="calls_click_action_dial"-->
+    <!--android:entries="@array/pref_contact_actions_keys"-->
+    <!--android:entryValues="@array/pref_contact_actions_values"-->
+    <!--/>-->
+    <!--<ListPreference-->
+    <!--android:key="calls_pref_phonenumber_format"-->
+    <!--android:title="@string/calls_pref_phonenumber_format_title"-->
+    <!--android:summary="@string/calls_pref_phonenumber_format_summary"-->
+    <!--android:defaultValue="calls_phonenumber_format_international"-->
+    <!--android:entries="@array/pref_phonenumber_format_texts"-->
+    <!--android:entryValues="@array/pref_phonenumber_format_values"-->
+    <!--/>-->
+
+    <!--</PreferenceCategory>-->
+    <!--<PreferenceCategory-->
+    <!--android:title="@string/calls_pref_favorites_section">-->
+    <!--<CheckBoxPreference-->
+    <!--android:key="calls_pref_show_favorites"-->
+    <!--android:title="@string/calls_pref_show_favorites_title"-->
+    <!--android:defaultValue="true"-->
+    <!--android:summaryOn="@string/calls_pref_show_favorites_sum_on"-->
+    <!--android:summaryOff="@string/calls_pref_show_favorites_sum_off"/>-->
+    <!--<CheckBoxPreference-->
+    <!--android:key="calls_pref_unlimited_favorites"-->
+    <!--android:title="@string/calls_pref_unlimited_favorites_title"-->
+    <!--android:dependency="calls_pref_show_favorites"-->
+    <!--android:defaultValue="true"-->
+    <!--android:disableDependentsState="true"-->
+    <!--android:summary="@string/calls_pref_unlimited_favorites_summary"/>-->
+    <!--<com.appsimobile.appsii.module.calls.SeekPreference-->
+    <!--android:key="calls_pref_favorites_count"-->
+    <!--android:title="@string/calls_pref_favorites_count_title"-->
+    <!--android:summary="@string/calls_pref_favorites_count_summary"-->
+    <!--android:persistent="true"-->
+    <!--android:dependency="calls_pref_unlimited_favorites"-->
+    <!--android:defaultValue="5"-->
+    <!--appsi:minValue="1"-->
+    <!--appsi:leftText="1"-->
+    <!--appsi:rightText="16"-->
+    <!--appsi:valueVisible="true"-->
+    <!--android:max="16"-->
+    <!--appsi:dialogMessage="@string/calls_pref_favorites_count_title"-->
+    <!--/>-->
+    <!--</PreferenceCategory>-->
+    <!--<PreferenceCategory-->
+    <!--android:title="@string/calls_pref_recent_section">-->
+    <!--<CheckBoxPreference-->
+    <!--android:key="calls_pref_show_recent"-->
+    <!--android:title="@string/calls_pref_show_recent_title"-->
+    <!--android:defaultValue="true"-->
+    <!--android:summaryOn="@string/calls_pref_show_recent_sum_on"-->
+    <!--android:summaryOff="@string/calls_pref_show_recent_sum_off"/>-->
+    <!--<CheckBoxPreference-->
+    <!--android:key="calls_pref_recent_show_time"-->
+    <!--android:title="@string/calls_pref_recent_show_time_title"-->
+    <!--android:defaultValue="true"-->
+    <!--android:summary="@string/calls_pref_recent_show_time_summary"/>-->
+    <!--<com.appsimobile.appsii.module.calls.SeekPreference-->
+    <!--android:key="calls_pref_recent_count"-->
+    <!--android:title="@string/calls_pref_recent_count_title"-->
+    <!--android:summary="@string/calls_pref_recent_count_summary"-->
+    <!--android:persistent="true"-->
+    <!--android:dependency="calls_pref_show_recent"-->
+    <!--android:defaultValue="5"-->
+    <!--appsi:minValue="1"-->
+    <!--appsi:leftText="1"-->
+    <!--appsi:rightText="16"-->
+    <!--appsi:valueVisible="true"-->
+    <!--android:max="16"-->
+    <!--appsi:dialogMessage="@string/calls_pref_recent_count_title"-->
+    <!--/>-->
+
+    <!--</PreferenceCategory>-->
+    <!--<PreferenceCategory-->
+    <!--android:title="@string/calls_pref_allapps_section">-->
+    <!--<CheckBoxPreference-->
+    <!--android:key="calls_pref_show_allapps"-->
+    <!--android:title="@string/calls_pref_show_allapps_title"-->
+    <!--android:defaultValue="true"-->
+    <!--android:summaryOn="@string/calls_pref_show_allapps_sum_on"-->
+    <!--android:summaryOff="@string/calls_pref_show_allapps_sum_off"/>-->
+    <!--<CheckBoxPreference-->
+    <!--android:key="calls_pref_enable_custom_contact_groups"-->
+    <!--android:title="@string/calls_pref_enable_custom_contact_groups_title"-->
+    <!--android:defaultValue="false"-->
+    <!--android:summary="@string/calls_pref_enable_custom_contact_groups_summary"/>-->
+    <!--<CheckBoxPreference-->
+    <!--android:key="calls_pref_group_contacts"-->
+    <!--android:title="@string/calls_pref_group_contacts_title"-->
+    <!--android:defaultValue="true"-->
+    <!--android:dependency="calls_pref_enable_custom_contact_groups"-->
+    <!--android:summary="@string/calls_pref_group_contacts_summary"/>-->
+    <!--<Preference-->
+    <!--android:key="calls_pref_custom_contact_groups"-->
+    <!--android:persistent="false"-->
+    <!--android:title="@string/calls_pref_custom_contact_groups_title"-->
+    <!--android:summary="@string/calls_pref_custom_contact_groups_summary"-->
+    <!--android:dependency="calls_pref_enable_custom_contact_groups"-->
+    <!--/>-->
+    <!--</PreferenceCategory>-->
+</PreferenceScreen>

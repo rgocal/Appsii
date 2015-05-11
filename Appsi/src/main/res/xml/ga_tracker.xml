@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2015. Appsi Mobile
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <integer name="ga_sessionTimeout">300</integer>
+
+    <integer name="ga_dispatchPeriod">30</integer>
+
+    <!-- Enable automatic Activity measurement -->
+    <bool name="ga_autoActivityTracking">true</bool>
+
+    <!-- The screen names that will appear in reports -->
+    <screenName name="appsii.AppsiPreferencesActivity">
+        Main
+    </screenName>
+    <screenName name="appsii.plugins.HomeEditorActivity">
+        HomeEditorActivity
+    </screenName>
+    <screenName name="appsii.module.apps.ReorderAppTagsActivity">
+        ReorderAppTagsActivity
+    </screenName>
+    <screenName name="appsii.module.apps.ReorderAppsActivity">
+        ReorderAppsActivity
+    </screenName>
+    <screenName name="appsii.AboutActivity">
+        AboutActivity
+    </screenName>
+    <screenName name="appsii.ManageHotspotsActivity.HotspotDetailsFragment">
+        HotspotDetailsFragment
+    </screenName>
+    <screenName name="appsii.HomePreferencesActivity">
+        HomePreferencesActivity
+    </screenName>
+    <screenName name="appsii.NotificationsPreferenceActivity">
+        NotificationsPreferenceActivity
+    </screenName>
+    <screenName name="appsii.HotspotsPreferenceActivity">
+        HotspotsPreferenceActivity
+    </screenName>
+    <screenName name="appsii.TroubleshootingPreferenceActivity">
+        TroubleshootingPreferenceActivity
+    </screenName>
+    <screenName name="appsii.LookAndFeelActivity">
+        LookAndFeelActivity
+    </screenName>
+    <screenName name="appsii.HotspotPositionsActivity">
+        HotspotPositionsActivity
+    </screenName>
+    <screenName name="appsii.ManageHotspotsActivity">
+        HotspotsManagerActivity
+    </screenName>
+    <screenName name="appsii.PluginManagerActivity">
+        PluginManagerActivity
+    </screenName>
+    <screenName name="appsii.ShortcutActionActivity">
+        ShortcutActionActivity
+    </screenName>
+    <screenName name="appsii.ShortcutActivity">
+        ShortcutActivity
+    </screenName>
+
+    <bool name="ga_reportUncaughtExceptions">true</bool>
+
+    <string name="ga_trackingId">UA-55656267-1</string>
+</resources>

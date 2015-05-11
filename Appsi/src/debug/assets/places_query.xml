@@ -1,0 +1,51 @@
+<!--
+  ~ /*
+  ~  * Copyright 2015. Appsi Mobile
+  ~  *
+  ~  * Licensed under the Apache License, Version 2.0 (the "License");
+  ~  * you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  *     http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
+  -->
+
+<places xmlns="http://where.yahooapis.com/v1/schema.rng"
+        xmlns:yahoo="http://www.yahooapis.com/v1/base.rng" yahoo:count="1" yahoo:start="0"
+        yahoo:total="16">
+    <place xml:lang="en-US" yahoo:uri="http://where.yahooapis.com/v1/place/756804">
+        <woeid>756804</woeid>
+        <placeTypeName code="7">Town</placeTypeName>
+        <name>Castello de la Plana</name>
+        <country code="ES" type="Country" woeid="23424950">Spain</country>
+        <admin1 code="ES-V" type="Autonomous Community" woeid="12578038">Valencia</admin1>
+        <admin2 code="" type="Province" woeid="12602138">Castellon</admin2>
+        <admin3 code="" type="Municipality" woeid="12695443">Castellon De La Plana</admin3>
+        <locality1 type="Town" woeid="756804">Castello de la Plana</locality1>
+        <locality2/>
+        <postal/>
+        <centroid>
+            <latitude>39.984550</latitude>
+            <longitude>-0.048690</longitude>
+        </centroid>
+        <boundingBox>
+            <southWest>
+                <latitude>39.964729</latitude>
+                <longitude>-0.089640</longitude>
+            </southWest>
+            <northEast>
+                <latitude>40.015381</latitude>
+                <longitude>-0.000910</longitude>
+            </northEast>
+        </boundingBox>
+        <areaRank>3</areaRank>
+        <popRank>11</popRank>
+        <timezone type="Time Zone" woeid="56043644">Europe/Madrid</timezone>
+    </place>
+</places>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2015. Appsi Mobile
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/appsi_plugins_got_it"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        app:cardElevation="4dp"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                style="?attr/appsiActionBarTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/colorPrimary"
+                android:drawablePadding="16dp"
+                android:drawableStart="@drawable/ic_page_white_48dp"
+                android:gravity="start|center_vertical"
+                android:paddingBottom="16dp"
+                android:paddingEnd="16dp"
+                android:paddingStart="16dp"
+                android:paddingTop="16dp"
+                android:text="@string/manage_home_pages"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?android:attr/textColorPrimaryInverse"
+                android:textSize="24sp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="Below is a list of all of your home-pages. Tap a home-page to change it\'s title."
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="Press the menu-button to change the layout of the page, or to delete it."
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="2dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:background="#18000000"
+                />
+
+            <Button
+                android:id="@+id/got_it_button"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginBottom="2dp"
+                android:layout_marginStart="8dp"
+                android:drawablePadding="8dp"
+                android:drawableStart="@drawable/ic_done_teal_24dp"
+                android:text="@string/got_it"
+                android:textAllCaps="true"
+                android:textColor="?attr/colorPrimary"
+                android:textSize="14sp"
+                />
+
+
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

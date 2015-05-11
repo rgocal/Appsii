@@ -1,0 +1,201 @@
+<!--
+  ~ Copyright 2015. Appsi Mobile
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <!--<string-array name="action_values">-->
+    <!--<item>@string/action_open_sidebar</item>-->
+    <!--<item>@string/action_open_recents</item>-->
+    <!--<item>@string/action_open_favorites</item>-->
+    <!--<item>@string/action_open_swyper</item>-->
+    <!--<item>@string/action_open_search</item>-->
+    <!--<item>@string/action_open_search_dialog</item>-->
+    <!--<item>@string/action_open_page</item>-->
+    <!--<item>@string/action_do_nothing</item>-->
+    <!--</string-array>-->
+    <!--<string-array name="action_keys">-->
+    <!--<item>action_open_sidebar</item>-->
+    <!--<item>action_open_recents</item>-->
+    <!--<item>action_open_favorites</item>-->
+    <!--<item>action_open_swyper</item>-->
+    <!--<item>action_open_search</item>-->
+    <!--<item>action_open_search_dialog</item>-->
+    <!--<item>action_open_page</item>-->
+    <!--<item>action_do_nothing</item>-->
+    <!--</string-array>-->
+
+    <!--<string-array name="tap_action_values">-->
+    <!--<item>@string/action_open_sidebar</item>-->
+    <!--<item>@string/action_suspend</item>-->
+    <!--<item>@string/action_open_page</item>-->
+    <!--<item>@string/action_open_search</item>-->
+    <!--<item>@string/action_open_search_dialog</item>-->
+    <!--<item>@string/action_do_nothing</item>-->
+    <!--</string-array>-->
+    <!--<string-array name="tap_action_keys">-->
+    <!--<item>action_open_sidebar</item>-->
+    <!--<item>action_suspend</item>-->
+    <!--<item>action_open_page</item>-->
+    <!--<item>action_open_search</item>-->
+    <!--<item>action_open_search_dialog</item>-->
+    <!--<item>action_do_nothing</item>-->
+    <!--</string-array>-->
+
+    <!--<string-array name="long_press_action_values">-->
+    <!--<item>@string/action_move_hotspot</item>-->
+    <!--<item>@string/action_open_sidebar</item>-->
+    <!--<item>@string/action_suspend</item>-->
+    <!--<item>@string/action_open_page</item>-->
+    <!--<item>@string/action_open_search</item>-->
+    <!--<item>@string/action_open_search_dialog</item>-->
+    <!--<item>@string/action_do_nothing</item>-->
+    <!--</string-array>-->
+    <!--<string-array name="long_press_action_keys">-->
+    <!--<item>action_move</item>-->
+    <!--<item>action_open_sidebar</item>-->
+    <!--<item>action_suspend</item>-->
+    <!--<item>action_open_page</item>-->
+    <!--<item>action_open_search</item>-->
+    <!--<item>action_open_search_dialog</item>-->
+    <!--<item>action_do_nothing</item>-->
+    <!--</string-array>-->
+
+    <!--<string-array name="theme_codes">-->
+    <!--<item>theme_dark</item>-->
+    <!--<item>theme_light</item>-->
+    <!--</string-array>-->
+    <!--<string-array name="theme_names">-->
+    <!--<item>@string/pref_theme_dark</item>-->
+    <!--<item>@string/pref_theme_light</item>-->
+    <!--</string-array>-->
+
+    <!--<string-array name="item_spacing_codes">-->
+    <!--<item>none</item>-->
+    <!--&lt;!&ndash; 0dp &ndash;&gt;-->
+    <!--<item>small</item>-->
+    <!--&lt;!&ndash; 4dp &ndash;&gt;-->
+    <!--<item>medium</item>-->
+    <!--&lt;!&ndash; 8dp &ndash;&gt;-->
+    <!--<item>large</item>-->
+    <!--&lt;!&ndash; 12dp &ndash;&gt;-->
+    <!--</string-array>-->
+    <!--<string-array name="item_spacing_names">-->
+    <!--<item>@string/pref_list_item_spacing_none</item>-->
+    <!--<item>@string/pref_list_item_spacing_small</item>-->
+    <!--<item>@string/pref_list_item_spacing_medium</item>-->
+    <!--<item>@string/pref_list_item_spacing_large</item>-->
+    <!--</string-array>-->
+
+    <!--<string-array name="item_scaling_codes">-->
+    <!--<item>scale_60</item>-->
+    <!--<item>scale_70</item>-->
+    <!--<item>scale_80</item>-->
+    <!--<item>scale_90</item>-->
+    <!--<item>scale_100</item>-->
+    <!--<item>scale_110</item>-->
+    <!--<item>scale_120</item>-->
+    <!--</string-array>-->
+    <!--<string-array name="item_scaling_names">-->
+    <!--<item>@string/pref_list_item_scaling_60</item>-->
+    <!--&lt;!&ndash; itty bitty &ndash;&gt;-->
+    <!--<item>@string/pref_list_item_scaling_70</item>-->
+    <!--<item>@string/pref_list_item_scaling_80</item>-->
+    <!--<item>@string/pref_list_item_scaling_90</item>-->
+    <!--<item>@string/pref_list_item_scaling_100</item>-->
+    <!--<item>@string/pref_list_item_scaling_110</item>-->
+    <!--<item>@string/pref_list_item_scaling_120</item>-->
+    <!--&lt;!&ndash; very large &ndash;&gt;-->
+    <!--</string-array>-->
+
+    <string-array name="paging_animation_codes">
+        <item>fade</item>
+        <item>zoom</item>
+        <item>depth</item>
+        <item>tablet</item>
+    </string-array>
+    <string-array name="paging_animation_names">
+        <item>@string/paging_animation_fade</item>
+        <item>@string/paging_animation_zoom</item>
+        <item>@string/paging_animation_depth</item>
+        <item>@string/paging_animation_tablet</item>
+    </string-array>
+
+    <!--<string-array name="tilemode_codes">-->
+    <!--<item>repeat</item>-->
+    <!--<item>repeat_edges</item>-->
+    <!--<item>mirror</item>-->
+    <!--<item>none</item>-->
+    <!--</string-array>-->
+    <!--<string-array name="tilemode_names">-->
+    <!--<item>@string/pref_tilemode_repeat</item>-->
+    <!--<item>@string/pref_tilemode_edge</item>-->
+    <!--<item>@string/pref_tilemode_mirror</item>-->
+    <!--<item>@string/pref_tilemode_none</item>-->
+    <!--</string-array>-->
+
+
+    <!--<string-array name="mediaplayer_field_options_codes">-->
+    <!--<item>pref_mediaplayer_opt_alb_art_title</item>-->
+    <!--<item>pref_mediaplayer_opt_alb_title</item>-->
+    <!--<item>pref_mediaplayer_opt_art_title</item>-->
+    <!--</string-array>-->
+    <!--<string-array name="mediaplayer_field_options_names">-->
+    <!--<item>@string/pref_mediaplayer_opt_alb_art_title</item>-->
+    <!--<item>@string/pref_mediaplayer_opt_alb_title</item>-->
+    <!--<item>@string/pref_mediaplayer_opt_art_title</item>-->
+    <!--</string-array>-->
+
+    <!--<string-array name="colors_codes">-->
+    <!--<item>blue</item>-->
+    <!--<item>grey</item>-->
+    <!--<item>purple</item>-->
+    <!--<item>green</item>-->
+    <!--<item>orange</item>-->
+    <!--<item>red</item>-->
+    <!--</string-array>-->
+    <!--<string-array name="colors_names">-->
+    <!--<item>@string/pref_color_blue</item>-->
+    <!--<item>@string/pref_color_grey</item>-->
+    <!--<item>@string/pref_color_purple</item>-->
+    <!--<item>@string/pref_color_green</item>-->
+    <!--<item>@string/pref_color_orange</item>-->
+    <!--<item>@string/pref_color_red</item>-->
+    <!--</string-array>-->
+
+
+    <!--<string-array name="pref_contact_actions_keys">-->
+    <!--&lt;!&ndash;<item>@string/click_action_details_badge</item>&ndash;&gt;-->
+    <!--&lt;!&ndash;<item>@string/click_action_open_contact_details</item>&ndash;&gt;-->
+    <!--</string-array>-->
+    <!--<string-array name="pref_contact_actions_values">-->
+    <!--<item>click_action_show_contact_badge</item>-->
+    <!--<item>click_action_open_contact_details</item>-->
+    <!--</string-array>-->
+
+    <!--<string-array name="pref_phonenumber_format_texts">-->
+    <!--<item>@string/format_international</item>-->
+    <!--<item>@string/format_as_is</item>-->
+    <!--<item>@string/format_national</item>-->
+    <!--<item>@string/format_e164</item>-->
+    <!--</string-array>-->
+    <!--<string-array name="pref_phonenumber_format_values">-->
+    <!--<item>phonenumber_format_international</item>-->
+    <!--<item>phonenumber_format_as_is</item>-->
+    <!--<item>phonenumber_format_national</item>-->
+    <!--<item>phonenumber_format_e164</item>-->
+    <!--</string-array>-->
+
+
+</resources>

@@ -1,0 +1,433 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2015. Appsi Mobile
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        style="?attr/appsiToolbarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:elevation="8dp"
+        app:navigationIcon="@drawable/ic_arrow_back_white_24dp"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="?attr/actionBarSize"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/title"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                android:textColor="#FF9E80"
+                />
+
+            <EditText
+                android:id="@+id/title_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginBottom="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:backgroundTint="#FF9E80"
+                android:singleLine="true"
+                android:text="@string/title"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                />
+        </LinearLayout>
+    </android.support.v7.widget.Toolbar>
+
+    <FrameLayout
+        android:id="@+id/advanced_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
+        android:background="?attr/colorPrimaryDark"
+        android:elevation="4dp"
+        android:outlineProvider="bounds"
+        >
+
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/advanced_switch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/show_advanced_options"
+            android:textColor="?android:attr/textColorPrimaryInverse"
+            />
+
+
+    </FrameLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/advanced_container">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            android:orientation="vertical"
+            >
+
+            <RelativeLayout
+                android:id="@+id/icon_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="?attr/selectableItemBackground"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp"
+                >
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="16dp"
+                    android:src="@drawable/ic_image_grey600_24dp"
+                    />
+
+                <TextView
+                    android:id="@+id/icon_head"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="72dp"
+                    android:text="@string/intent_icon"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    />
+
+
+                <TextView
+                    android:id="@+id/icon_picker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/icon_head"
+                    android:layout_gravity="top"
+                    android:layout_marginStart="72dp"
+                    android:hint="@string/empty"
+                    android:minWidth="84dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:textColor="?android:attr/textColorSecondary"
+                    tools:text="Auto"
+                    />
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/advanced_header"
+                style="@style/sectionHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/advanced"
+                android:textColor="?attr/colorPrimary"
+                />
+
+
+            <RelativeLayout
+                android:id="@+id/type_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="16dp"
+                    android:src="@drawable/ic_label_grey600_24dp"
+                    />
+
+
+                <TextView
+                    android:id="@+id/type_picker_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="72dp"
+                    android:ems="8"
+                    android:text="@string/choose_intent_type"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    />
+
+                <TextView
+                    android:id="@+id/type_picker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/type_picker_header"
+                    android:layout_marginStart="72dp"
+                    android:hint="@string/empty"
+                    android:minWidth="84dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:textColor="?android:attr/textColorSecondary"
+                    tools:text="App"
+                    />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/action_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="16dp"
+                    android:src="@drawable/ic_android_grey600_24dp"
+                    />
+
+                <TextView
+                    android:id="@+id/action_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="72dp"
+                    android:text="@string/intent_action"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    />
+
+                <TextView
+                    android:id="@+id/action_picker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/action_header"
+                    android:layout_gravity="top"
+                    android:layout_marginStart="72dp"
+                    android:hint="@string/empty"
+                    android:minWidth="84dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:textColor="?android:attr/textColorSecondary"
+                    tools:text="android.intent.action.MAIN"
+                    />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/category_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp"
+                >
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="16dp"
+                    android:src="@drawable/ic_folder_grey600_24dp"
+                    />
+
+                <TextView
+                    android:id="@+id/category_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="72dp"
+                    android:text="@string/intent_category"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    />
+
+                <TextView
+                    android:id="@+id/category_picker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/category_header"
+                    android:layout_marginStart="72dp"
+                    android:hint="@string/empty"
+                    android:minWidth="84dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:textColor="?android:attr/textColorSecondary"
+                    tools:text="android.intent.category.APP_CALENDAR"
+                    />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/package_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp"
+                >
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="16dp"
+                    android:src="@drawable/ic_package_grey600_24dp"
+                    />
+
+                <TextView
+                    android:id="@+id/package_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="72dp"
+                    android:text="@string/intent_target_package"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    />
+
+
+                <TextView
+                    android:id="@+id/package_picker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/package_header"
+                    android:layout_marginStart="72dp"
+                    android:hint="@string/empty"
+                    android:minWidth="84dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:textColor="?android:attr/textColorSecondary"
+                    tools:text="com.android.laucher"
+                    />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/class_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp"
+                >
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="16dp"
+                    android:src="@drawable/ic_description_grey600_24dp"
+                    />
+
+                <TextView
+                    android:id="@+id/class_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="72dp"
+                    android:text="@string/intent_target_class"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    />
+
+                <TextView
+                    android:id="@+id/class_picker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/class_header"
+                    android:layout_marginStart="72dp"
+                    android:hint="@string/empty"
+                    android:minWidth="84dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:textColor="?android:attr/textColorSecondary"
+                    tools:text=".MainActivity"
+                    />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/command_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp"
+                >
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="16dp"
+                    android:src="@drawable/ic_adb_grey600_24dp"
+                    />
+
+                <TextView
+                    android:id="@+id/command_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="72dp"
+                    android:ems="8"
+                    android:text="@string/shell_command"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    />
+
+                <TextView
+                    android:id="@+id/command_picker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/command_header"
+                    android:layout_marginStart="72dp"
+                    android:hint="@string/empty"
+                    android:minWidth="84dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:textColor="?android:attr/textColorSecondary"
+                    tools:text="am start activity..."
+                    />
+
+
+            </RelativeLayout>
+
+            <CheckBox
+                android:id="@+id/command_as_root"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="72dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/execute_as_root"
+                />
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <ViewStub
+        android:id="@+id/overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="12dp"
+        android:layout="@layout/fragment_cell_intent_editor_overlay"
+        />
+
+
+</RelativeLayout>

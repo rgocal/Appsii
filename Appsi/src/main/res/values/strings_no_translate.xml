@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2015. Appsi Mobile
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="application_name">Appsii</string>
+    <string name="degrees">\u00B0</string>
+    <string name="degrees_c">\u2103</string>
+    <string name="degrees_f">\u2109</string>
+    <string name="temperature_high_unit"><xliff:g id="degrees">%1$d</xliff:g><xliff:g id="unit">%2$s</xliff:g></string>
+
+    <!--
+    Action title used on the apps page, when the menu button of an app
+    is pressed. Allows the user to launch the app in Halo.
+    -->
+    <string name="apps_action_halo">Halo</string>
+    <string name="url_unlock_apks">https://www.dropbox.com/sh/8nvnjtgbsl19blr/AAA-Ljhhxr-KYL_0EYLpv2kia?dl=0</string>
+
+    <string name="letter_tile_letter_font_family" translatable="false">sans-serif-thin</string>
+
+    <string name="featured_appsi_apps_uri">market://details?id=com.appsimobile.appsiapps</string>
+    <string name="featured_appsi_calls_uri">market://details?id=com.appsimobile.appsicalls</string>
+    <string name="featured_appsi_agenda_uri">market://details?id=com.appsimobile.appsicalendar</string>
+    <string name="featured_appsi_contacts_uri">market://details?id=com.appsimobile.appsicontacts</string>
+    <string name="featured_appsi_sms_uri">market://details?id=com.appsimobile.appsisms</string>
+    <string name="featured_appsi_settings_uri">market://details?id=com.appsimobile.appsisettings</string>
+    <string name="featured_appsi_powerpack_uri">market://details?id=com.appsimobile.appsipowerpack</string>
+
+    <string name="support_report_address">support@appsimobile.com</string>
+    <string name="plugin_crash_address">support@appsimobile.com</string>
+    <string name="report_bug_and_troubleshoot_address">support@appsimobile.com</string>
+    <string name="licensing_error_address">support@appsimobile.com</string>
+
+    <string name="day_of_week_label_typeface">sans-serif-light</string>
+    <string name="sans_serif_condensed">sans-serif-condensed</string>
+    <string name="sans_serif">sans-serif</string>
+
+    <string-array name="base_theme_values">
+        <item>theme_dark</item>
+        <item>theme_light</item>
+        <item>theme_dark_light_ab</item>
+        <item>theme_light_dark_ab</item>
+    </string-array>
+    <string-array name="primary_colors_values">
+        <item>red</item>
+        <item>pink</item>
+        <item>purple</item>
+
+        <item>deep_purple</item>
+        <item>indigo</item>
+        <item>blue</item>
+
+        <item>light_blue</item>
+        <item>cyan</item>
+        <item>teal</item>
+
+        <item>green</item>
+        <item>light_green</item>
+        <item>lime</item>
+
+        <item>yellow</item>
+        <item>amber</item>
+        <item>orange</item>
+
+        <item>deep_orange</item>
+        <item>brown</item>
+        <item>grey</item>
+        <item>blue_grey</item>
+    </string-array>
+    <string-array name="primary_color_names">
+        <item>Red</item>
+        <item>Pink</item>
+        <item>Purple</item>
+
+        <item>Deep Purple</item>
+        <item>Indigo</item>
+        <item>Blue</item>
+
+        <item>Light Blue</item>
+        <item>Cyan</item>
+        <item>Teal</item>
+
+        <item>Green</item>
+        <item>Light Green</item>
+        <item>Lime</item>
+
+        <item>Yellow</item>
+        <item>Amber</item>
+        <item>Orange</item>
+
+        <item>Deep Orange</item>
+        <item>Brown</item>
+        <item>Grey</item>
+
+        <item>Blue Grey</item>
+    </string-array>
+
+    <string-array name="accent_colors_values">
+        <item>red</item>
+        <item>pink</item>
+        <item>purple</item>
+
+        <item>deep_purple</item>
+        <item>indigo</item>
+        <item>blue</item>
+
+        <item>light_blue</item>
+        <item>cyan</item>
+        <item>teal</item>
+
+        <item>green</item>
+        <item>light_green</item>
+        <item>lime</item>
+
+        <item>yellow</item>
+        <item>amber</item>
+        <item>orange</item>
+
+        <item>deep_orange</item>
+    </string-array>
+    <string-array name="accent_color_names">
+        <item>Red</item>
+        <item>Pink</item>
+        <item>Purple</item>
+
+        <item>Deep Purple</item>
+        <item>Indigo</item>
+        <item>Blue</item>
+
+        <item>Light Blue</item>
+        <item>Cyan</item>
+        <item>Teal</item>
+
+        <item>Green</item>
+        <item>Light Green</item>
+        <item>Lime</item>
+
+        <item>Yellow</item>
+        <item>Amber</item>
+        <item>Orange</item>
+
+        <item>Deep Orange</item>
+    </string-array>
+
+    <string-array name="intent_type_values">
+        <item>app</item>
+        <item>shortcut</item>
+        <item>broadcast</item>
+        <item>service</item>
+        <item>shell</item>
+    </string-array>
+
+    <string-array name="intent_icon_values">
+        <item>auto</item>
+        <item>play_music</item>
+        <item>camera</item>
+    </string-array>
+
+    <string-array name="weather_unit_values">
+        <!-- c represents celsius and is used for metric system -->
+        <item>c</item>
+        <!-- f represents fahrenheit and is used for imperial system -->
+        <item>f</item>
+    </string-array>
+
+    <string-array name="weather_title_types">
+        <item>@string/weather_condition_title</item>
+        <item>@string/weather_location_name</item>
+    </string-array>
+    <string-array name="weather_title_values">
+        <item>condition</item>
+        <item>location</item>
+    </string-array>
+
+
+</resources>

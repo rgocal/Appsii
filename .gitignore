@@ -1,0 +1,10 @@
+build
+.gradle
+.idea
+/*.iml
+/*.keystore
+/local.properties
+captures
+design
+hprof
+release.properties

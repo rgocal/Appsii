@@ -1,0 +1,507 @@
+<!--
+  ~ Copyright 2015. Appsi Mobile
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <!--
+    Used in the calls page to indicate a phone number is a not available
+    because it is a private number
+    -->
+    <string name="private_num">Private number</string>
+
+    <!--
+    Used in the agenda and calls page to indicate the event or call was
+    today. This is a group title
+    -->
+    <string name="today">Today</string>
+    <!--
+    Used in the agenda and calls page to indicate the event or call was
+    yesterday. This is a group title
+    -->
+    <string name="yesterday">Yesterday</string>
+
+    <!--
+    Used in the weather preferences to indicate weather information
+    should be displayed in the metric system. Used in combo-boxes
+     -->
+    <string name="metric">Metric</string>
+
+    <!--
+    Used in the weather preferences to indicate weather information
+    should be displayed in the imperial system. Used in combo-boxes
+     -->
+    <string name="imperial">Imperial</string>
+
+    <!--
+    Name of the unit to use for kilometers per hour. Used in the
+    Weather widgets on the home page.
+    -->
+    <string name="speed_kph">km/h</string>
+
+    <!--
+    Name of the unit to use for miles per hour. Used in the Weather
+    widgets on the home page.
+    -->
+    <string name="speed_mph">mph</string>
+
+    <!--
+    Used to indicate no weather data is available
+    -->
+    <string name="no_weather_data">No weather data</string>
+
+    <!--
+    Spoken text for accessibility indicates the selected item
+    -->
+    <string name="item_is_selected"><xliff:g example="2013" id="item">%1$s</xliff:g> selected</string>
+
+    <!--
+    Action shown in a popup menu that allows the user to call a
+    person
+    -->
+    <string name="action_call">Call</string>
+
+    <!--
+    Action title used in menus to edit the current item
+    -->
+    <string name="action_edit">Edit</string>
+
+    <!--
+    Action title used in menus to delete the selected item or the
+    item containing the menu
+    -->
+    <string name="action_delete">Delete</string>
+
+    <!--
+    Action title used in the calls page to add a number to contacts
+    -->
+    <string name="calls_action_add_to_contacts">Add to contacts</string>
+
+    <!--
+    Action title used on the apps page, when the menu button of an app
+    is pressed. Allows the user to change the tags for the app.
+    -->
+    <string name="action_tags">Tags</string>
+
+    <!--
+    Action title used on the apps page, when the menu button of an app
+    is pressed. Allows the user to open the App info screen in settings.
+    -->
+    <string name="apps_action_app_info" import_source="info_target_label">App info</string>
+
+    <!--
+    Action title used on the apps page, when the menu button of an app
+    is pressed. Allows the user to uninstall the App info.
+    -->
+    <string name="apps_action_uninstall" import_source="cab_menu_delete_app">Uninstall</string>
+
+    <!--
+    Description used in the (ongoing) notification when Appsii is running
+    -->
+    <string name="notification_description">Appsii is running normally</string>
+
+    <!--
+    Message shown in the ongoing notification when Appsii is suspended/paused
+    -->
+    <string name="notification_suspended">Appsii is suspended, tap to resume.</string>
+
+    <!--
+     Title of the setting in the general menu to change the width of the hotspots
+     -->
+    <string name="pref_hotspot_width_name">Hotspot width</string>
+
+    <!--
+     Title of the setting in the general menu to change the width of the sidebar
+     This is handled with a slider that can slide from small to full screen width
+     -->
+    <string name="pref_sidebar_size_name">Panel width</string>
+
+    <!--
+     Title of the setting in the general menu to enable or disable haptic feedback,
+     vibration, when the panel is touched
+     -->
+    <string name="pref_sidebar_haptic_feedback_title">Haptic feedback</string>
+
+    <!--
+     Summary of the setting in the general menu to enable or disable haptic feedback,
+     vibration, when the panel is touched
+     -->
+    <string name="pref_sidebar_haptic_feedback_summary">Vibrate when the panel is touched.</string>
+
+    <!--
+    Toast message shown when a contact, app, or anything else that can be started,
+    could not be started
+    -->
+    <string name="activity_not_found">Error launching app.</string>
+
+    <!--
+    Toast message shown when the user choose to contact support, but no e-mail app
+    could be launched
+    -->
+    <string name="no_email_client">No email client found</string>
+
+
+    <!-- Main activity -->
+
+    <!--
+    Status displayed in the main activity when Appsii is started.
+    The user has to option to pause (suspend) Appsii from here.
+    -->
+    <string name="appsi_status_running">Appsii is started</string>
+
+    <!--
+    Status displayed in the main activity when Appsii is not started.
+    The user has to option to start Appsii from here.
+    -->
+    <string name="appsi_status_stopped">Appsii is not started</string>
+
+    <!--
+    The title of the general options menu. The user can change some
+    configuration option in here.
+    -->
+    <string name="pref_category_general">General</string>
+
+
+    <!--
+    Used as a dialog title in the options where the screen dimming
+    preference can be set.
+    -->
+    <string name="dim_amount">Dim amount</string>
+
+    <!--
+    Title of the about screen, and of the menu item in the main menu
+    -->
+    <string name="pref_about_title">About Appsii</string>
+
+    <!--
+    Title of the changelog option in the about menu
+    -->
+    <string name="pref_changelog_title">Changelog</string>
+
+    <!--
+    The title of the option in the about screen that links to the
+    Google Plus profile of the developer of the app.
+    -->
+    <string name="pref_follow_me_title">About the developer</string>
+
+    <!--
+    The title of the option in the about screen that links to the
+    Appsii Google+ community .
+    -->
+    <string name="pref_community_title">Appsii users community</string>
+
+    <!--
+    The title of the option in the about screen that links to a website
+    containing information about beta testing.
+    -->
+    <string name="pref_become_beta_tester_title">Beta version</string>
+
+    <!--
+    The name of the first home screen that is added by default when
+    Appsii first starts
+    -->
+    <string name="home_screen_name">Home</string>
+
+    <string name="menu_add_hotspot">Add Panel</string>
+    <string name="hotspot_name">Name</string>
+
+    <string name="reopen_last_plugin">Reopen last page</string>
+
+    <string name="look_and_feel_section_colors">Sidebar</string>
+
+    <string name="done">Done</string>
+    <string name="shortcut_title">Appsii</string>
+    <string name="shortcut_title_hint">Shortcut name</string>
+    <string name="open_from_left">Left</string>
+
+    <string name="permission_control_appsi_label">Appsii licensing</string>
+    <string name="permission_control_appsi_desc">Allows a connection between Appsii and an Appsi plugin to unlock similar features in Appsii</string>
+
+    <string name="pref_icon_theme_name">Icon theme</string>
+    <string name="icon_pack_none">No icon theme</string>
+
+    <string name="pref_sidebar_dimming_level_title">Screen dimming</string>
+    <string name="pref_sidebar_dimming_level_description">Dimming amount when the sidebar is opened.</string>
+
+
+    <string name="pref_suggestions">Feature requests</string>
+
+    <string name="pref_paging_animation_title">Paging animation</string>
+    <string name="paging_animation_fade">Fade</string>
+    <string name="paging_animation_zoom">Zoom</string>
+    <string name="paging_animation_depth">Depth</string>
+    <string name="paging_animation_tablet">Cover flow</string>
+
+    <string name="pref_autostart_title">Auto-start Appsii</string>
+
+    <string name="edit">Edit</string>
+
+    <string name="all_apps">All apps</string>
+    <!--<string name="folder_running_apps">Running apps</string>-->
+    <string name="folder_recent_apps">Recent apps</string>
+    <string name="home_action_change_layout">Change layout</string>
+    <!--<string name="add_new_tag">New tag…</string>-->
+    <string name="add_tag">Add tag</string>
+    <string name="tag_name">Tag name</string>
+    <string name="tag_already_exists">Tag %1$s already exists</string>
+    <string name="tag_error_empty">Tag name can\'t be empty</string>
+    <string name="manage_tags">Manage tags</string>
+    <string name="sort_apps">Sort apps</string>
+    <string name="undo_delete">Undo deletion</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="other">Other</string>
+
+    <string name="feature_title_calllog">Call log</string>
+    <string name="item_price_free_early_access">Free early access</string>
+    <string name="feature_title_agenda">Agenda</string>
+    <string name="feature_people_title">People</string>
+    <string name="feature_title_weather">Weather</string>
+    <string name="feature_title_sms">SMS</string>
+    <string name="option_column_count">Column count</string>
+    <string name="apps_no_recent_apps">No recent apps</string>
+    <string name="new_calendar_event">New event</string>
+    <string name="all_day">All day</string>
+    <string name="agenda_view_type_normal">Schedule</string>
+    <string name="agenda_view_type_categories">Categorized</string>
+    <string name="go_to_today">Go to today</string>
+    <string name="empty_tag_text">This tag is empty</string>
+    <string name="edit_tag">Edit tag</string>
+    <string name="show_as_list">Show as list</string>
+    <string name="expand_by_default">Expand by default</string>
+    <string name="hide_hotspots">Hide hotspots</string>
+    <string name="promo_unlock">Appsi plugins</string>
+    <string name="appsi_calendar_plugin">Calendar plugin</string>
+    <string name="appsi_calls_plugin">Calls plugin</string>
+    <string name="appsi_sms_plugin">SMS plugin</string>
+    <string name="appsi_settings_plugin">Settings plugin</string>
+    <string name="appsi_contacts_plugin">Contacts plugin</string>
+    <string name="appsi_powerpack_plugin">Powerpack plugin</string>
+    <string name="theme">Theme</string>
+    <string name="weather">Weather</string>
+    <string name="weather_location">Location</string>
+    <string name="weather_options_header">Weather options</string>
+    <string name="weather_unit">Unit</string>
+    <string name="weather_auto_location">Use local weather</string>
+    <string name="weather_auto_location_summary">Based on the location you are at</string>
+    <string name="unknown">Unknown</string>
+    <string name="untitled">No title</string>
+    <string name="settings">Settings</string>
+    <string name="no_bluetooth">No Bluetooth</string>
+    <string name="enabled">Enabled</string>
+    <string name="enable">Enable</string>
+    <string name="user_location">Your location is <xliff:g example="Amsterdam" id="location1">&lt;ul>&lt;font color=\'#009688\'>%1$s&lt;/font>&lt;/ul></xliff:g>, <xliff:g example="The Netherlands" id="location2">&lt;ul>&lt;font color=\'#009688\'>%2$s&lt;/font>&lt;/ul></xliff:g>. Use this location?</string>
+    <string name="disabled">Disabled</string>
+    <string name="turning_off">Turning off</string>
+    <string name="turning_on">Turning on</string>
+    <string name="bluetooth_settings">Bluetooth settings</string>
+    <string name="clock_options">Clock options</string>
+    <string name="timezone">Timezone</string>
+    <string name="title">Title</string>
+    <string name="music">Music</string>
+    <string name="camera">Camera</string>
+    <string name="edit_layout">Edit layout</string>
+    <string name="select_switch_item">Tap the item to switch locations with</string>
+    <string name="remove_row">Remove row</string>
+    <string name="remove_cell">Remove cell</string>
+    <string name="insert_cell_left">Insert cell left</string>
+    <string name="insert_cell_right">Insert cell right</string>
+    <string name="insert_row_above">Insert row above</string>
+    <string name="insert_row_below">Insert row below</string>
+    <string name="empty">Empty</string>
+    <string name="home_item_app_widget_title">App widget</string>
+    <string name="home_item_image_title">Profile image</string>
+    <string name="home_item_temperature_title">Temperature</string>
+    <string name="home_item_sunset_title">Sunrise and sunset</string>
+    <string name="home_item_wind_title">Wind</string>
+    <string name="home_item_app_title">App launcher</string>
+    <string name="home_item_clock_title">Clock</string>
+    <string name="home_item_bluetooth_toggle_item">Bluetooth toggle</string>
+    <string name="no_title">No title</string>
+    <string name="choose_intent_type">Choose type</string>
+    <string name="intent_action">Action</string>
+    <string name="intent_category">Category</string>
+    <string name="intent_target_package">Package</string>
+    <string name="intent_target_class">Class</string>
+    <string name="app_launcher_options">App launcher options</string>
+    <string name="intent_icon">Icon</string>
+    <string name="advanced">Advanced</string>
+    <string name="select_package_first">Please select a package first</string>
+    <string name="shortcut">Shortcut</string>
+    <string name="continue_picker">This will clear this launcher, continue?</string>
+    <string name="show_advanced_options">Show advanced options</string>
+    <string name="execute_as_root">Execute as root (needs root)</string>
+    <string name="welcom_app_launcher_editor">Welcome to the App launcher editor!</string>
+    <string name="app_laucher_editor_description">Just press the wizard icon to get started and to pick a shortcut or app</string>
+    <string name="app_editor_advanced_description">Switch to advanced mode if you want to run a command, send a broadcast, start a service or want to enter the intent info manually.</string>
+    <string name="got_it">Got it</string>
+    <string name="need_at_least_one_cell">You need to have at least one item in you home page</string>
+    <string name="apps_page_name">Apps</string>
+    <string name="agenda_page_name">Agenda</string>
+    <string name="people_page_name">People</string>
+    <string name="calls_page_name">Calls</string>
+    <string name="settings_page_name">Settings</string>
+    <string name="sms_page_name">Sms</string>
+    <string name="search_page_name">Search</string>
+    <string name="action_move">Move</string>
+    <string name="pages">Pages</string>
+    <string name="action_set_height">Set height</string>
+    <string name="default_hotspot_name">My hotspot</string>
+    <string name="height">Height</string>
+    <string name="hide_hotspots_when_done">Hide hotspots again</string>
+    <string name="unlock">Unlock</string>
+    <string name="unlocked">Unlocked</string>
+    <string name="partially_unlocked">Partially unlocked</string>
+    <string name="manage_home_pages">Manage home-pages</string>
+    <string name="everything">Everything</string>
+    <string name="unlock_all_description">Unlocks all pages in a single package as a single purchase. This includes the settings and sms page which are not yet available.</string>
+    <string name="intent_error_message">Error executing the app launcher. Check the logs for more info</string>
+    <string name="connection_error">Connection error. Make sure you are connected to the internet</string>
+    <string name="error_launching_purchase_flow">Error starting purchase flow, check your connection or try again later</string>
+    <string name="purchase_in_progress">A purchase is still in progress, please wait</string>
+    <string name="connection_google_play_failed">Connection to Google Play failed. Check your connection</string>
+    <string name="home_new_page_title">My Home</string>
+    <string name="unlock_disclaimer">In case your purchases from Appsi are wrongly not listed as unlocked, check your connection and try again. If the problem persists, please contact Google play support about a licensing error.</string>
+    <string name="import_from_appsi">Import Appsi Plugins</string>
+    <string name="unlock_instruction">Tap the name of the plugin to unlock it. Make sure the plugin is installed and up-to-date</string>
+    <string name="plugin_not_installed">This plugin is not installed</string>
+    <string name="unlock_error">Error unlocking the plugin</string>
+    <string name="unlock_success">Unlock successful. Don\'t forget to select the page in the Panels menu.</string>
+    <string name="appsi_unlock_title">Got Appsi plugins?</string>
+    <string name="appsi_unlock_desc">If so, you can use them to unlock equivalent features in Appsii. Tap the menu button on the top right to unlock them.</string>
+    <string name="already_unlocked">Already unlocked</string>
+    <string name="page_not_yet_available">This page is not yet available</string>
+
+    <!--
+    Item in the main menu, to configure the Panels and content.
+    Also added as a secondary action to the ongoing notification to
+    go directly to Panels
+    -->
+    <string name="hotspots_and_pages">Panels</string>
+
+    <string name="theme_teal">Teal (default)</string>
+    <string name="theme_teal_dark">Teal Dark</string>
+    <string name="theme_light_green">Light green</string>
+    <string name="theme_blue_grey">Blue-Grey</string>
+    <string name="theme_orange">Orange</string>
+
+    <string-array name="base_theme_names">
+        <item>Dark</item>
+        <item>Light</item>
+        <item>Dark with light toolbar</item>
+        <item>Light with dark toolbar</item>
+    </string-array>
+
+    <string-array name="weather_units">
+        <item>Metric</item>
+        <item>Imperial</item>
+    </string-array>
+
+    <string-array name="intent_types">
+        <item>App</item>
+        <item>Shortcut</item>
+        <item>Broadcast (Advanced)</item>
+        <item>Service (Advanced)</item>
+        <item>Shell command (Advanced)</item>
+    </string-array>
+
+    <string-array name="intent_icons">
+        <item>Auto</item>
+        <item>Music</item>
+        <item>Camera</item>
+    </string-array>
+
+
+    <!-- Wireless controls settings screen, setting check box label -->
+    <string name="settings_airplane_mode">Airplane mode</string>
+    <string name="settings_wireless_networks_settings_title">Wireless &amp; networks</string>
+    <string name="settings_sound_settings">Sound</string>
+    <string name="settings_display_settings">Display</string>
+    <string name="settings_header_category_device">DEVICE</string>
+    <string name="settings_storage_settings">Storage</string>
+    <string name="settings_power_usage_summary_title">Battery</string>
+    <string name="settings_applications_settings">Apps</string>
+    <string name="settings_user_settings_title">Users</string>
+    <string name="settings_header_category_personal">PERSONAL</string>
+    <string name="settings_location_settings_title">Location access</string>
+    <string name="settings_security_settings_title">Security</string>
+    <string name="settings_language_settings">Language &amp; input</string>
+    <string name="settings_privacy_settings">Backup &amp; reset</string>
+    <string name="settings_account_settings">Accounts</string>
+    <string name="settings_header_category_system">SYSTEM</string>
+    <string name="settings_date_and_time_settings_title">Date &amp; time</string>
+    <string name="settings_accessibility_settings">Accessibility</string>
+    <string name="settings_development_settings_title">Developer options</string>
+    <!-- Main settings screen, setting title for the user to go into the About phone screen -->
+    <string name="settings_about_settings">About phone</string>
+    <string name="settings_header_category_wireless_networks">WIRELESS &amp; NETWORKS</string>
+    <string name="settings_wifi_settings_title">Wi-Fi</string>
+    <string name="settings_bluetooth_settings_title">Bluetooth</string>
+    <string name="settings_data_usage_summary_title">Data usage</string>
+    <string name="settings_radio_controls_title">More\u2026</string>
+    <!-- Toggle switch title for enabling all mobile allApps network connections. [CHAR LIMIT=32] -->
+    <string name="settings_data_usage_enable_mobile">Mobile data</string>
+
+    <string name="settings_settings_printing_settings">Printing</string>
+
+    <string name="settings_apns_title">Access Point Names</string>
+    <string name="settings_captioning_settings_title">Captioning</string>
+    <string name="settings_roaming_settings_title">Roaming</string>
+    <string name="settings_dream_settings_title">Day Dreams</string>
+    <string name="settings_input_methods_settings_title">Input Methods</string>
+    <string name="settings_memory_card_settings_title">Memory Card</string>
+    <string name="settings_nfc_sharing_settings_title">NFC sharing</string>
+    <string name="settings_nfc_settings_title">NFC</string>
+    <string name="settings_nfc_payment_settings_title">Tap &amp; Pay</string>
+    <string name="whats_new">What\'s new</string>
+    <string name="coming_soon">Coming soon</string>
+    <string name="download_apks">Get the apks</string>
+    <string name="choose_app_widget">Choose widget</string>
+    <string name="no_app_widget_selected">No widget selected</string>
+    <string name="tap_to_keep_open">Closing, tap to cancel</string>
+    <string name="no_compatible_calendar_app">No compatible calendar app found</string>
+    <string name="widget_action_always_close_text">Would you like to keep Appsii open after you perform this action in the future?</string>
+    <string name="never_close">Keep open</string>
+    <string name="close">Close</string>
+    <string name="error_loading_widget">Error loading widget</string>
+    <string name="cant_access_location">Could not determine your location. Location is used to get local weather information. Enable location services?</string>
+    <string name="configure">Enable location access</string>
+    <string name="nope">Nope</string>
+    <string name="shell_command">Shell command</string>
+    <string name="edit_app_launcher_title">App-launcher</string>
+    <string name="choose_contact">Choose contact</string>
+    <string name="theme_colors">Theme colors</string>
+    <string name="base_theme">Base theme</string>
+    <string name="primary_color">Primary color</string>
+    <string name="accent_color">Accent color</string>
+    <string name="presets">Presets</string>
+    <plurals name="search_app_count">
+        <item quantity="other">Found %d apps</item>
+        <item quantity="one">Found %d app</item>
+    </plurals>
+    <plurals name="search_people_count">
+        <item quantity="other">Found %d people</item>
+        <item quantity="one">Found %d person</item>
+    </plurals>
+
+    <string name="feels_like">Feels like <xliff:g example="33" id="item">%1$s</xliff:g></string>
+    <string name="forecast">Forecast</string>
+    <string name="city_images">City images</string>
+    <string name="title_type">Title type</string>
+    <string name="weather_condition_title">Condition title</string>
+    <string name="weather_location_name">Location name</string>
+    <string name="add_homepage">Add Homepage</string>
+    <string name="use_location_image_as_backgroud">Use location image as background</string>
+
+</resources>

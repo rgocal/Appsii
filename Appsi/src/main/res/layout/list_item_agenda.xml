@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright 2015. Appsi Mobile
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?android:attr/selectableItemBackground"
+    android:orientation="vertical"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="12dp">
+
+
+    <ImageView
+        android:id="@+id/agenda_time_image"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentStart="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="4dp"
+        android:cropToPadding="true"
+        android:scaleType="centerCrop"
+        />
+
+    <Space
+        android:layout_width="8dp"
+        android:layout_height="16dp"
+        android:layout_below="@id/agenda_time_image"
+        />
+
+    <ImageView
+        android:id="@+id/overflow"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="0dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:src="?attr/appsiOverflowButtonInverse"
+        android:visibility="gone"
+        />
+
+
+    <TextView
+        android:id="@+id/primary_text"
+        style="?android:attr/textAppearanceListItem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/agenda_time_image"
+        android:layout_toStartOf="@id/overflow"
+        android:ellipsize="end"
+        android:gravity="bottom"
+        android:maxLines="2"
+        android:textColor="?android:attr/textColorPrimary"
+        tools:text="Fred Flinstone"
+        />
+
+    <TextView
+        android:id="@+id/secondary_text"
+        style="?android:attr/textAppearanceListItemSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/primary_text"
+        android:layout_toEndOf="@id/agenda_time_image"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:textColor="?android:attr/textColorSecondary"
+        tools:text="Smoke signal phone"
+        />
+
+    <Space
+        android:layout_width="8dp"
+        android:layout_height="16dp"
+        android:layout_below="@id/secondary_text"
+        />
+
+
+</RelativeLayout>

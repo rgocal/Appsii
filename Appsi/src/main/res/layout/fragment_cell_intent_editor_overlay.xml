@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2015. Appsi Mobile
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="#ee009688"
+              android:elevation="12dp"
+              android:orientation="vertical"
+    >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="64dp"
+
+        android:text="@string/welcom_app_launcher_editor"
+        android:textAppearance="?attr/appsiActionBarTextStyle"
+        android:textColor="#DD2C00"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:drawablePadding="8dp"
+        android:drawableStart="@drawable/ic_action_wizard_48dp"
+        android:gravity="center_vertical"
+        android:text="@string/app_laucher_editor_description"
+        android:textAppearance="?attr/appsiTextStyleMedium"
+        android:textColor="?android:attr/textColorPrimaryInverse"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:gravity="center_vertical"
+        android:text="@string/app_editor_advanced_description"
+        android:textAppearance="?attr/appsiTextStyleMedium"
+        android:textColor="?android:attr/textColorPrimaryInverse"
+        />
+
+    <Button
+        android:id="@+id/dismiss"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="12dp"
+        android:elevation="8dp"
+        android:text="@string/got_it"
+        android:textColor="#DD2C00"
+        />
+
+
+</LinearLayout>

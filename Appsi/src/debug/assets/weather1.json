@@ -1,0 +1,110 @@
+{
+  "query": {
+    "results": {
+      "channel": {
+        "wind": {
+          "speed": "14.48",
+          "direction": "70",
+          "chill": "-6"
+        },
+        "title": "Yahoo! Weather - Etten-Leur, NL",
+        "location": {
+          "region": "NB",
+          "country": "Netherlands",
+          "city": "Etten-Leur"
+        },
+        "description": "Yahoo! Weather for Etten-Leur, NL",
+        "item": {
+          "guid": {
+            "content": "NLXX0035_2015_01_26_7_00_CET",
+            "isPermaLink": "false"
+          },
+          "pubDate": "Thu, 22 Jan 2015 3:26 pm CET",
+          "title": "Conditions for Etten-Leur, NL at 3:26 pm CET",
+          "forecast": [
+            {
+              "text": "Partly Cloudy",
+              "high": "1",
+              "day": "Thu",
+              "code": "29",
+              "low": "-2",
+              "date": "22 Jan 2015"
+            },
+            {
+              "text": "Mostly Sunny",
+              "high": "2",
+              "day": "Fri",
+              "code": "34",
+              "low": "-2",
+              "date": "23 Jan 2015"
+            },
+            {
+              "text": "AM Light Rain",
+              "high": "7",
+              "day": "Sat",
+              "code": "11",
+              "low": "3",
+              "date": "24 Jan 2015"
+            },
+            {
+              "text": "PM Showers",
+              "high": "7",
+              "day": "Sun",
+              "code": "39",
+              "low": "4",
+              "date": "25 Jan 2015"
+            },
+            {
+              "text": "Showers",
+              "high": "8",
+              "day": "Mon",
+              "code": "11",
+              "low": "3",
+              "date": "26 Jan 2015"
+            }
+          ],
+          "condition": {
+            "date": "Thu, 22 Jan 2015 3:26 pm CET",
+            "temp": "-1",
+            "text": "Cloudy",
+            "code": "26"
+          },
+          "description": "\n<img src=\"http:\/\/l.yimg.com\/a\/i\/us\/we\/52\/26.gif\"\/><br \/>\n<b>Current Conditions:<\/b><br \/>\nCloudy, -1 C<BR \/>\n<BR \/><b>Forecast:<\/b><BR \/>\nThu - Partly Cloudy. High: 1 Low: -2<br \/>\nFri - Mostly Sunny. High: 2 Low: -2<br \/>\nSat - AM Light Rain. High: 7 Low: 3<br \/>\nSun - PM Showers. High: 7 Low: 4<br \/>\nMon - Showers. High: 8 Low: 3<br \/>\n<br \/>\n<a href=\"http:\/\/us.rd.yahoo.com\/dailynews\/rss\/weather\/Etten-Leur__NL\/*http:\/\/weather.yahoo.com\/forecast\/NLXX0035_c.html\">Full Forecast at Yahoo! Weather<\/a><BR\/><BR\/>\n(provided by <a href=\"http:\/\/www.weather.com\" >The Weather Channel<\/a>)<br\/>\n",
+          "link": "http:\/\/us.rd.yahoo.com\/dailynews\/rss\/weather\/Etten-Leur__NL\/*http:\/\/weather.yahoo.com\/forecast\/NLXX0035_c.html",
+          "long": "4.64",
+          "lat": "51.57"
+        },
+        "lastBuildDate": "Thu, 22 Jan 2015 3:26 pm CET",
+        "link": "http:\/\/us.rd.yahoo.com\/dailynews\/rss\/weather\/Etten-Leur__NL\/*http:\/\/weather.yahoo.com\/forecast\/NLXX0035_c.html",
+        "image": {
+          "title": "Yahoo! Weather",
+          "height": "18",
+          "url": "http:\/\/l.yimg.com\/a\/i\/brand\/purplelogo\/\/uh\/us\/news-wea.gif",
+          "link": "http:\/\/weather.yahoo.com",
+          "width": "142"
+        },
+        "atmosphere": {
+          "pressure": "1015.92",
+          "visibility": "5",
+          "rising": "0",
+          "humidity": "83"
+        },
+        "language": "en-us",
+        "ttl": "60",
+        "astronomy": {
+          "sunset": "5:13 pm",
+          "sunrise": "8:32 am"
+        },
+        "units": {
+          "pressure": "mb",
+          "speed": "km\/h",
+          "distance": "km",
+          "temperature": "C"
+        }
+      }
+    },
+    "count": 1,
+    "lang": "en-US",
+    "created": "2015-01-22T14:46:22Z"
+  }
+}

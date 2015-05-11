@@ -1,0 +1,89 @@
+<!--
+  ~ Copyright 2015. Appsi Mobile
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+
+
+    <color name="letter_tile_font_color">#ffffff</color>
+    <color name="letter_tile_default_color">#cccccc</color>
+
+    <color name="action_mode_color">#212121</color>
+
+    <array name="letter_tile_colors">
+        <item>#33b679</item>
+        <item>#536173</item>
+        <item>#855e86</item>
+        <item>#df5948</item>
+        <item>#aeb857</item>
+        <item>#547bca</item>
+        <item>#ae6b23</item>
+        <item>#e5ae4f</item>
+    </array>
+
+    <color name="date_picker_text_normal">#ff999999</color>
+    <color name="blue">#33b5e5</color>
+    <color name="date_picker_text_disabled">#ccc</color>
+    <color name="white">#ffffff</color>
+    <color name="circle_background">#f2f2f2</color>
+
+    <!-- 
+    <color name="sidebar_bg">#f4151515</color>
+    -->
+    <color name="sidebar_bg">#ff1a1a1a</color>
+    <color name="sidebar_bg_light">#ffe9e9e9</color>
+
+    <color name="emphasis">#31b6e7</color>
+
+    <color name="drawer_top_textcolor_selected">#f7f3f7</color>
+
+    <color name="enhome_blue">#ff39b6ef</color>
+
+    <color name="plugin_background">#FF002e3e</color>
+    <color name="widget_background">#7F001e38</color>
+
+    <color name="dim_color">#79000000</color>
+    <color name="actionbar_color">#ff222222</color>
+
+
+    <color name="bright_foreground_disabled_holo_light">#ffb2b2b2</color>
+    <color name="bright_foreground_holo_light">@color/background_holo_dark</color>
+    <color name="background_holo_dark">#ff000000</color>
+
+
+    <color name="holo_blue">#ff33B5E5</color>
+    <color name="holo_dark_blue">#ff0099CC</color>
+
+    <color name="holo_purple">#ffAA66CC</color>
+    <color name="holo_dark_purple">#ff9933CC</color>
+
+    <color name="holo_green">#ff99CC00</color>
+    <color name="holo_dark_green">#ff669900</color>
+
+    <color name="holo_orange">#ffFFBB33</color>
+    <color name="holo_dark_orange">#ffff8800</color>
+
+    <color name="holo_red">#ffFF4444</color>
+    <color name="holo_dark_red">#ffcc0000</color>
+
+    <color name="lighter_gray">#ddd</color>
+    <color name="darker_gray">#aaa</color>
+
+    <color name="widget_pressed_bg">#2effffff</color>
+
+    <color name="widget_text_light">#ff111111</color>
+    <color name="widget_text_dark">#ffeeeeee</color>
+
+</resources>

@@ -1,0 +1,103 @@
+<!--
+  ~ Copyright 2015. Appsi Mobile
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:appsi="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        android:title="@string/look_and_feel_section_colors">
+
+
+        <Preference
+            android:key="pref_appsii_theme"
+            android:title="@string/theme"
+            />
+        <ListPreference
+            android:defaultValue="fade"
+            android:entries="@array/paging_animation_names"
+            android:entryValues="@array/paging_animation_codes"
+            android:key="pref_paging_animation"
+            android:summary="%1$s"
+            android:title="@string/pref_paging_animation_title"
+            />
+
+        <com.appsimobile.appsii.SeekPreference
+            android:defaultValue="50"
+            android:dialogMessage="@string/dim_amount"
+            android:key="pref_sidebar_dimming_level"
+            android:max="100"
+            android:persistent="true"
+            android:summary="@string/pref_sidebar_dimming_level_description"
+            android:title="@string/pref_sidebar_dimming_level_title"
+            appsi:leftText="0"
+            appsi:minValue="0"
+            appsi:rightText="100"
+            appsi:valueVisible="true"
+            />
+
+        <com.appsimobile.appsii.SeekPreference
+            android:defaultValue="80"
+            android:dialogMessage="@string/pref_sidebar_size_name"
+            android:key="pref_sidebar_size"
+            android:max="95"
+            android:persistent="true"
+            android:title="@string/pref_sidebar_size_name"
+            appsi:leftText="40"
+            appsi:minValue="40"
+            appsi:rightText="95"
+            appsi:valueVisible="true"
+            />
+
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="Hotspots">
+
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_hide_hotspots"
+            android:title="@string/hide_hotspots"
+            />
+
+        <com.appsimobile.appsii.SeekPreference
+            android:defaultValue="22"
+            android:dialogMessage="@string/pref_hotspot_width_name"
+            android:key="pref_hotspot_width"
+            android:max="40"
+            android:persistent="true"
+            android:title="@string/pref_hotspot_width_name"
+            appsi:leftText="4"
+            appsi:minValue="4"
+            appsi:rightText="40"
+            appsi:valueVisible="true"
+            />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_sidebar_haptic_feedback"
+            android:summary="@string/pref_sidebar_haptic_feedback_summary"
+            android:title="@string/pref_sidebar_haptic_feedback_title"
+            />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_autostart"
+            android:title="@string/pref_autostart_title"
+            />
+
+    </PreferenceCategory>
+</PreferenceScreen>
