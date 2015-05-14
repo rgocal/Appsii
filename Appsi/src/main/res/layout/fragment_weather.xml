@@ -40,7 +40,7 @@
             android:layout_marginStart="16dp"
             android:gravity="bottom"
             android:text="@string/feature_title_weather"
-            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
             android:textColor="?android:attr/textColorPrimary"
 
             />

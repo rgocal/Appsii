@@ -48,13 +48,6 @@ import java.util.concurrent.CountDownLatch;
  */
 public class PaintJob {
 
-    @Retention(RetentionPolicy.CLASS)
-    @IntDef({SWATCH_VIBRANT, SWATCH_DARK_VIBRANT, SWATCH_LIGHT_VIBRANT,
-            SWATCH_MUTED, SWATCH_DARK_MUTED, SWATCH_LIGHT_MUTED})
-    public @interface Swatch {
-
-    }
-
     public static final int SWATCH_VIBRANT = 0;
 
     public static final int SWATCH_DARK_VIBRANT = 1;
@@ -67,23 +60,9 @@ public class PaintJob {
 
     public static final int SWATCH_LIGHT_MUTED = 5;
 
-    @Retention(RetentionPolicy.CLASS)
-    @IntDef({RGB, TEXT, TITLE_TEXT})
-    public @interface SwatchColor {
-
-    }
-
-    public static final int RGB = 0;
-
-    public static final int TEXT = 1;
-
-    public static final int TITLE_TEXT = 2;
-
-    private final BitmapSource mBitmapSource;
+    private static ArgbEvaluator sArgbEvaluator;
 
     final View mRootView;
-
-    FallBackColors mFallBackColors;
 
     final List<ViewPainter> mViewPainters;
 
@@ -91,13 +70,22 @@ public class PaintJob {
 
     final CountDownLatch mCountDownLatch;
 
+    final SparseArray<View> mViews = new SparseArray<>();
+
+    private final BitmapSource mBitmapSource;
+
+    FallBackColors mFallBackColors;
+
     // volatile to ensure reference is visible after countdown.
     volatile Bitmap mBitmap;
 
+    boolean mCancelled;
 
     boolean mExecuted;
 
-    AsyncTask<Void, Void, Bitmap> mLoadTask;
+    AsyncTask<BitmapSource, ?, ?> mLoadTask;
+
+    AsyncTask<?, ?, ?> mPaletteTask;
 
     int mDuration;
 
@@ -118,6 +106,16 @@ public class PaintJob {
 
         // provide a simple future by implementing call using a countdown-latch.
         mCountDownLatch = new CountDownLatch(1);
+
+    }
+
+    public static Builder newBuilder(View view, BitmapSource bitmapSource) {
+        return new ViewBuilderImpl(view, bitmapSource);
+
+    }
+
+    public static Builder newBuilder(View view, Bitmap bitmap) {
+        return new ViewBuilderImpl(view, new PlainBitmapSource(bitmap));
 
     }
 
@@ -151,9 +149,10 @@ public class PaintJob {
     }
 
     private void loadBitmap(final BitmapSource bitmapSource) {
-        mLoadTask = new AsyncTask<Void, Void, Bitmap>() {
+        mLoadTask = new AsyncTask<BitmapSource, Void, Bitmap>() {
             @Override
-            protected Bitmap doInBackground(Void... params) {
+            protected Bitmap doInBackground(BitmapSource... params) {
+                BitmapSource bitmapSource = params[0];
                 return bitmapSource.loadBitmapAsync();
             }
 
@@ -162,7 +161,8 @@ public class PaintJob {
                 onBitmapLoaded(bitmap, false /* immediate */);
             }
         };
-        mLoadTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        mLoadTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+                new BitmapSource[]{bitmapSource});
 
     }
 
@@ -176,7 +176,7 @@ public class PaintJob {
             onPaletteGenerated(null, false);
         } else {
 
-            Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+            mPaletteTask = Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
                 @Override
                 public void onGenerated(Palette palette) {
                     onPaletteGenerated(palette, immediate);
@@ -189,6 +189,9 @@ public class PaintJob {
     }
 
     void onPaletteGenerated(@Nullable Palette palette, boolean immediate) {
+        // when we are cancelled, don't do anything
+        if (mCancelled) return;
+
         mPalette = palette;
         applyPalette(palette, immediate);
     }
@@ -199,7 +202,8 @@ public class PaintJob {
         }
     }
 
-    public void destroy() {
+    public void cancel() {
+        mCancelled = true;
         if (mLoadTask != null) {
             mLoadTask.cancel(true);
             mLoadTask = null;
@@ -213,13 +217,19 @@ public class PaintJob {
         return mFallBackColors;
     }
 
-    public static Builder newBuilder(View view, BitmapSource bitmapSource) {
-        return new ViewBuilderImpl(view, bitmapSource);
-
+    View findViewById(@IdRes int viewId) {
+        View result = mViews.get(viewId);
+        if (result == null) {
+            result = mRootView.findViewById(viewId);
+            mViews.put(viewId, result);
+        }
+        return result;
     }
 
-    public static Builder newBuilder(View view, Bitmap bitmap) {
-        return new ViewBuilderImpl(view, new PlainBitmapSource(bitmap));
+    @Retention(RetentionPolicy.CLASS)
+    @IntDef({SWATCH_VIBRANT, SWATCH_DARK_VIBRANT, SWATCH_LIGHT_VIBRANT,
+            SWATCH_MUTED, SWATCH_DARK_MUTED, SWATCH_LIGHT_MUTED})
+    public @interface Swatch {
 
     }
 
@@ -233,21 +243,40 @@ public class PaintJob {
         boolean canAnimate();
     }
 
-    final SparseArray<View> mViews = new SparseArray<>();
+    public interface DerivedBuilder {
 
-    View findViewById(@IdRes int viewId) {
-        View result = mViews.get(viewId);
-        if (result == null) {
-            result = mRootView.findViewById(viewId);
-            mViews.put(viewId, result);
-        }
-        return result;
+        Builder setFallBackColors(FallBackColors fallBackColors);
+
+        Builder paintWithSwatch(@Swatch int swatch, ViewPainter... viewPainters);
+
+        PaintJob build();
+
+    }
+
+    public interface Builder extends DerivedBuilder {
+
+        Builder setBitmapCallback(BitmapCallback bitmapCallback);
+    }
+
+    public interface BitmapSource {
+
+        Bitmap loadBitmapAsync();
+    }
+
+    public interface BitmapCallback {
+
+        void onBitmapLoaded(Bitmap bitmap, boolean immediate);
     }
 
     static class RgbViewPainter extends BaseViewPainter {
 
         RgbViewPainter(int alpha, int[] viewIds) {
             super(alpha, viewIds);
+        }
+
+        @Override
+        protected int getTargetColorFromSwatch(Palette.Swatch swatch) {
+            return swatch.getRgb();
         }
 
         @Override
@@ -260,21 +289,13 @@ public class PaintJob {
             return Color.TRANSPARENT;
         }
 
-        @Override
-        protected int getTargetColorFromSwatch(Palette.Swatch swatch) {
-            return swatch.getRgb();
-        }
+
 
         @Override
         protected void applyColorToView(View view, int color) {
             view.setBackgroundColor(color);
         }
 
-//        @Override
-//        protected void applyColorToView(View view, Palette.Swatch swatch, boolean immediate,
-//                int duration) {
-//            view.setBackgroundColor(swatch.getRgb());
-//        }
     }
 
     static class TitleViewPainter extends BaseViewPainter {
@@ -298,13 +319,6 @@ public class PaintJob {
             ((TextView) view).setTextColor(color);
         }
 
-//        @Override
-//        protected void applyColorToView(View view, Palette.Swatch swatch, boolean immediate,
-//                int duration) {
-//            if (view instanceof TextView) {
-//                ((TextView) view).setTextColor(swatch.getTitleTextColor());
-//            }
-//        }
     }
 
     static class BodyTextViewPainter extends TitleViewPainter {
@@ -323,24 +337,14 @@ public class PaintJob {
 
         final int[] mViewIds;
 
+        final int mAlpha;
+
         @Swatch
         int mSwatch;
-
-        final int mAlpha;
 
         protected BaseViewPainter(int alpha, int... viewIds) {
             mAlpha = alpha;
             mViewIds = viewIds;
-        }
-
-        @Override
-        public boolean canAnimate() {
-            return true;
-        }
-
-        @Override
-        public void setSwatch(int swatch) {
-            mSwatch = swatch;
         }
 
         @Override
@@ -361,46 +365,17 @@ public class PaintJob {
                 int viewId = mViewIds[i];
                 View view = paintJob.findViewById(viewId);
                 animateViewToColor(view, swatch, immediate, duration);
-
-                //applyColorToView(view, swatch, immediate, duration);
             }
         }
 
-        protected abstract int getCurrentColorFromView(View view);
-
-        protected abstract int getTargetColorFromSwatch(Palette.Swatch swatch);
-
-        protected abstract void applyColorToView(View view, int color);
-
-        protected boolean applyColorsToView(View view, Palette.Swatch swatch) {
-            return false;
+        @Override
+        public void setSwatch(int swatch) {
+            mSwatch = swatch;
         }
 
-        private void animateViewToColor(final View view, Palette.Swatch swatch, boolean immediate,
-                int duration) {
-
-            int targetColor = getTargetColorFromSwatch(swatch);
-            targetColor = ColorUtils.setAlphaComponent(targetColor, mAlpha);
-
-            if (!canAnimate() || immediate || duration <= 0) {
-                if (!canAnimate() && !applyColorsToView(view, swatch)) {
-                    applyColorToView(view, targetColor);
-                }
-            } else {
-                int currentColor = getCurrentColorFromView(view);
-
-                ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(),
-                        currentColor, targetColor);
-
-                colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animation) {
-                        applyColorToView(view, (int) animation.getAnimatedValue());
-                    }
-                });
-                colorAnimation.setDuration(duration);
-                colorAnimation.start();
-            }
+        @Override
+        public boolean canAnimate() {
+            return true;
         }
 
         private static Palette.Swatch getSwatch(@Swatch int swatch, @Nullable Palette palette) {
@@ -442,46 +417,91 @@ public class PaintJob {
             }
         }
 
-    }
+        private void animateViewToColor(final View view, Palette.Swatch swatch, boolean immediate,
+                int duration) {
 
+            int targetColor = getTargetColorFromSwatch(swatch);
+            targetColor = ColorUtils.setAlphaComponent(targetColor, mAlpha);
 
-    public interface DerivedBuilder {
+            if (!canAnimate() || immediate || duration <= 0) {
+                if (!canAnimate() && !applyColorsToView(view, swatch)) {
+                    applyColorToView(view, targetColor);
+                }
+            } else {
+                final int currentColor = getCurrentColorFromView(view);
 
-        Builder setFallBackColors(FallBackColors fallBackColors);
+                ValueAnimator colorAnimation = new ValueAnimator();
+                if (sArgbEvaluator == null) {
+                    sArgbEvaluator = new ArgbEvaluator();
+                }
+                colorAnimation.setIntValues(currentColor, targetColor);
 
-        Builder paintWithSwatch(@Swatch int swatch, ViewPainter... viewPainters);
+                final int finalTargetColor = targetColor;
+                colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        int color = evaluate(animation.getAnimatedFraction(), currentColor,
+                                finalTargetColor);
+                        applyColorToView(view, color);
+                    }
+                });
+                colorAnimation.setDuration(duration);
+                colorAnimation.start();
+            }
+        }
 
-        PaintJob build();
+        protected abstract int getTargetColorFromSwatch(Palette.Swatch swatch);
 
-    }
+        protected boolean applyColorsToView(View view, Palette.Swatch swatch) {
+            return false;
+        }
 
-    public interface Builder extends DerivedBuilder {
+        protected abstract void applyColorToView(View view, int color);
 
-        Builder setBitmapCallback(BitmapCallback bitmapCallback);
-    }
+        protected abstract int getCurrentColorFromView(View view);
 
-    public interface BitmapSource {
+        static int evaluate(float fraction, int startInt, int endInt) {
+            int startA = (startInt >> 24) & 0xff;
+            int startR = (startInt >> 16) & 0xff;
+            int startG = (startInt >> 8) & 0xff;
+            int startB = startInt & 0xff;
 
-        Bitmap loadBitmapAsync();
+            int endA = (endInt >> 24) & 0xff;
+            int endR = (endInt >> 16) & 0xff;
+            int endG = (endInt >> 8) & 0xff;
+            int endB = endInt & 0xff;
+
+            return (int) ((startA + (int) (fraction * (endA - startA))) << 24) |
+                    (int) ((startR + (int) (fraction * (endR - startR))) << 16) |
+                    (int) ((startG + (int) (fraction * (endG - startG))) << 8) |
+                    (int) ((startB + (int) (fraction * (endB - startB))));
+        }
+
     }
 
     static class ViewBuilderImpl implements Builder {
+
+        final View mView;
+
+        final List<ViewPainter> mViewPainters = new ArrayList<>();
 
         boolean mBuilt;
 
         FallBackColors mFallBackColors;
 
-        final View mView;
-
         BitmapSource mBitmapSource;
 
         BitmapCallback mBitmapCallback;
 
-        final List<ViewPainter> mViewPainters = new ArrayList<>();
-
         public ViewBuilderImpl(View view, BitmapSource bitmapSource) {
             mView = view;
             mBitmapSource = bitmapSource;
+        }
+
+        @Override
+        public Builder setFallBackColors(FallBackColors fallBackColors) {
+            mFallBackColors = fallBackColors;
+            return this;
         }
 
         @Override
@@ -503,12 +523,6 @@ public class PaintJob {
             mBuilt = true;
             return new PaintJob(mView, mBitmapSource, mFallBackColors, mViewPainters,
                     mBitmapCallback);
-        }
-
-        @Override
-        public Builder setFallBackColors(FallBackColors fallBackColors) {
-            mFallBackColors = fallBackColors;
-            return this;
         }
 
         @Override
@@ -554,6 +568,18 @@ public class PaintJob {
         public FallBackColors(int vibrantFallbackColor, int mutedFallbackColor) {
             mVibrantFallbackColor = vibrantFallbackColor;
             mMutedFallbackColor = mutedFallbackColor;
+        }
+
+        public static FallBackColors fromContext(Context context) {
+            TypedArray a = context.obtainStyledAttributes(
+                    new int[]{R.attr.colorPrimary, R.attr.colorAccent});
+
+            int vibrantFallback = a.getColor(1, 0 /* TODO: define smart default */);
+            int mutedFallback = a.getColor(0, 0 /* TODO: define smart default */);
+
+            a.recycle();
+
+            return new FallBackColors(vibrantFallback, mutedFallback);
         }
 
         public Palette.Swatch getVibrantSwatch() {
@@ -602,23 +628,6 @@ public class PaintJob {
             return mMutedSwatch;
         }
 
-        public static FallBackColors fromContext(Context context) {
-            TypedArray a = context.obtainStyledAttributes(
-                    new int[]{R.attr.colorPrimary, R.attr.colorAccent});
-
-            int vibrantFallback = a.getColor(1, 0 /* TODO: define smart default */);
-            int mutedFallback = a.getColor(0, 0 /* TODO: define smart default */);
-
-            a.recycle();
-
-            return new FallBackColors(vibrantFallback, mutedFallback);
-        }
-
-    }
-
-    public interface BitmapCallback {
-
-        void onBitmapLoaded(Bitmap bitmap, boolean immediate);
     }
 
 }

@@ -287,7 +287,19 @@ public class AgendaController extends PageController
         mHeaderView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         mToolbar = (Toolbar) view.findViewById(R.id.toolbar);
-        mAgendaRecycler.addOnScrollListener(new ToolbarScrollListener(this, mToolbar));
+        mAgendaRecycler.addOnScrollListener(new ToolbarScrollListener(this, mToolbar) {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                View child = recyclerView.getChildAt(0);
+                if (child != null) {
+                    int position = recyclerView.getChildLayoutPosition(child);
+                    if (position != RecyclerView.NO_POSITION) {
+                        syncDayToMonth(position);
+                    }
+                }
+            }
+        });
         Menu menu = mToolbar.getMenu();
         menu.clear();
         MenuInflater menuInflater = new MenuInflater(getContext());
@@ -335,7 +347,6 @@ public class AgendaController extends PageController
         mHeaderContainer = view.findViewById(R.id.header_container);
 
         mHeaderView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            boolean mSettling;
 
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -486,13 +497,6 @@ public class AgendaController extends PageController
         mTitleCompoundDrawable.setExpanded(false, true);
     }
 
-    void syncDayToMonth(int firstPosition) {
-        if (firstPosition != mLastVisiblePosition) {
-            mLastVisiblePosition = firstPosition;
-            updateToolbarTitleAndMonthPosition();
-        }
-    }
-
     void scrollAgendaViewToDate(int year, int month, int day, boolean fromTap) {
         int agendaPosition = mAgendaAdapter.positionOfDate(year, month, day);
 
@@ -509,6 +513,13 @@ public class AgendaController extends PageController
 
         if (fromTap) {
             collapseHeader();
+        }
+    }
+
+    void syncDayToMonth(int firstPosition) {
+        if (firstPosition != mLastVisiblePosition) {
+            mLastVisiblePosition = firstPosition;
+            updateToolbarTitleAndMonthPosition();
         }
     }
 

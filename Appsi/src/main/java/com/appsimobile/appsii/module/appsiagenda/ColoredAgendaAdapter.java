@@ -73,7 +73,7 @@ public class ColoredAgendaAdapter extends AgendaAdapter<ColoredAgendaViewHolder>
     @Override
     public int positionOfDate(int year, int month, int day) {
         mRecycleTime.set(day, month, year);
-        int julianDay = TimeUtils.getJulianDay();
+        int julianDay = Time.getJulianDay(mRecycleTime.toMillis(false), 0);
         return positionOfJulianDay(julianDay);
     }
 

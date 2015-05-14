@@ -44,7 +44,6 @@ public class WeatherPreferencesActivity extends AppCompatActivity {
         }
         ActivityUtils.setupToolbar(this, R.id.toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
     }
 
 

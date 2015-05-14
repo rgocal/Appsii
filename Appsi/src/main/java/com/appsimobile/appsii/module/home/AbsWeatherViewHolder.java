@@ -70,6 +70,8 @@ abstract class AbsWeatherViewHolder extends AbsHomeViewHolder implements
 
     final SharedPreferences mSharedPreferences;
 
+    final boolean mShowsWallpaper;
+
     HomeItem mHomeItem;
 
     AsyncTask<Void, Void, WeatherData> mLoaderTask;
@@ -93,8 +95,6 @@ abstract class AbsWeatherViewHolder extends AbsHomeViewHolder implements
     WeatherData mWeatherData;
 
     PaintJob mPaintJob;
-
-    final boolean mShowsWallpaper;
 
     public AbsWeatherViewHolder(HomeViewWrapper view, boolean showsWallpaper) {
         super(view);
@@ -127,14 +127,6 @@ abstract class AbsWeatherViewHolder extends AbsHomeViewHolder implements
     }
 
     @Override
-    public void onDetached(boolean allowLoads) {
-        super.onDetached(allowLoads);
-        if (mCellBackground != null) {
-            mCellBackground.setImageDrawable(null);
-        }
-    }
-
-    @Override
     public void onAllowLoads() {
         mConfigurationHelper.addConfigurationListener(this);
         mReceiver = new BroadcastReceiver() {
@@ -158,60 +150,23 @@ abstract class AbsWeatherViewHolder extends AbsHomeViewHolder implements
         }
     }
 
-    protected void configurePaintJob(PaintJob.Builder paintJob) {
-
-    }
-
-    public void applyBackgroundImageIfNeeded(String woeid) {
-        if (!mShowsWallpaper) return;
-        if (mCellBackground == null) return;
-
-        if (TextUtils.equals(woeid, mBackgroundLoadedForWoeid)) {
-            return;
-        }
-
-        if (mPaintJob != null) {
-            mPaintJob.destroy();
-        }
-
-        mCellBackground.setImageDrawable(null);
-
-        int w = (int) (itemView.getWidth() * 1.5f);
-        int h = (int) (itemView.getHeight() * 1.5f);
-
-        PaintJob.Builder builder = PaintJob.newBuilder(itemView, new BackgroundLoader(
-                itemView.getContext(), woeid, w, h, 10, true));
-
-        builder.setBitmapCallback(new PaintJob.BitmapCallback() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, boolean immediate) {
-                if (bitmap == null) {
-                    mCellBackground.setImageDrawable(null);
-                    return;
-                }
-
-                Drawable tmp = new ColorDrawable(Color.TRANSPARENT);
-                Drawable drawable = new BitmapDrawable(itemView.getResources(), bitmap);
-                TransitionDrawable d = new TransitionDrawable(new Drawable[]{
-                        tmp,
-                        drawable
-                });
-                mCellBackground.setImageDrawable(d);
-                d.startTransition(150);
-                d.setCrossFadeEnabled(true);
-            }
-        });
-        configurePaintJob(builder);
-        builder.build().execute(150);
-
-    }
-
     @Override
     public void onDisallowLoads() {
         mConfigurationHelper.removeConfigurationListener(this);
         itemView.getContext().unregisterReceiver(mReceiver);
         if (mLoaderTask != null) {
             mLoaderTask.cancel(true);
+        }
+    }
+
+    @Override
+    public void onDetached(boolean allowLoads) {
+        super.onDetached(allowLoads);
+        if (mCellBackground != null) {
+            mCellBackground.setImageDrawable(null);
+        }
+        if (mPaintJob != null) {
+            mPaintJob.cancel();
         }
     }
 
@@ -277,6 +232,55 @@ abstract class AbsWeatherViewHolder extends AbsHomeViewHolder implements
     abstract void onNoWeatherDataAvailable();
 
     abstract void onWeatherDataReady(WeatherData weatherData);
+
+    public void applyBackgroundImageIfNeeded(String woeid) {
+        if (!mShowsWallpaper) return;
+        if (mCellBackground == null) return;
+
+        if (TextUtils.equals(woeid, mBackgroundLoadedForWoeid)) {
+            return;
+        }
+
+        if (mPaintJob != null) {
+            mPaintJob.cancel();
+        }
+
+        mCellBackground.setImageDrawable(null);
+
+        int w = (int) (itemView.getWidth() * 1.5f);
+        int h = (int) (itemView.getHeight() * 1.5f);
+
+        PaintJob.Builder builder = PaintJob.newBuilder(itemView, new BackgroundLoader(
+                itemView.getContext(), woeid, w, h, 10, true));
+
+        builder.setBitmapCallback(new PaintJob.BitmapCallback() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, boolean immediate) {
+                if (bitmap == null) {
+                    mCellBackground.setImageDrawable(null);
+                    return;
+                }
+
+                Drawable tmp = new ColorDrawable(Color.TRANSPARENT);
+                Drawable drawable = new BitmapDrawable(itemView.getResources(), bitmap);
+                TransitionDrawable d = new TransitionDrawable(new Drawable[]{
+                        tmp,
+                        drawable
+                });
+                mCellBackground.setImageDrawable(d);
+                d.startTransition(150);
+                d.setCrossFadeEnabled(true);
+            }
+        });
+        configurePaintJob(builder);
+        PaintJob paintJob = builder.build();
+        paintJob.execute(150);
+        mPaintJob = paintJob;
+    }
+
+    protected void configurePaintJob(PaintJob.Builder paintJob) {
+
+    }
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {

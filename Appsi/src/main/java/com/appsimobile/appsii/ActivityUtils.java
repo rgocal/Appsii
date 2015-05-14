@@ -92,6 +92,26 @@ public final class ActivityUtils {
         return layoutToolbar;
     }
 
+    public static Toolbar setupToolbarNoTitle(AppCompatActivity activity, @IdRes int toolbarResId) {
+        ActionBar ab = activity.getSupportActionBar();
+        if (ab != null) throw new IllegalStateException("Activity already has a toolbar");
+
+        Toolbar layoutToolbar = (Toolbar) activity.findViewById(toolbarResId);
+        Toolbar result = (Toolbar) activity.findViewById(R.id.tablet_toolbar);
+        if (result != null) {
+            if (layoutToolbar != null) {
+                layoutToolbar.setVisibility(View.GONE);
+            }
+            activity.setSupportActionBar(result);
+            ((TextView) activity.findViewById(R.id.toolbar_title)).setText(activity.getTitle());
+            activity.getSupportActionBar().setTitle(null);
+            return result;
+        }
+        activity.setSupportActionBar(layoutToolbar);
+        activity.getSupportActionBar().setTitle(null);
+        return layoutToolbar;
+    }
+
     public static Toolbar getToolbarPlain(Activity activity, @IdRes int toolbarResId) {
         Toolbar layoutToolbar = (Toolbar) activity.findViewById(toolbarResId);
         Toolbar result = (Toolbar) activity.findViewById(R.id.tablet_toolbar);
@@ -103,6 +123,20 @@ public final class ActivityUtils {
             return result;
         }
         layoutToolbar.setTitle(activity.getTitle());
+        return layoutToolbar;
+    }
+
+    public static Toolbar getToolbarPlainNoTitle(Activity activity, @IdRes int toolbarResId) {
+        Toolbar layoutToolbar = (Toolbar) activity.findViewById(toolbarResId);
+        Toolbar result = (Toolbar) activity.findViewById(R.id.tablet_toolbar);
+        if (result != null) {
+            if (layoutToolbar != null) {
+                layoutToolbar.setVisibility(View.GONE);
+            }
+            ((TextView) activity.findViewById(R.id.toolbar_title)).setText(activity.getTitle());
+            return result;
+        }
+        layoutToolbar.setTitle(null);
         return layoutToolbar;
     }
 
