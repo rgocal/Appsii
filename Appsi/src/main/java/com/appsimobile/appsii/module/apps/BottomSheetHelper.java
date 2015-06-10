@@ -105,34 +105,6 @@ class BottomSheetHelper {
 
     }
 
-    private static boolean canRecyclerScrollUp(RecyclerView recyclerView) {
-        View view = recyclerView.getChildAt(0);
-        if (view == null) return false;
-
-        boolean isFirst = recyclerView.getChildLayoutPosition(view) == 0;
-        if (!isFirst) return true;
-
-        int top = view.getTop();
-        if (top < 0) return true;
-
-        return false;
-    }
-
-    private static boolean canRecyclerScrollDown(RecyclerView recyclerView) {
-        View view = recyclerView.getChildAt(recyclerView.getChildCount() - 1);
-        if (view == null) return false;
-
-        int lastItemPosition = recyclerView.getAdapter().getItemCount() - 1;
-
-        boolean isLast = recyclerView.getChildLayoutPosition(view) == lastItemPosition;
-        if (!isLast) return true;
-
-        int bottom = view.getBottom();
-        if (bottom > recyclerView.getHeight()) return true;
-
-        return false;
-    }
-
     public void onViewCreated(View parent) {
         mBottomSheetFooter = parent.findViewById(R.id.bottom_sheet_footer);
         mOverlay = parent.findViewById(R.id.bottom_sheet_overlay);
@@ -299,6 +271,11 @@ class BottomSheetHelper {
                         break;
                 }
             }
+
+            @Override
+            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+            }
         });
 
         mAddTagView = parent.findViewById(R.id.add_tag);
@@ -342,6 +319,34 @@ class BottomSheetHelper {
             }
         };
         ((ViewGroup) mContentView).setLayoutAnimation(mController);
+    }
+
+    private static boolean canRecyclerScrollUp(RecyclerView recyclerView) {
+        View view = recyclerView.getChildAt(0);
+        if (view == null) return false;
+
+        boolean isFirst = recyclerView.getChildLayoutPosition(view) == 0;
+        if (!isFirst) return true;
+
+        int top = view.getTop();
+        if (top < 0) return true;
+
+        return false;
+    }
+
+    private static boolean canRecyclerScrollDown(RecyclerView recyclerView) {
+        View view = recyclerView.getChildAt(recyclerView.getChildCount() - 1);
+        if (view == null) return false;
+
+        int lastItemPosition = recyclerView.getAdapter().getItemCount() - 1;
+
+        boolean isLast = recyclerView.getChildLayoutPosition(view) == lastItemPosition;
+        if (!isLast) return true;
+
+        int bottom = view.getBottom();
+        if (bottom > recyclerView.getHeight()) return true;
+
+        return false;
     }
 
     void snapToPosition(boolean expand, boolean closing) {

@@ -106,14 +106,6 @@ public class HomePageController extends PageController implements Toolbar.OnMenu
     }
 
     @Override
-    public void onTrimMemory(int level) {
-        super.onTrimMemory(level);
-        if (mHomeAdapter != null) {
-            mHomeAdapter.onTrimMemory(level);
-        }
-    }
-
-    @Override
     protected void onViewCreated(View view, Bundle savedInstanceState) {
         mRecyclerView = (RecyclerView) view.findViewById(R.id.home_recycler);
         mToolbar = (Toolbar) view.findViewById(R.id.toolbar);
@@ -169,6 +161,14 @@ public class HomePageController extends PageController implements Toolbar.OnMenu
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        if (mHomeAdapter != null) {
+            mHomeAdapter.onTrimMemory(level);
+        }
     }
 
     @Override
@@ -553,6 +553,11 @@ public class HomePageController extends PageController implements Toolbar.OnMenu
                     Crashlytics.logException(new NullPointerException("Should not happen"));
                 }
             }
+        }
+
+        @Override
+        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
         }
 
         private void dispatchTouchEvent(RecyclerView rv, MotionEvent e,

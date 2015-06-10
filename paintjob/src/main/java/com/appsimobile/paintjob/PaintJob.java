@@ -226,7 +226,7 @@ public class PaintJob {
         return result;
     }
 
-    @Retention(RetentionPolicy.CLASS)
+    @Retention(RetentionPolicy.SOURCE)
     @IntDef({SWATCH_VIBRANT, SWATCH_DARK_VIBRANT, SWATCH_LIGHT_VIBRANT,
             SWATCH_MUTED, SWATCH_DARK_MUTED, SWATCH_LIGHT_MUTED})
     public @interface Swatch {

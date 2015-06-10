@@ -272,6 +272,11 @@ public class AgendaController extends PageController
                     }
                 }
             }
+
+            @Override
+            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+            }
         });
         // setup the header view
         mHeaderView = (RecyclerView) view.findViewById(R.id.agenda_month_recycler);

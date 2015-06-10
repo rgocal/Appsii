@@ -139,12 +139,12 @@
 
     <style name="AppsiToolbar">
         <item name="popupTheme">@style/ThemeOverlay.AppCompat.Dark</item>
-        <item name="theme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="android:theme">@style/ThemeOverlay.AppCompat.Light</item>
     </style>
 
     <style name="AppsiToolbar.Dark">
         <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
-        <item name="theme">@style/ThemeOverlay.AppCompat.Dark</item>
+        <item name="android:theme">@style/ThemeOverlay.AppCompat.Dark</item>
     </style>
 
     <style name="TextAppearance.Appsi.Holo.Medium.Condensed" parent="TextAppearance.Appsi.Holo.Medium">
