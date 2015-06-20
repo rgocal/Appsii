@@ -1562,17 +1562,17 @@ public class HomeAdapterEditorTest extends InstrumentationTestCase {
 
     static class TestState {
 
-        HomeAdapter mHomeAdapter;
+        final HomeAdapter mHomeAdapter;
 
-        HomeAdapter.HomeAdapterEditor mEditor;
+        final HomeAdapter.HomeAdapterEditor mEditor;
 
-        ArrayList<ContentProviderOperation> mOps;
+        final ArrayList<ContentProviderOperation> mOps;
 
-        List<OperationWrapper> mOpWrappers;
+        final List<OperationWrapper> mOpWrappers;
 
-        TestOpsBuilder mTestOpsBuilder;
+        final TestOpsBuilder mTestOpsBuilder;
 
-        List<HomeItem> mInternalList;
+        final List<HomeItem> mInternalList;
 
         TestState(Context context, HomeItem... homeItems) {
             mHomeAdapter = new HomeAdapter(context, 1);

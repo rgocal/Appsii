@@ -29,13 +29,13 @@ public class PurchaseHelper implements BaseIabHelper.OnIabSetupFinishedListener 
 
     final Activity mActivity;
 
-    IabPurchaseHelper mIabPurchaseHelper;
+    final IabPurchaseHelper mIabPurchaseHelper;
 
     boolean mInitializing;
 
     boolean mConnectedToGooglePlay;
 
-    PurchaseHelperListener mPurchaseHelperListener;
+    final PurchaseHelperListener mPurchaseHelperListener;
 
     /**
      * Creates an instance of the PurchaseHelper. This will automatically attempt
@@ -92,7 +92,7 @@ public class PurchaseHelper implements BaseIabHelper.OnIabSetupFinishedListener 
     /**
      * A listener that will receive connection status callbacks from
      */
-    public static interface PurchaseHelperListener {
+    public interface PurchaseHelperListener {
 
         void onIabSetupSuccess();
 

@@ -39,11 +39,11 @@ public class NovaIconPack extends AbstractIconPack {
 
     AppFilterParser.AppFilterData mAppFilterData;
 
-    private String mPackageName;
+    private final String mPackageName;
 
     private Resources mResources;
 
-    private Uri mIconPackUri;
+    private final Uri mIconPackUri;
 
     private AppFilterDecorationHelper mAppFilterDecorationHelper;
 

@@ -166,6 +166,33 @@ public class WeatherActivityTest extends ActivityInstrumentationTestCase2<CellWe
 
     }
 
+    public void testPickLocation_locationPermissionDenied() {
+
+        HomeItemConfigurationHelper.setFactory(new MockLocationFactory());
+
+        YahooLocationChooserDialogFragment.sLocationUpdateHelper =
+                new PermissionDeniedLocationUpdate();
+
+        mWeatherActivity = getActivity();
+        mConfiguration = (MockHomeItemConfiguration) HomeItemConfigurationHelper.
+                getInstance(mWeatherActivity);
+
+        onView(withId(R.id.weather_location)).perform(click());
+        onView(withId(R.id.location_title)).check(matches(withText(R.string.location_disabled)));
+
+        onView(withId(R.id.location_search)).
+                check(matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)));
+        onView(withId(R.id.location_unavailable)).
+                check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
+
+        onView(withId(R.id.cancel_enable_location_button)).perform(click());
+        onView(withId(R.id.location_unavailable)).
+                check(matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)));
+
+        // TODO choose auto option and verify
+
+    }
+
     private static class MockImperialLocationFactory implements HomeItemConfigurationFactory {
 
         MockImperialLocationFactory() {
@@ -215,6 +242,28 @@ public class WeatherActivityTest extends ActivityInstrumentationTestCase2<CellWe
         @Override
         protected int doStartLocationUpdateIfNeeded(Context context, int passedMinutes) {
             return YahooLocationChooserDialogFragment.LOCATION_REQUEST_RESULT_DISABLED;
+        }
+
+        @Override
+        public void setFragment(YahooLocationChooserDialogFragment fragment) {
+
+        }
+
+        @Override
+        public void onStop() {
+
+        }
+    }
+
+    private static class PermissionDeniedLocationUpdate
+            extends YahooLocationChooserDialogFragment.AbstractDefaultLocationUpdate {
+
+        PermissionDeniedLocationUpdate() {
+        }
+
+        @Override
+        protected int doStartLocationUpdateIfNeeded(Context context, int passedMinutes) {
+            return YahooLocationChooserDialogFragment.LOCATION_REQUEST_RESULT_PERMISSION_DENIED;
         }
 
         @Override

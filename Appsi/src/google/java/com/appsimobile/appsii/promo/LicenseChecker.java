@@ -67,9 +67,9 @@ abstract class LicenseChecker {
 
     PluginConnectionHelper mPluginConnectionHelper;
 
-    Activity mContext;
+    final Activity mContext;
 
-    String mVersionCode;
+    final String mVersionCode;
 
     AsyncTask<Void, Void, Bundle> mTask;
 

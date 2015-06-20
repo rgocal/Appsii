@@ -21,10 +21,7 @@ import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -38,16 +35,9 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 
-import com.appsimobile.appsii.HotspotPageEntry;
-import com.appsimobile.appsii.HotspotPagesQuery;
 import com.appsimobile.appsii.R;
-import com.appsimobile.appsii.module.BaseListAdapter;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
-import com.mobeta.android.dslv.ConditionalRemovableAdapter;
 import com.mobeta.android.dslv.DragSortListView;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A dialog that shows the general options for a hotspot. The user
@@ -60,8 +50,7 @@ import java.util.List;
  * Created by nick on 31/01/15.
  */
 public class HotspotSettingsFragment extends DialogFragment
-        implements DragSortListView.DropListener,
-        PageHotspotViewHolder.OnPageEnabledChangedListener, View.OnClickListener,
+        implements View.OnClickListener,
         CompoundButton.OnCheckedChangeListener, TextWatcher {
 
     /**
@@ -73,11 +62,6 @@ public class HotspotSettingsFragment extends DialogFragment
      * The listview used to change the order of the pages with
      */
     DragSortListView mDragSortListView;
-
-    /**
-     * The list-adapter showing all the pages in the hotspot
-     */
-    HotspotAdapter mHotspotAdapter;
 
     /**
      * The title edit-text
@@ -120,6 +104,8 @@ public class HotspotSettingsFragment extends DialogFragment
      */
     QueryHandlerImpl mQueryHandler;
 
+    ReorderController mReorderController;
+
     public HotspotSettingsFragment() {
         setStyle(DialogFragment.STYLE_NO_TITLE, 0);
         mHandler = new Handler(new Handler.Callback() {
@@ -158,7 +144,7 @@ public class HotspotSettingsFragment extends DialogFragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mHotspotAdapter = new HotspotAdapter(this);
+
         Bundle args = getArguments();
         if (args == null) {
             mHotspotId = -1L;
@@ -172,64 +158,10 @@ public class HotspotSettingsFragment extends DialogFragment
         mRestoredInstanceState = savedInstanceState != null;
 
         mQueryHandler = new QueryHandlerImpl(getActivity().getContentResolver());
-        loadHotspotPages();
+        mReorderController = new ReorderController(getActivity(), mHotspotId);
+        mReorderController.loadHotspotPages();
     }
 
-    /**
-     * Loads the pages enabled in the hotspot
-     */
-    private void loadHotspotPages() {
-
-        AsyncTask<Void, Void, List<HotspotPageEntry>> task =
-                new AsyncTask<Void, Void, List<HotspotPageEntry>>() {
-
-
-                    @Override
-                    protected List<HotspotPageEntry> doInBackground(Void... params) {
-                        Context context = getActivity();
-                        if (context == null) return null;
-
-                        Cursor c = context.getContentResolver().
-                                query(HotspotPagesQuery.createUri(mHotspotId),
-                                        HotspotPagesQuery.ARGS,
-                                        null,
-                                        null,
-                                        HomeContract.HotspotDetails.POSITION + " ASC"
-                                );
-                        List<HotspotPageEntry> result = new ArrayList<>(c.getCount());
-                        while (c.moveToNext()) {
-                            HotspotPageEntry entry = new HotspotPageEntry();
-                            entry.mEnabled = c.getInt(HotspotPagesQuery.ENABLED) == 1;
-                            entry.mPageId = c.getLong(HotspotPagesQuery.PAGE_ID);
-                            entry.mHotspotId = c.getLong(HotspotPagesQuery.HOTSPOT_ID);
-                            entry.mPageName = c.getString(HotspotPagesQuery.PAGE_NAME);
-                            entry.mHotspotName = c.getString(HotspotPagesQuery.HOTSPOT_NAME);
-                            entry.mPosition = c.getInt(HotspotPagesQuery.POSITION);
-                            entry.mPageType = c.getInt(HotspotPagesQuery.PAGE_TYPE);
-                            result.add(entry);
-                        }
-                        c.close();
-                        return result;
-                    }
-
-                    @Override
-                    protected void onPostExecute(List<HotspotPageEntry> hotspotPageEntries) {
-
-                        Context context = getActivity();
-                        if (context == null) return;
-
-                        onHotspotPagesLoaded(hotspotPageEntries);
-                    }
-                };
-        task.execute();
-    }
-
-    /**
-     * Called when the hotspot-pages are loaded. Sets them in the adapter
-     */
-    void onHotspotPagesLoaded(List<HotspotPageEntry> hotspotPageEntries) {
-        mHotspotAdapter.setItems(hotspotPageEntries);
-    }
 
     @Nullable
     @Override
@@ -247,8 +179,7 @@ public class HotspotSettingsFragment extends DialogFragment
         mRememberLastSwitch = (SwitchCompat) view.findViewById(R.id.remember_last_switch);
 
         mDragSortListView = (DragSortListView) view.findViewById(R.id.sort_list_view);
-        mDragSortListView.setDropListener(this);
-        mDragSortListView.setAdapter(mHotspotAdapter);
+        mReorderController.configure(mDragSortListView);
 
         mOkButton.setOnClickListener(this);
     }
@@ -275,41 +206,6 @@ public class HotspotSettingsFragment extends DialogFragment
         mRememberLastSwitch.setOnCheckedChangeListener(null);
         mHotspotTitleView.removeTextChangedListener(this);
 
-    }
-
-    @Override
-    public void drop(int from, int to) {
-        mHotspotAdapter.handleDrop(from, to);
-        updatePositions();
-    }
-
-    /**
-     * Updates the positions of all hotspot-pages. This is called after a page was dropped
-     * somewhere else in the adapter
-     */
-    private void updatePositions() {
-        int count = mHotspotAdapter.getCount();
-        int nextPosition = 0;
-        for (int i = 0; i < count; i++) {
-            HotspotPageEntry hotspotPageEntry = mHotspotAdapter.getItem(i);
-            if (hotspotPageEntry.mEnabled) {
-                // now if the position has changed, update it in the database
-                if (hotspotPageEntry.mPosition != nextPosition) {
-                    mQueryHandler.updateItemPosition(
-                            hotspotPageEntry.mPageId, hotspotPageEntry.mHotspotId, nextPosition);
-                    hotspotPageEntry.mPosition = nextPosition;
-                }
-                nextPosition++;
-            }
-        }
-
-    }
-
-
-    @Override
-    public void onPageEnabledStateChanged(long pageId, long hotspotId, boolean enabled) {
-        mQueryHandler.updateEnabledState(pageId, hotspotId, enabled);
-        updatePositions();
     }
 
     @Override
@@ -350,39 +246,6 @@ public class HotspotSettingsFragment extends DialogFragment
             startUpdate(0, null, uri, values, null, null);
         }
 
-        public void updateItemPosition(long pageId, long hotspotId, int position) {
-            ContentValues values = new ContentValues(1);
-            values.put(HomeContract.HotspotPages.POSITION, position);
-            startUpdate(0, null, HomeContract.HotspotPages.CONTENT_URI,
-                    values,
-                    HomeContract.HotspotPages._HOTPSOT_ID + "=? AND " +
-                            HomeContract.HotspotPages._PAGE_ID + "=?",
-                    new String[]{
-                            String.valueOf(hotspotId),
-                            String.valueOf(pageId)
-                    });
-
-        }
-
-        public void updateEnabledState(long pageId, long hotspotId, boolean enabled) {
-            ContentValues values = new ContentValues(1);
-            if (enabled) {
-                values.put(HomeContract.HotspotPages.POSITION, Integer.MAX_VALUE);
-                values.put(HomeContract.HotspotPages._HOTPSOT_ID, hotspotId);
-                values.put(HomeContract.HotspotPages._PAGE_ID, pageId);
-                startInsert(0, null, HomeContract.HotspotPages.CONTENT_URI, values);
-            } else {
-                startDelete(0, null, HomeContract.HotspotPages.CONTENT_URI,
-                        HomeContract.HotspotPages._HOTPSOT_ID + "=? AND " +
-                                HomeContract.HotspotPages._PAGE_ID + "=?",
-                        new String[]{
-                                String.valueOf(hotspotId),
-                                String.valueOf(pageId)
-                        });
-            }
-
-        }
-
         public void updateHotspotRemembersLast(long hotspotId, boolean alwaysOpenLast) {
             Uri uri = ContentUris.withAppendedId(HomeContract.Hotspots.CONTENT_URI, hotspotId);
             ContentValues values = new ContentValues(1);
@@ -391,52 +254,5 @@ public class HotspotSettingsFragment extends DialogFragment
         }
     }
 
-    public static class HotspotAdapter
-            extends BaseListAdapter<HotspotPageEntry, PageHotspotViewHolder>
-            implements ConditionalRemovableAdapter {
-
-        final PageHotspotViewHolder.OnPageEnabledChangedListener mOnPageEnabledChangedListener;
-
-        public HotspotAdapter(
-                PageHotspotViewHolder.OnPageEnabledChangedListener onPageEnabledChangedListener) {
-            mOnPageEnabledChangedListener = onPageEnabledChangedListener;
-        }
-
-        @Override
-        protected long getItemId(HotspotPageEntry entry) {
-            return entry.genId();
-        }
-
-        @Override
-        protected PageHotspotViewHolder newViewHolder(LayoutInflater inflater, ViewGroup parent) {
-            View view = inflater.inflate(R.layout.list_item_hotspot, parent, false);
-            return new PageHotspotViewHolder(view, mOnPageEnabledChangedListener);
-        }
-
-        @Override
-        protected void bindViewHolder(HotspotPageEntry item, PageHotspotViewHolder holder) {
-            holder.bind(item);
-        }
-
-        @Override
-        public boolean hasStableIds() {
-            return true;
-        }
-
-        @Override
-        public boolean canRemove(int pos) {
-            return false;
-        }
-
-        /**
-         * Updates the position in the adapter after a drop
-         */
-        public void handleDrop(int from, int to) {
-            HotspotPageEntry entry = removeItem(from, false);
-            addItemAt(to, entry);
-        }
-
-
-    }
 
 }

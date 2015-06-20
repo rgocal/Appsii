@@ -37,13 +37,13 @@ public class ApexIconPack extends AbstractIconPack {
 
     public static final String APEX_PACK_ID = "apex";
 
+    private final String mPackageName;
+
+    private final Uri mIconPackUri;
+
     AppFilterParser.AppFilterData mAppFilterData;
 
-    private String mPackageName;
-
     private Resources mResources;
-
-    private Uri mIconPackUri;
 
     private AppFilterDecorationHelper mAppFilterDecorationHelper;
 

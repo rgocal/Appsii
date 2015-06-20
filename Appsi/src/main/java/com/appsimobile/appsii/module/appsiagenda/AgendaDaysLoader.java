@@ -16,6 +16,7 @@
 
 package com.appsimobile.appsii.module.appsiagenda;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -27,20 +28,23 @@ import android.support.annotation.NonNull;
 import android.text.format.Time;
 import android.util.SparseBooleanArray;
 
+import com.appsimobile.appsii.PermissionDeniedException;
+import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.appsimobile.util.ConvertedCursorLoader;
 import com.appsimobile.util.TimeUtils;
 
 /**
  * Created by nick on 22/09/14.
  */
-public class AgendaDaysLoader extends ConvertedCursorLoader<SparseBooleanArray> {
-
+public class AgendaDaysLoader extends ConvertedCursorLoader<AgendaDaysResult> {
 
     private static final String EVENT_DAYS_SELECTION = CalendarContract.Events.VISIBLE + "=1";
 
     int mLastLoadedDay = TimeUtils.getJulianDay();
 
     private BroadcastReceiver mDayChangeReceiver;
+
+    private BroadcastReceiver mPermissionGrantedReceiver;
 
     public AgendaDaysLoader(Context context, DatePickerController controller) {
 
@@ -71,7 +75,17 @@ public class AgendaDaysLoader extends ConvertedCursorLoader<SparseBooleanArray> 
 
 
     @Override
-    protected SparseBooleanArray convertCursor(@NonNull Cursor c) {
+    protected void checkPermissions() throws PermissionDeniedException {
+        PermissionUtils.throwIfNotPermitted(getContext(), Manifest.permission.READ_CALENDAR);
+    }
+
+    @Override
+    protected AgendaDaysResult convertPermissionDeniedException(PermissionDeniedException e) {
+        return new AgendaDaysResult(e);
+    }
+
+    @Override
+    protected AgendaDaysResult convertCursor(@NonNull Cursor c) {
         c.moveToPosition(-1);
 
         int count = c.getCount();
@@ -86,13 +100,13 @@ public class AgendaDaysLoader extends ConvertedCursorLoader<SparseBooleanArray> 
                     result.put(i, true);
                 }
             }
-            return result;
+            return new AgendaDaysResult(result);
         }
-        return null;
+        return new AgendaDaysResult((SparseBooleanArray) null);
     }
 
     @Override
-    protected void cleanup(SparseBooleanArray old) {
+    protected void cleanup(AgendaDaysResult old) {
 
     }
 
@@ -117,6 +131,18 @@ public class AgendaDaysLoader extends ConvertedCursorLoader<SparseBooleanArray> 
         IntentFilter filter = new IntentFilter(Intent.ACTION_DATE_CHANGED);
         getContext().registerReceiver(mDayChangeReceiver, filter);
 
+        mPermissionGrantedReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                int req = intent.getIntExtra(PermissionUtils.EXTRA_REQUEST_CODE, 0);
+                if (req == PermissionUtils.REQUEST_CODE_PERMISSION_READ_CALENDAR) {
+                    onContentChanged();
+                }
+            }
+        };
+        IntentFilter filter2 = new IntentFilter(PermissionUtils.ACTION_PERMISSION_RESULT);
+        getContext().registerReceiver(mPermissionGrantedReceiver, filter2);
+
     }
 
     @Override
@@ -127,6 +153,11 @@ public class AgendaDaysLoader extends ConvertedCursorLoader<SparseBooleanArray> 
         if (mDayChangeReceiver != null) {
             getContext().unregisterReceiver(mDayChangeReceiver);
         }
+
+        if (mPermissionGrantedReceiver != null) {
+            getContext().unregisterReceiver(mPermissionGrantedReceiver);
+        }
+
     }
 
 }

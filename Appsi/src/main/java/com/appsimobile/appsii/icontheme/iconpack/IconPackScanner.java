@@ -27,7 +27,7 @@ import java.util.List;
  */
 public class IconPackScanner {
 
-    private static List<Class<? extends IconPackFormatScanner>> sScannerList =
+    private static final List<Class<? extends IconPackFormatScanner>> sScannerList =
             new ArrayList<Class<? extends IconPackFormatScanner>>();
 
     static {
@@ -36,7 +36,7 @@ public class IconPackScanner {
         sScannerList.add(NovaIconPackScanner.class);
     }
 
-    private Context mContext;
+    private final Context mContext;
 
     private IconPackScanner(Context context) {
         mContext = context;

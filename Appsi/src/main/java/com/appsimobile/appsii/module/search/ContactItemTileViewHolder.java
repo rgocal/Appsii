@@ -47,13 +47,13 @@ class ContactItemTileViewHolder extends RecyclerView.ViewHolder implements View.
 
     final ContactView.PeopleActionListener mPeopleActionListener;
 
-    TextView mTitle;
+    final TextView mTitle;
 
-    Button mActionButton;
+    final Button mActionButton;
 
-    RecyclerView mRecyclerView;
+    final RecyclerView mRecyclerView;
 
-    List<BaseContactInfo> mItems = new ArrayList<>();
+    final List<BaseContactInfo> mItems = new ArrayList<>();
 
     public ContactItemTileViewHolder(
             View itemView,

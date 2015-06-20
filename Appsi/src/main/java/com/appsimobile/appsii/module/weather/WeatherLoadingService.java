@@ -16,6 +16,7 @@
 
 package com.appsimobile.appsii.module.weather;
 
+import android.Manifest;
 import android.accounts.Account;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -37,6 +38,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresPermission;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.WindowManager;
@@ -52,6 +54,7 @@ import com.appsimobile.appsii.module.home.config.HomeItemConfigurationHelper;
 import com.appsimobile.appsii.module.weather.loader.CantGetWeatherException;
 import com.appsimobile.appsii.module.weather.loader.WeatherData;
 import com.appsimobile.appsii.module.weather.loader.YahooWeatherApiClient;
+import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.appsimobile.appsii.preference.PreferenceHelper;
 import com.appsimobile.appsii.preference.PreferencesFactory;
 
@@ -76,6 +79,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+
 /**
  * Created by Nick on 19/02/14.
  * <p/>
@@ -94,7 +100,7 @@ public class WeatherLoadingService {
     public static final String ACTION_WEATHER_UPDATED =
             BuildConfig.APPLICATION_ID + ".weather_updated";
 
-    private static Handler sMainHandler = new Handler(Looper.getMainLooper());
+    private static final Handler sMainHandler = new Handler(Looper.getMainLooper());
 
     final HomeItemConfiguration mConfigurationHelper;
 
@@ -398,8 +404,17 @@ public class WeatherLoadingService {
 
         try {
             if (BuildConfig.DEBUG) Log.d("WeatherLoadingService", "request location");
-            Location location = requestLocationInfo();
+            Location location;
+
+            if (PermissionUtils.holdsPermission(
+                    mContext, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                location = requestLocationInfoBlocking();
+            } else {
+                woeids = addFallbackWoeid(woeids, woeidTimezones);
+                location = null;
+            }
             if (BuildConfig.DEBUG) Log.d("WeatherLoadingService", "- request location");
+
 
             Map<String, WeatherData> previousData = new HashMap<>(woeids.length);
             for (String woeid : woeids) {
@@ -416,48 +431,8 @@ public class WeatherLoadingService {
             if (BuildConfig.DEBUG) Log.d("WeatherLoadingService", "sync images");
             for (WeatherData weatherData : data) {
                 try {
-                    String woeid = weatherData.woeid;
-                    WeatherData previous = previousData.get(woeid);
-                    File[] photos = WeatherUtils.getCityPhotos(mContext, woeid);
-
-                    boolean changed = photos == null || previous == null ||
-                            previous.nowConditionCode != weatherData.nowConditionCode;
-
-                    if (changed) {
-
-                        boolean downloadEnabled = preferenceHelper.getUseFlickrImages();
-                        boolean downloadOnWifiOnly = preferenceHelper.getDownloadImagesOnWifiOnly();
-                        boolean downloadWhenRoaming = preferenceHelper.getDownloadWhenRoaming();
-
-                        netInfo = cm.getActiveNetworkInfo();
-                        if (netInfo == null) continue;
-                        boolean wifi = netInfo.getType() == ConnectivityManager.TYPE_WIFI;
-                        boolean roaming = netInfo.isRoaming();
-
-                        // tell the sync we got an io exception
-                        // so it knows we would like to try again later
-                        if (roaming && !downloadWhenRoaming) {
-                            result.stats.numIoExceptions++;
-                            continue;
-                        }
-
-                        // well, we are not on wifi, and the user
-                        // only wants to sync this when wifi
-                        // is enabled.
-                        if (!wifi && downloadOnWifiOnly) {
-                            result.stats.numIoExceptions++;
-                            continue;
-                        }
-
-                        // only download when the user has the option
-                        // to download flickr images enabled in
-                        // settings
-                        if (downloadEnabled) {
-                            String timezone = woeidTimezones.get(woeid);
-                            downloadWeatherImages(mContext, woeid, weatherData, timezone);
-                            result.stats.numInserts++;
-                        }
-                    }
+                    syncImages(result, cm, preferenceHelper, woeidTimezones, previousData,
+                            weatherData);
                 } catch (VolleyError e) {
                     Log.w("WeatherLoadingService", "error getting images", e);
                 }
@@ -473,12 +448,79 @@ public class WeatherLoadingService {
 
     }
 
+    private void syncImages(SyncResult result, ConnectivityManager cm,
+            PreferenceHelper preferenceHelper, Map<String, String> woeidTimezones,
+            Map<String, WeatherData> previousData, WeatherData weatherData) throws VolleyError {
+
+        NetworkInfo netInfo;
+        String woeid = weatherData.woeid;
+        WeatherData previous = previousData.get(woeid);
+        File[] photos = WeatherUtils.getCityPhotos(mContext, woeid);
+
+        boolean changed = photos == null || previous == null ||
+                previous.nowConditionCode != weatherData.nowConditionCode;
+
+        if (changed) {
+
+            boolean downloadEnabled = preferenceHelper.getUseFlickrImages();
+            boolean downloadOnWifiOnly = preferenceHelper.getDownloadImagesOnWifiOnly();
+            boolean downloadWhenRoaming = preferenceHelper.getDownloadWhenRoaming();
+
+            netInfo = cm.getActiveNetworkInfo();
+            if (netInfo == null) return;
+            boolean wifi = netInfo.getType() == ConnectivityManager.TYPE_WIFI;
+            boolean roaming = netInfo.isRoaming();
+
+            // tell the sync we got an io exception
+            // so it knows we would like to try again later
+            if (roaming && !downloadWhenRoaming) {
+                result.stats.numIoExceptions++;
+                return;
+            }
+
+            // well, we are not on wifi, and the user
+            // only wants to sync this when wifi
+            // is enabled.
+            if (!wifi && downloadOnWifiOnly) {
+                result.stats.numIoExceptions++;
+                return;
+            }
+
+            // only download when the user has the option
+            // to download flickr images enabled in
+            // settings
+            if (downloadEnabled) {
+                String timezone = woeidTimezones.get(woeid);
+                downloadWeatherImages(mContext, woeid, weatherData, timezone);
+                result.stats.numInserts++;
+            }
+        }
+    }
+
+    private String[] addFallbackWoeid(String[] woeids, Map<String, String> woeidTimezones) {
+        PreferenceHelper preferenceHelper = PreferenceHelper.getInstance(mContext);
+        String woeid = preferenceHelper.getDefaultLocationWoeId();
+        if (woeid != null) {
+            String[] tmp = new String[woeids.length + 1];
+            System.arraycopy(woeids, 0, tmp, 1, woeids.length);
+            tmp[0] = woeid;
+            woeids = tmp;
+
+            String woeidTimezone = preferenceHelper.getDefaultLocationTimezone();
+            if (!woeidTimezones.containsKey(woeid)) {
+                woeidTimezones.put(woeid, woeidTimezone);
+            }
+        }
+        return woeids;
+    }
+
     void bailOut(String reason) {
         Log.i("WeatherLoadingService", "not updating weather for reason: " + reason);
     }
 
     @Nullable
-    private Location requestLocationInfo() throws InterruptedException {
+    @RequiresPermission(anyOf = {ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION})
+    private Location requestLocationInfoBlocking() throws InterruptedException {
 
         final LocationManager locationManager =
                 (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);

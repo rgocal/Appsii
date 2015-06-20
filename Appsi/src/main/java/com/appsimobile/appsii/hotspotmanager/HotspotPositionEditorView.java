@@ -73,7 +73,7 @@ public class HotspotPositionEditorView extends ViewGroup
 
     boolean mDragging;
 
-    Rect mDragRect = new Rect();
+    final Rect mDragRect = new Rect();
 
     OnPositionChangedListener mOnPositionChangedListener;
 
@@ -419,7 +419,7 @@ public class HotspotPositionEditorView extends ViewGroup
         }
     }
 
-    static interface OnPositionChangedListener {
+    interface OnPositionChangedListener {
 
         void onPositionChanged(long hotspotId, boolean isLeft, float yPosition);
     }
@@ -472,11 +472,11 @@ public class HotspotPositionEditorView extends ViewGroup
 
     static class LayoutTag {
 
-        float mHeight;
+        final float mHeight;
 
-        float mYpos;
+        final float mYpos;
 
-        boolean mLeft;
+        final boolean mLeft;
 
         public LayoutTag(boolean left, float yposRelativeToView, float heightRelativeToViewHeight) {
             mLeft = left;

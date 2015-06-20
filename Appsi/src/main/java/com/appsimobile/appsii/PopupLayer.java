@@ -49,7 +49,7 @@ public class PopupLayer extends FrameLayout {
     /**
      * The last known alpha. So we know if it has changed
      */
-    float mLastAlpha = -1;
+    final float mLastAlpha = -1;
 
     /**
      * True when the root layer is added
@@ -259,7 +259,7 @@ public class PopupLayer extends FrameLayout {
         mAdded = false;
     }
 
-    public static interface PopupLayerListener {
+    public interface PopupLayerListener {
 
         void onPopupLayerForceClosed();
 

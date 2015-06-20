@@ -16,7 +16,6 @@
 
 package com.appsimobile.view;
 
-import android.R;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -56,13 +55,13 @@ class SlidingTabStrip extends LinearLayout {
 
     private final float mDividerHeight;
 
+    private final SimpleTabColorizer mDefaultTabColorizer;
+
     private int mSelectedPosition;
 
     private float mSelectionOffset;
 
     private SlidingTabLayout.TabColorizer mCustomTabColorizer;
-
-    private final SimpleTabColorizer mDefaultTabColorizer;
 
     SlidingTabStrip(Context context) {
         this(context, null);
@@ -75,7 +74,7 @@ class SlidingTabStrip extends LinearLayout {
         final float density = getResources().getDisplayMetrics().density;
 
         TypedValue outValue = new TypedValue();
-        context.getTheme().resolveAttribute(R.attr.colorForeground, outValue, true);
+        context.getTheme().resolveAttribute(android.R.attr.colorForeground, outValue, true);
         final int themeForegroundColor = outValue.data;
 
         mDefaultBottomBorderColor = setColorAlpha(themeForegroundColor,
@@ -96,6 +95,13 @@ class SlidingTabStrip extends LinearLayout {
         mDividerHeight = DEFAULT_DIVIDER_HEIGHT;
         mDividerPaint = new Paint();
         mDividerPaint.setStrokeWidth((int) (DEFAULT_DIVIDER_THICKNESS_DIPS * density));
+    }
+
+    /**
+     * Set the alpha value of the {@code color} to be the given {@code alpha} value.
+     */
+    private static int setColorAlpha(int color, byte alpha) {
+        return Color.argb(alpha, Color.red(color), Color.green(color), Color.blue(color));
     }
 
     void setCustomTabColorizer(SlidingTabLayout.TabColorizer customTabColorizer) {
@@ -173,13 +179,6 @@ class SlidingTabStrip extends LinearLayout {
     }
 
     /**
-     * Set the alpha value of the {@code color} to be the given {@code alpha} value.
-     */
-    private static int setColorAlpha(int color, byte alpha) {
-        return Color.argb(alpha, Color.red(color), Color.green(color), Color.blue(color));
-    }
-
-    /**
      * Blend {@code color1} and {@code color2} using the given ratio.
      *
      * @param ratio of which to blend. 1.0 will return {@code color1}, 0.5 will give an even blend,
@@ -198,6 +197,9 @@ class SlidingTabStrip extends LinearLayout {
         private int[] mIndicatorColors;
 
         private int[] mDividerColors;
+
+        SimpleTabColorizer() {
+        }
 
         @Override
         public final int getIndicatorColor(int position) {

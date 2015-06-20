@@ -31,6 +31,7 @@ import android.graphics.drawable.TransitionDrawable;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.text.format.Time;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -64,7 +65,7 @@ abstract class AbsWeatherViewHolder extends AbsHomeViewHolder implements
         HomeItemConfigurationHelper.ConfigurationListener, View.OnClickListener,
         PopupMenu.OnMenuItemClickListener {
 
-    static Time sTime = new Time();
+    static final Time sTime = new Time();
 
     final HomeItemConfiguration mConfigurationHelper;
 
@@ -78,16 +79,17 @@ abstract class AbsWeatherViewHolder extends AbsHomeViewHolder implements
 
     BroadcastReceiver mReceiver;
 
-    View mOverflow;
+    final View mOverflow;
 
     OnWeatherCellClickListener mOnWeatherCellClickListener;
 
-    PreferenceHelper mPreferenceHelper;
+    final PreferenceHelper mPreferenceHelper;
 
     /**
      * This is null when {@link #mShowsWallpaper} is false
      */
     @Nullable
+    final
     ImageView mCellBackground;
 
     String mBackgroundLoadedForWoeid;
@@ -186,8 +188,18 @@ abstract class AbsWeatherViewHolder extends AbsHomeViewHolder implements
                 cellId, WeatherFragment.PREFERENCE_WEATHER_WOEID, null);
 
         if (woeid == null) {
-            woeid = mSharedPreferences.getString(
-                    WeatherLoadingService.PREFERENCE_LAST_KNOWN_WOEID, null);
+            long lastUpdateMillis =
+                    mSharedPreferences.getLong(WeatherLoadingService.PREFERENCE_LAST_UPDATED_MILLIS,
+                            0);
+            long elapsed = System.currentTimeMillis() - lastUpdateMillis;
+            if (elapsed < DateUtils.DAY_IN_MILLIS) {
+                woeid = mSharedPreferences.getString(
+                        WeatherLoadingService.PREFERENCE_LAST_KNOWN_WOEID, null);
+            }
+        }
+        if (woeid == null) {
+            PreferenceHelper preferenceHelper = PreferenceHelper.getInstance(itemView.getContext());
+            woeid = preferenceHelper.getDefaultLocationWoeId();
         }
 
         if (woeid != null) {

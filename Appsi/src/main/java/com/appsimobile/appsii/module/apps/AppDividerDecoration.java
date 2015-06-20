@@ -29,7 +29,7 @@ public class AppDividerDecoration extends RecyclerView.ItemDecoration {
 
     private Drawable mDivider = new ColorDrawable(0x33000000);
 
-    private Paint mPaint;
+    private final Paint mPaint;
 
     private int mOrientation;
 

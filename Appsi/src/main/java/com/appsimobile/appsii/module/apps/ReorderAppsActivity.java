@@ -170,7 +170,7 @@ public class ReorderAppsActivity extends Activity implements AppTagUtils.AppTagL
 
     static class SpinnerViewHolder extends ViewHolder {
 
-        TextView mTextView;
+        final TextView mTextView;
 
         public SpinnerViewHolder(View view) {
             super(view);

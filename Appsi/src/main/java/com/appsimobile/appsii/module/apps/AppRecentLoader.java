@@ -97,6 +97,7 @@ public class AppRecentLoader extends AsyncTaskLoader<List<HistoryItem>> {
         }
 
 
+        cursor.close();
         return result;
     }
 

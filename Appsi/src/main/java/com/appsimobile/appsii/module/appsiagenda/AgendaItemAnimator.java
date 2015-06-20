@@ -36,28 +36,28 @@ public class AgendaItemAnimator extends RecyclerView.ItemAnimator {
 
     private static final boolean DEBUG = false;
 
-    ArrayList<ArrayList<ViewHolder>> mAdditionsList =
+    final ArrayList<ArrayList<ViewHolder>> mAdditionsList =
             new ArrayList<ArrayList<ViewHolder>>();
 
-    ArrayList<ArrayList<MoveInfo>> mMovesList = new ArrayList<>();
+    final ArrayList<ArrayList<MoveInfo>> mMovesList = new ArrayList<>();
 
-    ArrayList<ArrayList<ChangeInfo>> mChangesList = new ArrayList<>();
+    final ArrayList<ArrayList<ChangeInfo>> mChangesList = new ArrayList<>();
 
-    ArrayList<ViewHolder> mAddAnimations = new ArrayList<>();
+    final ArrayList<ViewHolder> mAddAnimations = new ArrayList<>();
 
-    ArrayList<ViewHolder> mMoveAnimations = new ArrayList<>();
+    final ArrayList<ViewHolder> mMoveAnimations = new ArrayList<>();
 
-    ArrayList<ViewHolder> mRemoveAnimations = new ArrayList<>();
+    final ArrayList<ViewHolder> mRemoveAnimations = new ArrayList<>();
 
-    ArrayList<ViewHolder> mChangeAnimations = new ArrayList<>();
+    final ArrayList<ViewHolder> mChangeAnimations = new ArrayList<>();
 
-    private ArrayList<ViewHolder> mPendingRemovals = new ArrayList<>();
+    private final ArrayList<ViewHolder> mPendingRemovals = new ArrayList<>();
 
-    private ArrayList<ViewHolder> mPendingAdditions = new ArrayList<>();
+    private final ArrayList<ViewHolder> mPendingAdditions = new ArrayList<>();
 
-    private ArrayList<MoveInfo> mPendingMoves = new ArrayList<>();
+    private final ArrayList<MoveInfo> mPendingMoves = new ArrayList<>();
 
-    private ArrayList<ChangeInfo> mPendingChanges = new ArrayList<>();
+    private final ArrayList<ChangeInfo> mPendingChanges = new ArrayList<>();
 
     @Override
     public void runPendingAnimations() {
@@ -636,9 +636,15 @@ public class AgendaItemAnimator extends RecyclerView.ItemAnimator {
 
     private static class MoveInfo {
 
-        public ViewHolder holder;
+        public final ViewHolder holder;
 
-        public int fromX, fromY, toX, toY;
+        public final int fromX;
+
+        public final int fromY;
+
+        public final int toX;
+
+        public final int toY;
 
         MoveInfo(ViewHolder holder, int fromX, int fromY, int toX, int toY) {
             this.holder = holder;

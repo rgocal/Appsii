@@ -43,11 +43,11 @@ public class RoundedImageDrawable extends Drawable {
 
     private final Matrix mLocalMatrix = new Matrix();
 
-    private Bitmap mBitmap;
+    private final Bitmap mBitmap;
 
-    private Shader mShader;
+    private final Shader mShader;
 
-    private Resources mResources;
+    private final Resources mResources;
 
     private SparseArray<RoundedImageDrawable> mEffectColors = new SparseArray<>();
 

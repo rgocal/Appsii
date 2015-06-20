@@ -34,7 +34,7 @@ public abstract class BaseListAdapter<I, VH extends ViewHolder> extends BaseAdap
 
     private final List<I> mItems = new ArrayList<>();
 
-    private WeakHashMap<View, VH> mViewHolders = new WeakHashMap<>();
+    private final WeakHashMap<View, VH> mViewHolders = new WeakHashMap<>();
 
     private LayoutInflater mLayoutInflater;
 

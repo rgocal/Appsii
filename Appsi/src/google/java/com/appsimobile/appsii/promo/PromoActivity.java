@@ -16,15 +16,8 @@
 
 package com.appsimobile.appsii.promo;
 
-import android.content.AsyncQueryHandler;
-import android.content.ContentResolver;
-import android.content.ContentUris;
-import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -38,6 +31,7 @@ import android.widget.Toast;
 import com.appsimobile.appsii.ActivityUtils;
 import com.appsimobile.appsii.AnalyticsManager;
 import com.appsimobile.appsii.AppsiiUtils;
+import com.appsimobile.appsii.PageHelper;
 import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.iab.BaseIabHelper;
 import com.appsimobile.appsii.iab.FeatureManager;
@@ -117,8 +111,6 @@ public class PromoActivity extends AppCompatActivity
 
     boolean mIabHelperConnected;
 
-    AsyncQueryHandlerImpl mAsyncQueryHandler;
-
     SharedPreferences mPreferences;
 
 
@@ -176,8 +168,6 @@ public class PromoActivity extends AppCompatActivity
         if (unlockFragment != null) {
             unlockFragment.setUnlockListener(this);
         }
-
-        mAsyncQueryHandler = new AsyncQueryHandlerImpl(this, getContentResolver());
     }
 
     @Override
@@ -490,7 +480,10 @@ public class PromoActivity extends AppCompatActivity
 
     private void unlockPurchase(Purchase info) {
         String sku = info.getSku();
-        mAsyncQueryHandler.ensurePageEnabled(sku);
+        PageHelper pageHelper = PageHelper.getInstance(this);
+        // unlock the page and add it to the existing hotspots
+        // if the page was not already enabled
+        pageHelper.enablePageAccess(sku, false);
 
         mAnalyticsManager.trackAppsiEvent(AnalyticsManager.ACTION_PURCHASE,
                 AnalyticsManager.CATEGORY_PAGES, sku);
@@ -516,133 +509,133 @@ public class PromoActivity extends AppCompatActivity
         updateButtonStatusFromInventory();
     }
 
-
-    static class AsyncQueryHandlerImpl extends AsyncQueryHandler {
-
-        static final int QUERY_PAGE_INSERTED = 1;
-
-        static final int QUERY_HOTSPOTS = 2;
-
-        static final int INSERT_ENABLE_PAGE = 3;
-
-        static final int INSERT_HOTSPOT_PAGE = 4;
-
-        final Context mContext;
-
-        public AsyncQueryHandlerImpl(Context context, ContentResolver cr) {
-            super(cr);
-            mContext = context;
-        }
-
-        public void ensurePageEnabled(String sku) {
-            switch (sku) {
-                case FeatureManager.AGENDA_FEATURE:
-                    ensurePageEnabled(HomeContract.Pages.PAGE_AGENDA);
-                    break;
-                case FeatureManager.SETTINGS_AGENDA_FEATURE:
-                    ensurePageEnabled(HomeContract.Pages.PAGE_AGENDA);
-                    ensurePageEnabled(HomeContract.Pages.PAGE_SETTINGS);
-                    break;
-                case FeatureManager.SMS_CALLS_PEOPLE_FEATURE:
-                    ensurePageEnabled(HomeContract.Pages.PAGE_SMS);
-                    ensurePageEnabled(HomeContract.Pages.PAGE_CALLS);
-                    ensurePageEnabled(HomeContract.Pages.PAGE_PEOPLE);
-                    break;
-                case FeatureManager.SETTINGS_FEATURE:
-                    ensurePageEnabled(HomeContract.Pages.PAGE_SETTINGS);
-                    break;
-                case FeatureManager.ALL_FEATURE:
-                    ensurePageEnabled(HomeContract.Pages.PAGE_AGENDA);
-                    ensurePageEnabled(HomeContract.Pages.PAGE_CALLS);
-                    ensurePageEnabled(HomeContract.Pages.PAGE_PEOPLE);
-                    break;
-                case FeatureManager.CALLS_FEATURE:
-                    ensurePageEnabled(HomeContract.Pages.PAGE_CALLS);
-                    break;
-                case FeatureManager.PEOPLE_FEATURE:
-                    ensurePageEnabled(HomeContract.Pages.PAGE_PEOPLE);
-                    break;
-                case FeatureManager.SMS_FEATURE:
-                    ensurePageEnabled(HomeContract.Pages.PAGE_SMS);
-                    break;
-            }
-        }
-
-        private void ensurePageEnabled(int pageType) {
-            startQuery(QUERY_PAGE_INSERTED, pageType,
-                    HomeContract.Pages.CONTENT_URI,
-                    new String[]{HomeContract.Pages._ID},
-                    HomeContract.Pages.TYPE + "=?",
-                    new String[]{String.valueOf(pageType)},
-                    null
-            );
-        }
-
-        @Override
-        protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-            if (token == QUERY_PAGE_INSERTED) {
-                int pageType = (int) cookie;
-                int count = cursor.getCount();
-                cursor.close();
-                if (count == 0) {
-                    enablePage(pageType);
-                }
-            } else if (token == QUERY_HOTSPOTS) {
-                Uri pageUri = (Uri) cookie;
-                long pageId = ContentUris.parseId(pageUri);
-                while (cursor.moveToNext()) {
-                    long hotspotId = cursor.getLong(0);
-                    ContentValues values = new ContentValues(3);
-                    values.put(HomeContract.HotspotPages._PAGE_ID, pageId);
-                    values.put(HomeContract.HotspotPages._HOTPSOT_ID, hotspotId);
-                    values.put(HomeContract.HotspotPages.POSITION, 12);
-                    startInsert(INSERT_HOTSPOT_PAGE, null,
-                            HomeContract.HotspotPages.CONTENT_URI, values);
-                }
-                cursor.close();
-
-            }
-        }
-
-        public void enablePage(int pageType) {
-            ContentValues values = new ContentValues();
-            String displayName = getTitleForPageType(pageType);
-
-            values.put(HomeContract.Pages.TYPE, pageType);
-            values.put(HomeContract.Pages.DISPLAY_NAME, displayName);
-
-            startInsert(INSERT_ENABLE_PAGE, null, HomeContract.Pages.CONTENT_URI, values);
-        }
-
-        private String getTitleForPageType(int pageType) {
-            int resId;
-            switch (pageType) {
-                case HomeContract.Pages.PAGE_AGENDA:
-                    resId = R.string.agenda_page_name;
-                    break;
-                case HomeContract.Pages.PAGE_CALLS:
-                    resId = R.string.calls_page_name;
-                    break;
-                case HomeContract.Pages.PAGE_PEOPLE:
-                    resId = R.string.people_page_name;
-                    break;
-                default:
-                    return null;
-            }
-            return mContext.getString(resId);
-        }
-
-        @Override
-        protected void onInsertComplete(int token, Object cookie, Uri uri) {
-            if (token == INSERT_ENABLE_PAGE) {
-                startQuery(QUERY_HOTSPOTS, uri,
-                        HomeContract.Hotspots.CONTENT_URI,
-                        new String[]{HomeContract.Hotspots._ID},
-                        null,
-                        null,
-                        null);
-            }
-        }
-    }
+//
+//    static class AsyncQueryHandlerImpl extends AsyncQueryHandler {
+//
+//        static final int QUERY_PAGE_INSERTED = 1;
+//
+//        static final int QUERY_HOTSPOTS = 2;
+//
+//        static final int INSERT_ENABLE_PAGE = 3;
+//
+//        static final int INSERT_HOTSPOT_PAGE = 4;
+//
+//        final Context mContext;
+//
+//        public AsyncQueryHandlerImpl(Context context, ContentResolver cr) {
+//            super(cr);
+//            mContext = context;
+//        }
+//
+//        public void ensurePageEnabled(String sku) {
+//            switch (sku) {
+//                case FeatureManager.AGENDA_FEATURE:
+//                    ensurePageEnabled(HomeContract.Pages.PAGE_AGENDA);
+//                    break;
+//                case FeatureManager.SETTINGS_AGENDA_FEATURE:
+//                    ensurePageEnabled(HomeContract.Pages.PAGE_AGENDA);
+//                    ensurePageEnabled(HomeContract.Pages.PAGE_SETTINGS);
+//                    break;
+//                case FeatureManager.SMS_CALLS_PEOPLE_FEATURE:
+//                    ensurePageEnabled(HomeContract.Pages.PAGE_SMS);
+//                    ensurePageEnabled(HomeContract.Pages.PAGE_CALLS);
+//                    ensurePageEnabled(HomeContract.Pages.PAGE_PEOPLE);
+//                    break;
+//                case FeatureManager.SETTINGS_FEATURE:
+//                    ensurePageEnabled(HomeContract.Pages.PAGE_SETTINGS);
+//                    break;
+//                case FeatureManager.ALL_FEATURE:
+//                    ensurePageEnabled(HomeContract.Pages.PAGE_AGENDA);
+//                    ensurePageEnabled(HomeContract.Pages.PAGE_CALLS);
+//                    ensurePageEnabled(HomeContract.Pages.PAGE_PEOPLE);
+//                    break;
+//                case FeatureManager.CALLS_FEATURE:
+//                    ensurePageEnabled(HomeContract.Pages.PAGE_CALLS);
+//                    break;
+//                case FeatureManager.PEOPLE_FEATURE:
+//                    ensurePageEnabled(HomeContract.Pages.PAGE_PEOPLE);
+//                    break;
+//                case FeatureManager.SMS_FEATURE:
+//                    ensurePageEnabled(HomeContract.Pages.PAGE_SMS);
+//                    break;
+//            }
+//        }
+//
+//        private void ensurePageEnabled(int pageType) {
+//            startQuery(QUERY_PAGE_INSERTED, pageType,
+//                    HomeContract.Pages.CONTENT_URI,
+//                    new String[]{HomeContract.Pages._ID},
+//                    HomeContract.Pages.TYPE + "=?",
+//                    new String[]{String.valueOf(pageType)},
+//                    null
+//            );
+//        }
+//
+//        @Override
+//        protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+//            if (token == QUERY_PAGE_INSERTED) {
+//                int pageType = (int) cookie;
+//                int count = cursor.getCount();
+//                cursor.close();
+//                if (count == 0) {
+//                    enablePage(pageType);
+//                }
+//            } else if (token == QUERY_HOTSPOTS) {
+//                Uri pageUri = (Uri) cookie;
+//                long pageId = ContentUris.parseId(pageUri);
+//                while (cursor.moveToNext()) {
+//                    long hotspotId = cursor.getLong(0);
+//                    ContentValues values = new ContentValues(3);
+//                    values.put(HomeContract.HotspotPages._PAGE_ID, pageId);
+//                    values.put(HomeContract.HotspotPages._HOTPSOT_ID, hotspotId);
+//                    values.put(HomeContract.HotspotPages.POSITION, 12);
+//                    startInsert(INSERT_HOTSPOT_PAGE, null,
+//                            HomeContract.HotspotPages.CONTENT_URI, values);
+//                }
+//                cursor.close();
+//
+//            }
+//        }
+//
+//        public void enablePage(int pageType) {
+//            ContentValues values = new ContentValues();
+//            String displayName = getTitleForPageType(pageType);
+//
+//            values.put(HomeContract.Pages.TYPE, pageType);
+//            values.put(HomeContract.Pages.DISPLAY_NAME, displayName);
+//
+//            startInsert(INSERT_ENABLE_PAGE, null, HomeContract.Pages.CONTENT_URI, values);
+//        }
+//
+//        private String getTitleForPageType(int pageType) {
+//            int resId;
+//            switch (pageType) {
+//                case HomeContract.Pages.PAGE_AGENDA:
+//                    resId = R.string.agenda_page_name;
+//                    break;
+//                case HomeContract.Pages.PAGE_CALLS:
+//                    resId = R.string.calls_page_name;
+//                    break;
+//                case HomeContract.Pages.PAGE_PEOPLE:
+//                    resId = R.string.people_page_name;
+//                    break;
+//                default:
+//                    return null;
+//            }
+//            return mContext.getString(resId);
+//        }
+//
+//        @Override
+//        protected void onInsertComplete(int token, Object cookie, Uri uri) {
+//            if (token == INSERT_ENABLE_PAGE) {
+//                startQuery(QUERY_HOTSPOTS, uri,
+//                        HomeContract.Hotspots.CONTENT_URI,
+//                        new String[]{HomeContract.Hotspots._ID},
+//                        null,
+//                        null,
+//                        null);
+//            }
+//        }
+//    }
 }
 

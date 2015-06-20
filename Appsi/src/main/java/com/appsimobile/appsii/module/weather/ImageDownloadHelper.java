@@ -56,18 +56,18 @@ public class ImageDownloadHelper {
 
     public static final String FLICKR_API_KEY = "11ed8a19c24662dc6b18979902dc6494";
 
-    static String extras = "tags, url_o, url_h";
+    static final String extras = "tags, url_o, url_h";
 
     private static ImageDownloadHelper sImageDownloadHelper;
 
-    RequestQueue sRequestQueue;
+    final RequestQueue sRequestQueue;
 
-    ImageLoader sImageLoader;
+    final ImageLoader sImageLoader;
 
     private ImageDownloadHelper(Context context) {
         sRequestQueue = Volley.newRequestQueue(context, null, MAX_CACHE_SIZE);
         sImageLoader = new ImageLoader(sRequestQueue, createImageCache()) {
-            RetryPolicy mRetryPolicy = new DefaultRetryPolicy(
+            final RetryPolicy mRetryPolicy = new DefaultRetryPolicy(
                     30000,
                     DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                     DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);

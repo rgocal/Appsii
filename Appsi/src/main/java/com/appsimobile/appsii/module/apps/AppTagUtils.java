@@ -56,11 +56,11 @@ public class AppTagUtils {
 
     int mStatus = STATUS_NEEDS_LOAD;
 
-    ContentObserver mContentObserver;
+    final ContentObserver mContentObserver;
 
-    private List<AppTag> mAppTags = new ArrayList<>(6);
+    private final List<AppTag> mAppTags = new ArrayList<>(6);
 
-    private WeakHashMap<AppTagListener, Void> mListeners = new WeakHashMap<>();
+    private final WeakHashMap<AppTagListener, Void> mListeners = new WeakHashMap<>();
 
     private AppTagUtils(Context context) {
         mContext = context;
@@ -173,7 +173,7 @@ public class AppTagUtils {
         return mAppTags;
     }
 
-    public static interface AppTagListener {
+    public interface AppTagListener {
 
         void onTagsChanged(List<AppTag> appTags);
     }

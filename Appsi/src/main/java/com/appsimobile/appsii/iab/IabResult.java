@@ -25,9 +25,9 @@ package com.appsimobile.appsii.iab;
  */
 public class IabResult {
 
-    int mResponse;
+    final int mResponse;
 
-    String mMessage;
+    final String mMessage;
 
     public IabResult(int response, String message) {
         mResponse = response;

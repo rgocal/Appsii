@@ -35,7 +35,7 @@ import android.widget.TextView;
  */
 public class AppsiServiceStatusView extends RelativeLayout implements View.OnClickListener {
 
-    AnalyticsManager mAnalyticsManager = AnalyticsManager.getInstance();
+    final AnalyticsManager mAnalyticsManager = AnalyticsManager.getInstance();
 
     TextView mStatusView;
 
@@ -152,8 +152,7 @@ public class AppsiServiceStatusView extends RelativeLayout implements View.OnCli
                 onAppsiEnabled();
                 break;
             case Appsi.RESULT_RUNNING_STATUS_ENABLED:
-                Intent stop = new Intent(Appsi.ACTION_STOP_APPSI);
-                getContext().sendBroadcast(stop);
+                AppsiiUtils.stopAppsi(getContext());
                 onAppsiDisabled();
                 track(AnalyticsManager.ACTION_STOP_APPSI, AnalyticsManager.CATEGORY_OTHER);
                 break;

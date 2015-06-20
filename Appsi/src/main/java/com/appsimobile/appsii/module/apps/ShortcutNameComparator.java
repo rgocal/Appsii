@@ -33,9 +33,9 @@ public class ShortcutNameComparator implements Comparator<LauncherActivityInfoCo
 
     final LauncherAppsCompat mLauncherAppsCompat;
 
-    private Collator mCollator;
+    private final Collator mCollator;
 
-    private Map<ComponentName, CharSequence> mLabelCache;
+    private final Map<ComponentName, CharSequence> mLabelCache;
 
     public ShortcutNameComparator(Context context, Map<ComponentName, CharSequence> labelCache) {
         mLabelCache = labelCache;

@@ -35,6 +35,10 @@ import java.util.TimeZone;
 
 public class TimeZoneInfo implements Comparable<TimeZoneInfo> {
 
+    public static final int NUM_OF_TRANSITIONS = 6;
+
+    public static final long time = System.currentTimeMillis() / 1000;
+
     private static final int GMT_TEXT_COLOR = TimeZonePickerUtils.GMT_TEXT_COLOR;
 
     private static final int DST_SYMBOL_COLOR = TimeZonePickerUtils.DST_SYMBOL_COLOR;
@@ -45,40 +49,36 @@ public class TimeZoneInfo implements Comparable<TimeZoneInfo> {
 
     private static final Factory mSpannableFactory = Factory.getInstance();
 
-    public static int NUM_OF_TRANSITIONS = 6;
+    private static final StringBuilder mSB = new StringBuilder(50);
 
-    public static long time = System.currentTimeMillis() / 1000;
+    private static final Formatter mFormatter = new Formatter(mSB, Locale.getDefault());
+
+    static private final SparseArray<CharSequence> mGmtDisplayNameCache =
+            new SparseArray<CharSequence>();
 
     public static boolean is24HourFormat;
 
-    private static StringBuilder mSB = new StringBuilder(50);
-
-    private static Formatter mFormatter = new Formatter(mSB, Locale.getDefault());
-
     static private long mGmtDisplayNameUpdateTime;
 
-    static private SparseArray<CharSequence> mGmtDisplayNameCache =
-            new SparseArray<CharSequence>();
+    public final String mTzId;
 
-    public String mTzId;
+    public final String mCountry;
+
+    final TimeZone mTz;
+
+    final int mRawoffset;
+
+    final SparseArray<String> mLocalTimeCache = new SparseArray<String>();
+
+    private final Time recycledTime = new Time();
 
     public int[] mTransitions; // may have trailing 0's.
-
-    public String mCountry;
 
     public int groupId;
 
     public String mDisplayName;
 
-    TimeZone mTz;
-
-    int mRawoffset;
-
-    SparseArray<String> mLocalTimeCache = new SparseArray<String>();
-
     long mLocalTimeCacheReferenceTime = 0;
-
-    private Time recycledTime = new Time();
 
     public TimeZoneInfo(TimeZone tz, String country) {
         mTz = tz;

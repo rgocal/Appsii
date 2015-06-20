@@ -376,7 +376,7 @@ public class ExtensionData implements Parcelable {
         }
     };
 
-    private ExtensionData(Parcel in) {
+    ExtensionData(Parcel in) {
         int parcelableVersion = in.readInt();
         int parcelableSize = in.readInt();
         int startPosition = in.dataPosition();

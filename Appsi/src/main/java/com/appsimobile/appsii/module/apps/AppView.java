@@ -284,13 +284,13 @@ public class AppView extends FrameLayout implements View.OnClickListener,
         mAppActionListener = appActionListener;
     }
 
-    public static interface AppActionListener {
+    public interface AppActionListener {
 
         void onEditAppliedTags(AppEntry entry, List<AppTag> allTags, List<TaggedApp> appliedTags);
 
     }
 
-    public static interface TagActionListener {
+    public interface TagActionListener {
 
         void onEditAppTag(AppTag entry);
 

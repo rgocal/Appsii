@@ -65,12 +65,12 @@ public abstract class AbstractSidebarPagerAdapter extends PagerAdapter {
     @VisibleForTesting
     final SparseArray<PageController> mPrevPageControllers = new SparseArray<>(8);
 
+    final boolean mDontCachePages = true;
+
     private final SimpleArrayMap<HotspotPageEntry, Bundle> mSavedControllerStates =
             new SimpleArrayMap<>();
 
     private final Context mContext;
-
-    boolean mDontCachePages = true;
 
     FlagListener mFlagListener;
 
@@ -352,7 +352,7 @@ public abstract class AbstractSidebarPagerAdapter extends PagerAdapter {
         }
     }
 
-    static interface FlagListener {
+    interface FlagListener {
 
         void onFlagsChanged(int flags);
     }

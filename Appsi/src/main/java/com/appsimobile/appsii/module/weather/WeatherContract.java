@@ -34,30 +34,30 @@ public class WeatherContract {
      * This table holds the weather information for Appsii. Historic information is kept for past
      * events. This database is intended to be used for multiple locations
      */
-    public static interface WeatherColumns extends BaseColumns {
+    public interface WeatherColumns extends BaseColumns {
 
-        public static final String TABLE_NAME = "weather";
+        String TABLE_NAME = "weather";
         /**
          * Long, The timestamp when this forecast was last updated
          * Can be used to determine if an update is needed.
          */
-        public static final String COLUMN_NAME_LAST_UPDATED = "lastUpdate";
-        public static final Uri CONTENT_URI =
+        String COLUMN_NAME_LAST_UPDATED = "lastUpdate";
+        Uri CONTENT_URI =
                 Uri.parse("content://" + AUTHORITY + "/" + TABLE_NAME);
-        public static final String COLUMN_NAME_WOEID = "woeid";
-        public static final String COLUMN_NAME_CITY = "city";
-        public static final String COLUMN_NAME_NOW_CONDITION_CODE = "now_condition_code";
-        public static final String COLUMN_NAME_NOW_TEMPERATURE = "now_temp";
-        public static final String COLUMN_NAME_WIND_CHILL = "wind_chill";
-        public static final String COLUMN_NAME_WIND_DIRECTION = "wind_direction";
-        public static final String COLUMN_NAME_WIND_SPEED = "wind_speed";
-        public static final String COLUMN_NAME_ATMOSPHERE_HUMIDITY = "atmosphere_humidity";
-        public static final String COLUMN_NAME_ATMOSPHERE_PRESSURE = "atmosphere_pressure";
-        public static final String COLUMN_NAME_ATMOSPHERE_RISING = "atmosphere_rising";
-        public static final String COLUMN_NAME_ATMOSPHERE_VISIBILITY = "atmosphere_visibility";
-        public static final String COLUMN_NAME_SUNRISE = "sunrise";
-        public static final String COLUMN_NAME_SUNSET = "sunset";
-        public static final String COLUMN_NAME_UNIT = "unit";
+        String COLUMN_NAME_WOEID = "woeid";
+        String COLUMN_NAME_CITY = "city";
+        String COLUMN_NAME_NOW_CONDITION_CODE = "now_condition_code";
+        String COLUMN_NAME_NOW_TEMPERATURE = "now_temp";
+        String COLUMN_NAME_WIND_CHILL = "wind_chill";
+        String COLUMN_NAME_WIND_DIRECTION = "wind_direction";
+        String COLUMN_NAME_WIND_SPEED = "wind_speed";
+        String COLUMN_NAME_ATMOSPHERE_HUMIDITY = "atmosphere_humidity";
+        String COLUMN_NAME_ATMOSPHERE_PRESSURE = "atmosphere_pressure";
+        String COLUMN_NAME_ATMOSPHERE_RISING = "atmosphere_rising";
+        String COLUMN_NAME_ATMOSPHERE_VISIBILITY = "atmosphere_visibility";
+        String COLUMN_NAME_SUNRISE = "sunrise";
+        String COLUMN_NAME_SUNSET = "sunset";
+        String COLUMN_NAME_UNIT = "unit";
 
 
     }
@@ -67,28 +67,28 @@ public class WeatherContract {
      * past
      * events. This database is intended to be used for multiple locations
      */
-    public static interface ForecastColumns extends BaseColumns {
+    public interface ForecastColumns extends BaseColumns {
 
-        public static final String TABLE_NAME = "forecast";
+        String TABLE_NAME = "forecast";
         /**
          * Integer, The julian day for which this is the forecast
          */
-        public static final String COLUMN_NAME_FORECAST_DAY = "forecastDay";
+        String COLUMN_NAME_FORECAST_DAY = "forecastDay";
         /**
          * Long, The timestamp when this forecast was last updated
          * Can be used to determine if an update is needed.
          */
-        public static final String COLUMN_NAME_LAST_UPDATED = "lastUpdate";
+        String COLUMN_NAME_LAST_UPDATED = "lastUpdate";
         /**
          * Long, The location for which this is the forecast. Expressed in Yahoo weather WoeId
          */
-        public static final String COLUMN_NAME_LOCATION_WOEID = "location_woeid";
-        public static final Uri CONTENT_URI =
+        String COLUMN_NAME_LOCATION_WOEID = "location_woeid";
+        Uri CONTENT_URI =
                 Uri.parse("content://" + AUTHORITY + "/" + TABLE_NAME);
-        public static final String COLUMN_NAME_CONDITION_CODE = "condition_code";
-        public static final String COLUMN_NAME_TEMPERATURE_LOW = "temp_low";
-        public static final String COLUMN_NAME_TEMPERATURE_HIGH = "temp_high";
-        public static final String COLUMN_NAME_UNIT = "unit";
+        String COLUMN_NAME_CONDITION_CODE = "condition_code";
+        String COLUMN_NAME_TEMPERATURE_LOW = "temp_low";
+        String COLUMN_NAME_TEMPERATURE_HIGH = "temp_high";
+        String COLUMN_NAME_UNIT = "unit";
 
 
     }

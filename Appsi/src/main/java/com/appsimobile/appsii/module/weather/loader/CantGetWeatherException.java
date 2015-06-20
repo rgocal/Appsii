@@ -21,9 +21,9 @@ package com.appsimobile.appsii.module.weather.loader;
  */
 public class CantGetWeatherException extends Exception {
 
-    private int mUserFacingErrorStringId;
+    private final int mUserFacingErrorStringId;
 
-    private boolean mRetryable;
+    private final boolean mRetryable;
 
     public CantGetWeatherException(boolean retryable, int userFacingErrorStringId) {
         this(retryable, userFacingErrorStringId, null, null);

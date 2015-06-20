@@ -17,8 +17,8 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     tools:context=".AppsiPreferencesActivity">
 
     <android.support.v7.widget.Toolbar
@@ -41,23 +41,11 @@
             />
     </android.support.v7.widget.Toolbar>
 
-
-    <include
-        android:id="@+id/running_status"
-        layout="@layout/include_running_status"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        />
-
-    <fragment
-        android:id="@+id/main_preferences"
-        android:name="com.appsimobile.appsii.MainActivity$MainPreferencesFragment"
+    <FrameLayout
+        android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/running_status"
         android:layout_below="@id/toolbar"
-        android:paddingEnd="@dimen/preferences_list_padding"
-        android:paddingStart="@dimen/preferences_list_padding"/>
+        />
 
 </RelativeLayout>

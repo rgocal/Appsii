@@ -60,6 +60,8 @@
                 android:backgroundTint="#FF9E80"
                 android:singleLine="true"
                 android:text="@string/title"
+                android:hint="@string/title"
+                android:inputType="textCapWords"
                 android:textAppearance="@style/TextAppearance.AppCompat.Display1"
                 />
         </LinearLayout>

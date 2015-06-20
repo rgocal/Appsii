@@ -28,7 +28,7 @@ import android.view.animation.ScaleAnimation;
 /**
  * Created by Nick Martens on 8/28/13.
  */
-public class ActionbarUtils {
+class ActionbarUtils {
 
     private static final ScaleAnimation sScaleAnimation =
             new ScaleAnimation(1, 1, 0, 1, ScaleAnimation.RELATIVE_TO_SELF, .5f,

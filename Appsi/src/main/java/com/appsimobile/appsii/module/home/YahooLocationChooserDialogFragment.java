@@ -25,16 +25,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
-import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.support.annotation.Nullable;
+import android.support.annotation.IntDef;
+import android.support.annotation.RequiresPermission;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.Html;
@@ -52,15 +50,19 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.appsimobile.appsii.LocationLoader;
+import com.appsimobile.appsii.LocationReceiver;
 import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.annotation.VisibleForTesting;
-import com.appsimobile.appsii.module.weather.loader.CantGetWeatherException;
 import com.appsimobile.appsii.module.weather.loader.YahooWeatherApiClient;
+import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.appsimobile.appsii.preference.PreferencesFactory;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+
+import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 /**
  * Dialog fragment that pops up when touching the preference.
@@ -75,6 +77,22 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
     public static final int LOCATION_REQUEST_RESULT_READY = 1;
 
     public static final int LOCATION_REQUEST_RESULT_UPDATING_LOCATION = 2;
+
+    public static final int LOCATION_REQUEST_RESULT_PERMISSION_DENIED = 3;
+
+    View mGrantAccessContainer;
+
+    Button mCancelGrantLocationAccessButton;
+
+    Button mConfirmGrantLocationAccessButton;
+
+    @IntDef({LOCATION_REQUEST_RESULT_DISABLED,
+            LOCATION_REQUEST_RESULT_READY,
+            LOCATION_REQUEST_RESULT_UPDATING_LOCATION,
+            LOCATION_REQUEST_RESULT_PERMISSION_DENIED})
+    public @interface LocationRequestResult {
+
+    }
 
     /**
      * Time between search queries while typing.
@@ -108,8 +126,6 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
 
     ListView mSearchResultsList;
 
-    boolean mLocationDisabled;
-
     Button mApplyCurrentLocationButton;
 
     Button mCancelCurrentLocationButton;
@@ -118,7 +134,7 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
 
     Button mConfirmUseLocationButton;
 
-    Runnable mShowLocationRunnable = new Runnable() {
+    final Runnable mShowLocationRunnable = new Runnable() {
         @Override
         public void run() {
             Activity activity = getActivity();
@@ -134,6 +150,8 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
         }
     };
 
+    boolean mNoHints;
+
     private Handler mHandler;
 
     private String mQuery;
@@ -145,6 +163,16 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
 
     public static YahooLocationChooserDialogFragment newInstance() {
         return new YahooLocationChooserDialogFragment();
+    }
+
+    public static YahooLocationChooserDialogFragment newInstance(boolean noHints) {
+        YahooLocationChooserDialogFragment result = new YahooLocationChooserDialogFragment();
+        if (noHints) {
+            Bundle args = new Bundle();
+            args.putBoolean("no_hints", true);
+            result.setArguments(args);
+        }
+        return result;
     }
 
     @Override
@@ -183,6 +211,11 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // first see if we need to show hints
+        Bundle args = getArguments();
+        mNoHints = args != null && args.getBoolean("no_hints");
+
+
         mHandler = new Handler();
         mRestartLoaderHandler = new Handler(this);
         if (sLocationUpdateHelper == null) {
@@ -212,6 +245,11 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
                 (Button) rootView.findViewById(R.id.cancel_enable_location_button);
         mConfirmUseLocationButton = (Button) rootView.findViewById(R.id.enable_location_button);
 
+        mGrantAccessContainer = rootView.findViewById(R.id.location_permission_denied);
+        mCancelGrantLocationAccessButton =
+                (Button) rootView.findViewById(R.id.cancel_grant_location_access_button);
+        mConfirmGrantLocationAccessButton =
+                (Button) rootView.findViewById(R.id.grant_location_access_button);
 
         mHeaderTextView = (TextView) rootView.findViewById(R.id.your_location_title);
 
@@ -221,6 +259,8 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
         mCancelCurrentLocationButton.setOnClickListener(this);
         mCancelUseLocationButton.setOnClickListener(this);
         mConfirmUseLocationButton.setOnClickListener(this);
+        mCancelGrantLocationAccessButton.setOnClickListener(this);
+        mConfirmGrantLocationAccessButton.setOnClickListener(this);
 
         // Set up apps
         mSearchResultsList = (ListView) rootView.findViewById(android.R.id.list);
@@ -250,12 +290,17 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
     public void onStart() {
         super.onStart();
 
-        if (mHasUpdatedLocationInfo) return;
+        // if we already have a location, or we should not show hints,
+        // return immediately.
+        if (mHasUpdatedLocationInfo || mNoHints) return;
 
+        @LocationRequestResult
         int locationResult = startLocationUpdateIfNeeded();
         switch (locationResult) {
+            case LOCATION_REQUEST_RESULT_PERMISSION_DENIED:
+                showLocationPermissionDenied();
+                break;
             case LOCATION_REQUEST_RESULT_DISABLED:
-                mLocationDisabled = true;
                 showLocationProviderDisabled();
                 break;
             case LOCATION_REQUEST_RESULT_READY:
@@ -269,6 +314,7 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
 
     }
 
+    @LocationRequestResult
     private int startLocationUpdateIfNeeded() {
         Activity activity = getActivity();
         mHasUpdatedLocationInfo = true;
@@ -278,6 +324,11 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
     void showLocationProviderDisabled() {
         mHasUpdatedLocationInfo = false;
         mEnableLocationContainer.setVisibility(View.VISIBLE);
+    }
+
+    void showLocationPermissionDenied() {
+        mHasUpdatedLocationInfo = false;
+        mGrantAccessContainer.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -387,6 +438,12 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
             case R.id.cancel_enable_location_button:
                 onCancelEnableLocationClicked();
                 break;
+            case R.id.grant_location_access_button:
+                onGrantLocationAccessClicked();
+                break;
+            case R.id.cancel_grant_location_access_button:
+                onCancelLocationAccessClicked();
+                break;
         }
     }
 
@@ -414,12 +471,22 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
         dismiss();
     }
 
+    void onGrantLocationAccessClicked() {
+        requestPermissions(new String[]{ACCESS_COARSE_LOCATION}, 7);
+        dismiss();
+    }
+
     void onCancelEnableLocationClicked() {
         mEnableLocationContainer.setVisibility(View.GONE);
     }
 
+    void onCancelLocationAccessClicked() {
+        mGrantAccessContainer.setVisibility(View.GONE);
+    }
+
     interface LocationUpdateHelper {
 
+        @LocationRequestResult
         int startLocationUpdateIfNeeded(Context context);
 
         void setFragment(YahooLocationChooserDialogFragment fragment);
@@ -428,13 +495,7 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
     }
 
 
-    interface LocationReceiver {
-
-
-        void onCurrentLocationInfoReady(String woeid, String country, String town, String timezone);
-    }
-
-    interface LocationResultListener {
+    public interface LocationResultListener {
 
         void onLocationSearchResult(YahooWeatherApiClient.LocationSearchResult result);
     }
@@ -445,7 +506,7 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
     private static class ResultsLoader
             extends AsyncTaskLoader<List<YahooWeatherApiClient.LocationSearchResult>> {
 
-        private String mQuery;
+        private final String mQuery;
 
         private List<YahooWeatherApiClient.LocationSearchResult> mResults;
 
@@ -496,99 +557,11 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
         }
     }
 
-    public static class LocationLoader implements LocationListener {
-
-        final LocationReceiver mLocationReceiver;
-
-        LocationManager mLocationManager;
-
-        AsyncTask<Location, Void, YahooWeatherApiClient.LocationInfo> mTask;
-
-        public LocationLoader(LocationReceiver locationReceiver) {
-            mLocationReceiver = locationReceiver;
-        }
-
-        public void requestLocationUpdate(Context context) {
-            mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-            Location lastKnown =
-                    mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            if (lastKnown != null) {
-                onLocationChanged(lastKnown);
-            }
-            mLocationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, this, null);
-        }
-
-        @Override
-        public void onLocationChanged(final Location location) {
-            if (mTask != null) {
-                mTask.cancel(true);
-            }
-            mTask = new AsyncTask<Location, Void, YahooWeatherApiClient.LocationInfo>() {
-                @Override
-                protected YahooWeatherApiClient.LocationInfo doInBackground(
-                        Location... locations) {
-                    Location location = locations[0];
-                    try {
-                        return YahooWeatherApiClient.getLocationInfo(location);
-                    } catch (CantGetWeatherException e) {
-                        Log.w("WeatherFragment", "Error getting locationInfo", e);
-                        return null;
-                    }
-                }
-
-                @Override
-                protected void onPostExecute(
-                        YahooWeatherApiClient.LocationInfo locationInfo) {
-                    onLocationInfoLoaded(locationInfo);
-                }
-            };
-            mTask.execute(location);
-        }
-
-        void onLocationInfoLoaded(@Nullable YahooWeatherApiClient.LocationInfo locationInfo) {
-            List<String> woeids = locationInfo == null ?
-                    Collections.<String>emptyList() : locationInfo.woeids;
-
-            String town = locationInfo == null ? null : locationInfo.town;
-            String country = locationInfo == null ? null : locationInfo.country;
-            String timezone = locationInfo == null ? null : locationInfo.timezone;
-
-            Log.i("WeatherFragment",
-                    "town: " + town + " country: " + country + " woeids: " + woeids);
-            if (!woeids.isEmpty() && town != null) {
-                String woeid = woeids.get(0);
-                mLocationReceiver.onCurrentLocationInfoReady(woeid, country, town, timezone);
-            } else {
-                mLocationReceiver.onCurrentLocationInfoReady(null, null, null, null);
-            }
-        }
-
-        @Override
-        public void onStatusChanged(String s, int i, Bundle bundle) {
-
-        }
-
-        @Override
-        public void onProviderEnabled(String s) {
-
-        }
-
-        @Override
-        public void onProviderDisabled(String s) {
-
-        }
-
-        public void destroy() {
-            if (mTask != null) {
-                mTask.cancel(true);
-            }
-        }
-    }
-
     static abstract class AbstractDefaultLocationUpdate implements LocationUpdateHelper {
 
 
         @Override
+        @LocationRequestResult
         public final int startLocationUpdateIfNeeded(Context context) {
             // request location updates if needed
             SharedPreferences preferences = PreferencesFactory.getPreferences(context);
@@ -602,6 +575,7 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
             return doStartLocationUpdateIfNeeded(context, passedMinutes);
         }
 
+        @LocationRequestResult
         protected abstract int doStartLocationUpdateIfNeeded(Context context, int passedMinutes);
 
     }
@@ -617,7 +591,15 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
         }
 
         @Override
-        protected int doStartLocationUpdateIfNeeded(Context context, int passedMinutes) {
+        @LocationRequestResult
+        @RequiresPermission(anyOf = {ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION})
+        protected int doStartLocationUpdateIfNeeded(
+                Context context, int passedMinutes) throws SecurityException {
+
+
+            if (!PermissionUtils.holdsPermission(context, ACCESS_COARSE_LOCATION)) {
+                return LOCATION_REQUEST_RESULT_PERMISSION_DENIED;
+            }
 
             LocationManager locationManager =
                     (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);

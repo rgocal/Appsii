@@ -52,13 +52,13 @@ class ExpandableAgendaAdapter extends AgendaAdapter<AgendaViewHolder>
 
     private final Time mTime = new Time(Time.TIMEZONE_UTC);
 
-    List<Object> mVisibleItems = new ArrayList<>();
+    final List<Object> mVisibleItems = new ArrayList<>();
 
-    private ParallaxHeaderItem mHeaderView;
+    private final ParallaxHeaderItem mHeaderView;
 
     private ItemAgendaViewHolder.OnItemClickListener mOnAgendaItemClickListener;
 
-    private Handler mHandler;
+    private final Handler mHandler;
 
     private View mParallaxView;
 

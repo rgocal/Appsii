@@ -23,7 +23,7 @@ import org.json.JSONObject;
  */
 public class SkuDetails {
 
-    String mItemType;
+    final String mItemType;
 
     String mSku;
 
@@ -42,7 +42,7 @@ public class SkuDetails {
 
     String mDescription;
 
-    String mJson;
+    final String mJson;
 
     public SkuDetails(String jsonSkuDetails) throws JSONException {
         this(IabPurchaseHelper.ITEM_TYPE_INAPP, jsonSkuDetails);

@@ -16,6 +16,7 @@
 
 package com.appsimobile.appsii.module.calls;
 
+import android.Manifest;
 import android.animation.LayoutTransition;
 import android.content.Context;
 import android.content.Intent;
@@ -38,9 +39,12 @@ import android.widget.TextView;
 import com.appsimobile.appsii.AnalyticsManager;
 import com.appsimobile.appsii.LoaderManager;
 import com.appsimobile.appsii.PageController;
+import com.appsimobile.appsii.PermissionDeniedException;
 import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.module.AppsiPreferences;
+import com.appsimobile.appsii.module.PermissionHelper;
 import com.appsimobile.appsii.module.ToolbarScrollListener;
+import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.appsimobile.util.TimeUtils;
 
 import java.util.ArrayList;
@@ -50,14 +54,17 @@ import java.util.List;
  * Created by nick on 25/05/14.
  */
 public class CallLogController extends PageController
-        implements LoaderManager.LoaderCallbacks<List<CallLogEntry>>, View.OnClickListener,
+        implements LoaderManager.LoaderCallbacks<CallLogResult>, View.OnClickListener,
         LayoutTransition.TransitionListener,
-        BasePeopleAdapter.OnItemClickListener {
+        BasePeopleAdapter.OnItemClickListener, PermissionHelper.PermissionListener {
 
     private static final int CALL_LOG_LOADER_ID = 2001;
 
     private static final int LAST_CALLED_LOADER_ID = 2002;
 
+    ViewGroup mPermissionOverlay;
+
+    boolean mPendingPermissionError;
 
     private RecyclerView mCallLogList;
 
@@ -90,6 +97,8 @@ public class CallLogController extends PageController
 
         mCallLogList = (RecyclerView) view.findViewById(R.id.callog_recycler_view);
 
+        mPermissionOverlay = (ViewGroup) view.findViewById(R.id.permission_overlay);
+
         mToolbar = (Toolbar) view.findViewById(R.id.toolbar);
         mToolbar.setTitle(mTitle);
         setToolbarBackgroundAlpha(0);
@@ -106,6 +115,10 @@ public class CallLogController extends PageController
             mCallLogList.setLayoutManager(new LinearLayoutManager(getContext()));
         }
         mCallLogList.setAdapter(mCallLogAdapter);
+
+        if (mPendingPermissionError) {
+            showPermissionError();
+        }
 
     }
 
@@ -143,15 +156,42 @@ public class CallLogController extends PageController
         mToolbar.setBackgroundColor(color);
     }
 
-    public Loader<List<CallLogEntry>> onCreateLoader(int id, Bundle args) {
+    private void showPermissionError() {
+        mPendingPermissionError = false;
+        PermissionHelper permissionHelper = new PermissionHelper(
+                R.string.permission_reason_calls,
+                false, this, Manifest.permission.READ_CALL_LOG, Manifest.permission.READ_CONTACTS);
+
+        permissionHelper.show(mPermissionOverlay);
+    }
+
+    @Override
+    public Loader<CallLogResult> onCreateLoader(int id, Bundle args) {
         return new CallLogLoader(getContext());
     }
 
-    public void onLoadFinished(Loader<List<CallLogEntry>> loader, List<CallLogEntry> data) {
-        mCallLogAdapter.setData(data);
+    @Override
+    public void onLoadFinished(Loader<CallLogResult> loader, CallLogResult data) {
+        if (data.mPermissionDeniedException != null) {
+            onPermissionDenied(data.mPermissionDeniedException);
+        } else {
+            if (mPermissionOverlay != null) {
+                mPermissionOverlay.removeAllViews();
+            }
+            mCallLogAdapter.setData(data.mCallLog);
+        }
     }
 
-    public void onLoaderReset(Loader<List<CallLogEntry>> loader) {
+    private void onPermissionDenied(PermissionDeniedException permissionDeniedException) {
+        if (mPermissionOverlay == null) {
+            mPendingPermissionError = true;
+        } else {
+            showPermissionError();
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<CallLogResult> loader) {
         mCallLogAdapter.clear();
     }
 
@@ -190,17 +230,35 @@ public class CallLogController extends PageController
         }
     }
 
+    @Override
+    public void onAccepted(PermissionHelper permissionHelper) {
+        Intent intent = PermissionUtils.
+                buildRequestPermissionsIntent(getContext(),
+                        PermissionUtils.REQUEST_CODE_PERMISSION_READ_CALL_LOG,
+                        permissionHelper.getPermissions());
+
+        getContext().startActivity(intent);
+
+    }
+
+    @Override
+    public void onCancelled(PermissionHelper permissionHelper, boolean dontShowAgain) {
+        // this option is not available so this method won't be called
+
+    }
+
     private static class CallLogAdapter extends BasePeopleAdapter {
 
-        private List<Object> mCallLogEntries = new ArrayList<>();
+        private final List<Object> mCallLogEntries = new ArrayList<>();
 
-        private Context mContext;
+        private final Context mContext;
 
         private View mParallaxView;
 
         public CallLogAdapter(Context context) {
             super(context);
             mContext = context;
+            mCallLogEntries.add(null);
         }
 
         @Override
@@ -263,6 +321,7 @@ public class CallLogController extends PageController
         @Override
         public void clear() {
             mCallLogEntries.clear();
+            mCallLogEntries.add(null);
             notifyDataSetChanged();
         }
 

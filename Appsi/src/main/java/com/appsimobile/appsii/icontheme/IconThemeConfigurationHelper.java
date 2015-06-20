@@ -29,7 +29,7 @@ public class IconThemeConfigurationHelper {
 
     private static IconThemeConfigurationHelper sInstance;
 
-    private Context mContext;
+    private final Context mContext;
 
     private Map<String, String> mPrefixMapping = new ConcurrentHashMap<String, String>();
 
@@ -46,7 +46,6 @@ public class IconThemeConfigurationHelper {
 
     public Uri createIconUri(String key, String prefix) {
         Uri u = Uri.parse(prefix);
-        Uri path = Uri.withAppendedPath(u, Uri.encode(key));
-        return path;
+        return Uri.withAppendedPath(u, Uri.encode(key));
     }
 }

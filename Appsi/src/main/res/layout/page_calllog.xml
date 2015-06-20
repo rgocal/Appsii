@@ -28,13 +28,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:drawablePadding="8dp"
-        android:drawableStart="@android:drawable/sym_def_app_icon"
         android:gravity="center_vertical"
         android:listSelector="@android:color/transparent"
         android:textAppearance="?android:attr/textAppearanceLarge"
         />
-
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -53,5 +50,11 @@
         android:background="?attr/colorPrimaryDarkStatusBar"
         android:minHeight="24dp"
         />
+
+    <FrameLayout
+        android:layout_marginTop="80dp"
+        android:id="@+id/permission_overlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
 </FrameLayout>

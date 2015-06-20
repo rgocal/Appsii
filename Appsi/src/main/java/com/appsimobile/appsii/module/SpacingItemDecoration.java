@@ -22,13 +22,13 @@ import android.view.View;
 
 public class SpacingItemDecoration extends RecyclerView.ItemDecoration {
 
-    int mSpacingLeft;
+    final int mSpacingLeft;
 
-    int mSpacingTop;
+    final int mSpacingTop;
 
-    int mSpacingRight;
+    final int mSpacingRight;
 
-    int mSpacingBottom;
+    final int mSpacingBottom;
 
     public SpacingItemDecoration(Context context, int spacingDps) {
         mSpacingLeft = mSpacingTop = mSpacingRight = mSpacingBottom =

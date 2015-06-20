@@ -21,6 +21,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
+import com.appsimobile.appsii.PermissionDeniedException;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
 import com.appsimobile.util.ConvertedCursorLoader;
 
@@ -58,6 +59,15 @@ public class HomeLoader extends ConvertedCursorLoader<List<HomeItem>> {
         setSelection(null);
         setSelectionArgs(null);
         setSortOrder(DEFAULT_SORT_ORDER);
+    }
+
+    @Override
+    protected void checkPermissions() throws PermissionDeniedException {
+    }
+
+    @Override
+    protected List<HomeItem> convertPermissionDeniedException(PermissionDeniedException e) {
+        return null;
     }
 
     public static int longCompare(long lhs, long rhs) {

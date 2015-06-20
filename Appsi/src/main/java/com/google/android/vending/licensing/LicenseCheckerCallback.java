@@ -45,7 +45,7 @@ public interface LicenseCheckerCallback {
      * @param reason Policy.LICENSED or Policy.RETRY typically. (although in
      * theory the policy can return Policy.NOT_LICENSED here as well)
      */
-    public void allow(int reason);
+    void allow(int reason);
 
     /**
      * Don't allow use. App should inform user and take appropriate action.
@@ -54,11 +54,11 @@ public interface LicenseCheckerCallback {
      * the policy can return Policy.LICENSED here as well ---
      * perhaps the call to the LVL took too long, for example)
      */
-    public void dontAllow(int reason);
+    void dontAllow(int reason);
 
     /**
      * Error in application code. Caller did not call or set up license checker
      * correctly. Should be considered fatal.
      */
-    public void applicationError(int errorCode);
+    void applicationError(int errorCode);
 }

@@ -77,7 +77,7 @@ public class AppTag implements Comparable<AppTag>, Parcelable {
         this.tagType = tagType;
     }
 
-    private AppTag(Parcel in) {
+    AppTag(Parcel in) {
         id = in.readLong();
         title = in.readString();
         position = in.readInt();

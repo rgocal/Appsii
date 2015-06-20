@@ -61,5 +61,15 @@
         tools:visibility="visible"
         />
 
+    <include
+        android:id="@+id/location_permission_denied"
+        layout="@layout/include_location_permission_denied"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:visibility="gone"
+        tools:visibility="visible"
+        />
+
 
 </LinearLayout>

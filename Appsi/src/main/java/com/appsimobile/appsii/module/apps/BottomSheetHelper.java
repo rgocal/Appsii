@@ -19,6 +19,7 @@ package com.appsimobile.appsii.module.apps;
 import android.animation.Animator;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -48,7 +49,7 @@ import java.util.List;
  */
 class BottomSheetHelper {
 
-    private final Context mContext;
+    final Context mContext;
 
     View mOverlay;
 
@@ -70,11 +71,11 @@ class BottomSheetHelper {
 
     AppEntry mAppEntry;
 
-    AppsController mAppsController;
+    final AppsController mAppsController;
 
-    AppTagAdapter mAdapter;
+    final AppTagAdapter mAdapter;
 
-    float mCellHeight;
+    final float mCellHeight;
 
     int mMaxTranslationY;
 
@@ -82,15 +83,13 @@ class BottomSheetHelper {
 
     View mBottomSheetFooter;
 
-    private Animator.AnimatorListener mOnClosedListener = new AnimatorAdapter() {
+    private final Animator.AnimatorListener mOnClosedListener = new AnimatorAdapter() {
         @Override
         public void onAnimationEnd(Animator animation) {
             mOverlay.setVisibility(View.GONE);
             mBottomSheet.setVisibility(View.INVISIBLE);
         }
     };
-
-    private LayoutAnimationController mController;
 
     BottomSheetHelper(Context context, AppsController appsController) {
         mContext = context;
@@ -140,7 +139,7 @@ class BottomSheetHelper {
              * True if we decided to capture the event. Used to know if up/cancel
              * events must be handled.
              */
-            boolean mCapured;
+            boolean mCaptured;
 
             /**
              * An event is marked as ignored if the touch-slop was passed we we decided,
@@ -165,7 +164,7 @@ class BottomSheetHelper {
 
                 // Reset the state on a down event
                 if (action == MotionEvent.ACTION_DOWN) {
-                    mCapured = false;
+                    mCaptured = false;
                     mClosing = false;
                     mIgnoring = false;
                     mStartY = rawY;
@@ -190,7 +189,7 @@ class BottomSheetHelper {
                 // clickable
                 if (action == MotionEvent.ACTION_UP ||
                         action == MotionEvent.ACTION_CANCEL) {
-                    return mCapured;
+                    return mCaptured;
                 }
 
                 // Only move events will be handled below. So return false when it
@@ -218,7 +217,7 @@ class BottomSheetHelper {
                     boolean canScrollUp = canRecyclerScrollUp(mTagsRecycler);
                     if (!canScrollUp) {
                         mClosing = true;
-                        mCapured = true;
+                        mCaptured = true;
                         return true;
                     } else {
                         mIgnoring = true;
@@ -228,17 +227,17 @@ class BottomSheetHelper {
 
 
                 if (down && !canRecyclerScrollUp(mTagsRecycler)) {
-                    mCapured = true;
+                    mCaptured = true;
                     return true;
                 }
 
                 if (collapsed && !down) {
-                    mCapured = true;
+                    mCaptured = true;
                     return true;
                 }
 
                 if (!down && !canRecyclerScrollDown(mTagsRecycler)) {
-                    mCapured = true;
+                    mCaptured = true;
                     return true;
                 }
 
@@ -308,20 +307,19 @@ class BottomSheetHelper {
                 Animation.RELATIVE_TO_PARENT, 0);
         animation.setDuration(450);
         animation.setInterpolator(new DecelerateInterpolator());
-        mController = new LayoutAnimationController(animation) {
+        LayoutAnimationController controller = new LayoutAnimationController(animation) {
 
             @Override
-            protected long getDelayForView(View view) {
+            protected long getDelayForView(@NonNull View view) {
                 int top = view.getTop();
                 float pct = top / (float) mContentView.getHeight();
-                int delay = (int) (pct * 200);
-                return delay;
+                return (int) (pct * 200);
             }
         };
-        ((ViewGroup) mContentView).setLayoutAnimation(mController);
+        ((ViewGroup) mContentView).setLayoutAnimation(controller);
     }
 
-    private static boolean canRecyclerScrollUp(RecyclerView recyclerView) {
+    static boolean canRecyclerScrollUp(RecyclerView recyclerView) {
         View view = recyclerView.getChildAt(0);
         if (view == null) return false;
 
@@ -329,12 +327,13 @@ class BottomSheetHelper {
         if (!isFirst) return true;
 
         int top = view.getTop();
+        //noinspection RedundantIfStatement
         if (top < 0) return true;
 
         return false;
     }
 
-    private static boolean canRecyclerScrollDown(RecyclerView recyclerView) {
+    static boolean canRecyclerScrollDown(RecyclerView recyclerView) {
         View view = recyclerView.getChildAt(recyclerView.getChildCount() - 1);
         if (view == null) return false;
 
@@ -344,6 +343,7 @@ class BottomSheetHelper {
         if (!isLast) return true;
 
         int bottom = view.getBottom();
+        //noinspection RedundantIfStatement
         if (bottom > recyclerView.getHeight()) return true;
 
         return false;

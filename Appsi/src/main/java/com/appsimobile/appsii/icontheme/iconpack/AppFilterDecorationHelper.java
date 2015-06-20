@@ -36,7 +36,7 @@ import java.util.Random;
  */
 public class AppFilterDecorationHelper {
 
-    private static Rect mBoundsRect = new Rect();
+    private static final Rect mBoundsRect = new Rect();
 
     final PorterDuffXfermode mDstOut = new PorterDuffXfermode(PorterDuff.Mode.DST_OUT);
 

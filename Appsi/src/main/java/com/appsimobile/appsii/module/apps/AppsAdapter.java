@@ -222,8 +222,7 @@ class AppsAdapter extends RecyclerView.Adapter<AppsController.AbstractAppViewHol
     public long getItemId(int position) {
         Object item = mVisibleItems.get(position);
         if (item == null) return RecyclerView.NO_ID;
-        int itemType = getItemViewType(position);
-        long result = itemType;
+        long result = getItemViewType(position);
         result = result << 32;
 
         if (item instanceof AppTag) return result ^ ((AppTag) item).id;
@@ -401,11 +400,11 @@ class AppsAdapter extends RecyclerView.Adapter<AppsController.AbstractAppViewHol
 
         final private Rect mSlopBounds;
 
-        View mDelegateView;
+        final View mDelegateView;
 
         boolean mDelegateTargeted;
 
-        private int mSlop;
+        private final int mSlop;
 
         public OverflowTouchDelegate(View delegateView) {
             super(new Rect(), delegateView);
@@ -504,9 +503,9 @@ class AppsAdapter extends RecyclerView.Adapter<AppsController.AbstractAppViewHol
 
         AppTag mAppTag;
 
-        TextView mTextView;
+        final TextView mTextView;
 
-        View mHeaderOverflow;
+        final View mHeaderOverflow;
 
         public AppHeaderHolder(View itemView) {
             super(itemView);

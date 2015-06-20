@@ -54,15 +54,16 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implem
 
     final ContactView.PeopleActionListener mPeopleActionListener;
 
-    List<BaseContactInfo> mContactInfos = new ArrayList<>();
+    final List<BaseContactInfo> mContactInfos = new ArrayList<>();
 
-    List<AppEntry> mApps = new ArrayList<>();
+    final List<AppEntry> mApps = new ArrayList<>();
 
     boolean mShowPlainApps;
 
     boolean mShowPlainContacts;
 
-    GridLayoutManager.SpanSizeLookup mSpanSizeLookup = new GridLayoutManager.SpanSizeLookup() {
+    final GridLayoutManager.SpanSizeLookup mSpanSizeLookup =
+            new GridLayoutManager.SpanSizeLookup() {
         @Override
         public int getSpanSize(int position) {
             return SearchAdapter.this.getSpanSize(position);

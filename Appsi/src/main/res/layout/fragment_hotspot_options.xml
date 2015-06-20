@@ -38,6 +38,8 @@
         android:layout_below="@id/title_view"
         android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
+        android:hint="@string/title"
+        android:inputType="textCapWords"
         />
 
     <android.support.v7.widget.SwitchCompat

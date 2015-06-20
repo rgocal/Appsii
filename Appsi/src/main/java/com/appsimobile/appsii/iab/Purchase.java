@@ -35,7 +35,7 @@ public class Purchase {
 
     public static final int PURCHASE_STATE_REFUNDED = 2;
 
-    String mItemType;  // ITEM_TYPE_INAPP or ITEM_TYPE_SUBS
+    final String mItemType;  // ITEM_TYPE_INAPP or ITEM_TYPE_SUBS
 
     String mOrderId;
 

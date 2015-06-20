@@ -32,7 +32,7 @@ public class ObfuscatedPreferences {
 
     private final SharedPreferences mPreferences;
 
-    private final Obfuscator mObfuscator;
+    final Obfuscator mObfuscator;
 
     /**
      * Constructor.
@@ -71,7 +71,7 @@ public class ObfuscatedPreferences {
 
     public class Editor {
 
-        SharedPreferences.Editor mEditor;
+        final SharedPreferences.Editor mEditor;
 
         boolean mValid;
 

@@ -71,15 +71,15 @@ public class TimeZoneResultAdapter extends BaseAdapter implements OnItemClickLis
 
     private boolean mHasResults = false;
 
-    private Context mContext;
+    private final Context mContext;
 
-    private LayoutInflater mInflater;
+    private final LayoutInflater mInflater;
 
-    private TimeZonePickerView.OnTimeZoneSetListener mTimeZoneSetListener;
+    private final TimeZonePickerView.OnTimeZoneSetListener mTimeZoneSetListener;
 
-    private TimeZoneData mTimeZoneData;
+    private final TimeZoneData mTimeZoneData;
 
-    private int[] mFilteredTimeZoneIndices;
+    private final int[] mFilteredTimeZoneIndices;
 
     private int mFilteredTimeZoneLength = 0;
 
@@ -208,13 +208,13 @@ public class TimeZoneResultAdapter extends BaseAdapter implements OnItemClickLis
         View v = convertView;
 
         if (mFilteredTimeZoneIndices[position] == EMPTY_INDEX) {
-            v = mInflater.inflate(R.layout.tzp_empty_time_zone_item, null);
+            v = mInflater.inflate(R.layout.tzp_empty_time_zone_item, parent, false);
             return v;
         }
 
         // We'll need to re-inflate the view if it was null, or if it was used as an empty item.
         if (v == null || v.findViewById(R.id.empty_item) != null) {
-            v = mInflater.inflate(R.layout.tzp_time_zone_item, null);
+            v = mInflater.inflate(R.layout.tzp_time_zone_item, parent, false);
             ViewHolder.setupViewHolder(v);
         }
 

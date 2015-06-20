@@ -54,7 +54,7 @@ public class CallLogView extends AbstractContactView implements View.OnClickList
 
     private TextView mCallLogCount;
 
-    private String mPrivateNumberString;
+    private final String mPrivateNumberString;
 
     private CallLogEntry mCallLogEntry;
 
@@ -94,7 +94,7 @@ public class CallLogView extends AbstractContactView implements View.OnClickList
             }
         }
 
-        String title = entry.mPrivateNumner ? mPrivateNumberString : name;
+        String title = entry.mPrivateNumber ? mPrivateNumberString : name;
         bindToData(entry.mBaseContactInfo, title);
 
 //        if (mCallLogNumber != null) {

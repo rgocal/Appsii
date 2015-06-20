@@ -17,15 +17,11 @@
 package com.appsimobile.appsii;
 
 import android.app.Application;
-import android.content.AsyncQueryHandler;
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
@@ -53,12 +49,10 @@ public class AppsiApplication extends Application {
 
     public static final int APPWIDGET_HOST_ID = 0x0BADBABE;
 
-
     private static float density = -1;
 
     private static Bitmap mDefaultAppIcon;
 
-    AsyncQueryHandlerImpl mQueryHandler;
 
 
     public static float getDensity(Context context) {
@@ -105,8 +99,6 @@ public class AppsiApplication extends Application {
         Fabric.with(this, new Crashlytics.Builder().disabled(BuildConfig.DEBUG).build());
 
         verifyPurchases();
-        AccountHelper accountHelper = AccountHelper.getInstance(this);
-        accountHelper.createAccountIfNeeded();
 
         unlockOverflowButton();
     }
@@ -186,20 +178,9 @@ public class AppsiApplication extends Application {
     }
 
     private void updatePageEnabledState(int pageType, boolean enabled) {
-        if (BuildConfig.DEBUG) {
-            if (enabled) {
-                Log.d("Appsi", "Marking purchase for pageType: " + pageType + " as enabled");
-            } else {
-                Log.d("Appsi", "Marking purchase for pageType: " + pageType + " as not purchased");
-            }
-        }
-        if (mQueryHandler == null) {
-            mQueryHandler = new AsyncQueryHandlerImpl(this, getContentResolver());
-        }
-        if (!enabled) {
-            //mQueryHandler.disablePage(pageType);
-        } else {
-            mQueryHandler.ensurePageEnabled(pageType);
+        if (enabled) {
+            PageHelper pageHelper = PageHelper.getInstance(this);
+            pageHelper.enablePageAccess(pageType, false /* force */);
         }
     }
 
@@ -219,81 +200,6 @@ public class AppsiApplication extends Application {
         }
     }
 
-    static class AsyncQueryHandlerImpl extends AsyncQueryHandler {
 
-        final Context mContext;
-
-        public AsyncQueryHandlerImpl(Context context, ContentResolver cr) {
-            super(cr);
-            mContext = context;
-        }
-
-        public void disablePage(int pageType) {
-            // we can simply delete this page from the pages table.
-            // this will cascade into the hotspot_pages table.
-            startDelete(0, null, HomeContract.Pages.CONTENT_URI,
-                    HomeContract.Pages.TYPE + "=?",
-                    new String[]{
-                            String.valueOf(pageType)
-                    });
-        }
-
-        public void ensurePageEnabled(int pageType) {
-            startQuery(1, pageType,
-                    HomeContract.Pages.CONTENT_URI,
-                    new String[]{HomeContract.Pages._ID},
-                    HomeContract.Pages.TYPE + "=?",
-                    new String[]{String.valueOf(pageType)},
-                    null
-            );
-        }
-
-        @Override
-        protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-            int pageType = (int) cookie;
-            int count = cursor.getCount();
-            cursor.close();
-            if (count == 0) {
-                enablePage(pageType);
-            }
-        }
-
-        public void enablePage(int pageType) {
-            ContentValues values = new ContentValues();
-            String displayName = getTitleForPageType(pageType);
-
-            values.put(HomeContract.Pages.TYPE, pageType);
-            values.put(HomeContract.Pages.DISPLAY_NAME, displayName);
-
-            startInsert(0, null, HomeContract.Pages.CONTENT_URI, values);
-        }
-
-        private String getTitleForPageType(int pageType) {
-            int resId;
-            switch (pageType) {
-                case HomeContract.Pages.PAGE_SETTINGS:
-                    resId = R.string.settings_page_name;
-                    break;
-                case HomeContract.Pages.PAGE_SMS:
-                    resId = R.string.sms_page_name;
-                    break;
-                case HomeContract.Pages.PAGE_AGENDA:
-                    resId = R.string.agenda_page_name;
-                    break;
-                case HomeContract.Pages.PAGE_CALLS:
-                    resId = R.string.calls_page_name;
-                    break;
-                case HomeContract.Pages.PAGE_PEOPLE:
-                    resId = R.string.people_page_name;
-                    break;
-                case HomeContract.Pages.PAGE_SEARCH:
-                    resId = R.string.search_page_name;
-                    break;
-                default:
-                    return null;
-            }
-            return mContext.getString(resId);
-        }
-    }
 
 }

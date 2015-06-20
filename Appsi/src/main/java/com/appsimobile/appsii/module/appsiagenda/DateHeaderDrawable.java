@@ -25,17 +25,21 @@ import android.text.SpannableStringBuilder;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by nick on 25/09/14.
  */
 public class DateHeaderDrawable extends Drawable {
 
-    public static final SimpleDateFormat MONTH_FORMAT = new SimpleDateFormat("MMM");
+    public static final SimpleDateFormat MONTH_FORMAT =
+            new SimpleDateFormat("MMM", Locale.getDefault());
 
-    public static final SimpleDateFormat DAY_FORMAT = new SimpleDateFormat("d");
+    public static final SimpleDateFormat DAY_FORMAT =
+            new SimpleDateFormat("d", Locale.getDefault());
 
-    public static final SimpleDateFormat YEAR_FORMAT = new SimpleDateFormat("yyyy");
+    public static final SimpleDateFormat YEAR_FORMAT =
+            new SimpleDateFormat("yyyy", Locale.getDefault());
 
     final SpannableStringBuilder mStringBuilder;
 

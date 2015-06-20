@@ -47,25 +47,25 @@ public class SettingsConstants {
 
     public static final String DATA_USAGE_ACTION = "_DATA_USAGE_";
 
-    static int bv = Build.VERSION.SDK_INT;
+    static final int bv = Build.VERSION.SDK_INT;
 
     private final Section[] mSections;
 
     private final List<SectionItem> mPickerItems;
 
-    int mAirplaneToggleDrawableResourceId;
+    final int mAirplaneToggleDrawableResourceId;
 
-    int mBluetoothToggleDrawableResourceId;
+    final int mBluetoothToggleDrawableResourceId;
 
-    int mDataToggleDrawableResourceId;
+    final int mDataToggleDrawableResourceId;
 
-    int mWirelessToggleDrawableResourceId;
+    final int mWirelessToggleDrawableResourceId;
 
-    int mSoundToggleDrawableResourceId;
+    final int mSoundToggleDrawableResourceId;
 
     List<SectionItem> mAdditionalPickerItems;
 
-    private Context mContext;
+    private final Context mContext;
 
     public SettingsConstants(Context context, Section[] sections,
             int airplaneToggleDrawableResourceId,
@@ -421,9 +421,9 @@ public class SettingsConstants {
 
     public static class Section {
 
-        int mNameResourceId;
+        final int mNameResourceId;
 
-        SectionItem[] mItems;
+        final SectionItem[] mItems;
 
         public Section(int resourceId, SectionItem[] items) {
             mItems = items;
@@ -436,11 +436,11 @@ public class SettingsConstants {
 
         volatile boolean mShown = true;
 
-        String mActivityAction;
+        final String mActivityAction;
 
-        int mTitleResourceId;
+        final int mTitleResourceId;
 
-        int mIconResourceId;
+        final int mIconResourceId;
 
         public SectionItem(String action, int title, int icon) {
             mActivityAction = action;
@@ -454,15 +454,15 @@ public class SettingsConstants {
 
         private final Section[] mSections;
 
-        int mAirplaneToggleDrawableResourceId;
+        final int mAirplaneToggleDrawableResourceId;
 
-        int mBluetoothToggleDrawableResourceId;
+        final int mBluetoothToggleDrawableResourceId;
 
-        int mDataToggleDrawableResourceId;
+        final int mDataToggleDrawableResourceId;
 
-        int mWirelessToggleDrawableResourceId;
+        final int mWirelessToggleDrawableResourceId;
 
-        int mSoundToggleDrawableResourceId;
+        final int mSoundToggleDrawableResourceId;
 
         public Builder(Section[] sections,
                 int airplaneToggleDrawableResourceId,

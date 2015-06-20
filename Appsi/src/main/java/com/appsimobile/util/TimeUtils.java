@@ -46,10 +46,8 @@ public class TimeUtils {
 //    }
 
     public static int getJulianDay(long millis, Time recycle) {
-        Time time = recycle;
-        time.set(millis);
-        int today = Time.getJulianDay(millis, time.gmtoff);
-        return today;
+        recycle.set(millis);
+        return Time.getJulianDay(millis, recycle.gmtoff);
     }
 
     public static int getJulianDayForTime(Time time, boolean ignoreDst) {

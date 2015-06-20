@@ -142,9 +142,9 @@ public class AppFilterParser {
 
         float mScaleFactor;
 
-        Map<String, String> mIconNameMappings = MapCompat.createMap();
+        final Map<String, String> mIconNameMappings = MapCompat.createMap();
 
-        Resources mResources;
+        final Resources mResources;
 
         public AppFilterData(Resources resources) {
             mResources = resources;

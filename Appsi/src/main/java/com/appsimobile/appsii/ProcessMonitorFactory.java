@@ -276,7 +276,7 @@ public class ProcessMonitorFactory {
             }
         }
 
-        private void handleMessageOnMainThread(Message msg) {
+        void handleMessageOnMainThread(Message msg) {
             if (msg.what == MSG_PACKAGES_RUNNING) {
                 // We know we get a Set<String>, so ignore the cast warning
                 //noinspection unchecked

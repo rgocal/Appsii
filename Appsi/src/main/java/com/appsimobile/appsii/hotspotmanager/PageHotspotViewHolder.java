@@ -42,7 +42,7 @@ public class PageHotspotViewHolder extends ViewHolder
     /**
      * The switch to enable or disable the page
      */
-    SwitchCompat mSwitchCompat;
+    final SwitchCompat mSwitchCompat;
 
     /**
      * The entry to which this view-holder is bound
@@ -78,13 +78,14 @@ public class PageHotspotViewHolder extends ViewHolder
         }
         mHotspotPageEntry.mEnabled = isChecked;
         mOnPageEnabledChangedListener.onPageEnabledStateChanged(
-                mHotspotPageEntry.mPageId, mHotspotPageEntry.mHotspotId, isChecked);
+                mHotspotPageEntry.mPageId, mHotspotPageEntry.mHotspotId, isChecked,
+                mHotspotPageEntry.mPageType);
 
     }
 
-    static interface OnPageEnabledChangedListener {
+    interface OnPageEnabledChangedListener {
 
-        void onPageEnabledStateChanged(long pageId, long hotspotId, boolean enabled);
+        void onPageEnabledStateChanged(long pageId, long hotspotId, boolean enabled, int pageType);
     }
 
 }

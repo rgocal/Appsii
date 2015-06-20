@@ -35,9 +35,9 @@ import java.util.List;
  */
 public class CallTypeIconsView extends View {
 
-    private List<Integer> mCallTypes = new ArrayList<>(3);
+    private final List<Integer> mCallTypes = new ArrayList<>(3);
 
-    private Resources mResources;
+    private final Resources mResources;
 
     private int mWidth;
 

@@ -21,7 +21,7 @@ import android.os.UserManager;
 
 public class UserManagerCompatV17 extends UserManagerCompatV16 {
 
-    protected UserManager mUserManager;
+    protected final UserManager mUserManager;
 
     UserManagerCompatV17(Context context) {
         mUserManager = (UserManager) context.getSystemService(Context.USER_SERVICE);

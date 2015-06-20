@@ -126,7 +126,7 @@ public class ContactPickerDialog extends DialogFragment
 
         PeopleViewHolder.OnItemClickListener mOnItemClickListener;
 
-        private Context mContext;
+        private final Context mContext;
 
         public ProfileImageAdapter(Context context) {
             mContext = context;

@@ -47,7 +47,7 @@ import java.util.concurrent.CountDownLatch;
  */
 public class PluginConnectionHelper {
 
-    private static final String TAG = "RpcConnectionHelper";
+    static final String TAG = "RpcConnectionHelper";
 
     private static final SecureRandom RANDOM = new SecureRandom();
 
@@ -63,7 +63,7 @@ public class PluginConnectionHelper {
 
     boolean mConnected;
 
-    private IAppsiPlugin mService;
+    IAppsiPlugin mService;
 
     /**
      * @param context a Context
@@ -149,7 +149,7 @@ public class PluginConnectionHelper {
     /**
      * Unbinds service if necessary and removes reference to it.
      */
-    private void cleanupService() {
+    void cleanupService() {
         if (mService != null) {
             try {
                 mContext.unbindService(mServiceConnection);

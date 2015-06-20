@@ -304,10 +304,8 @@ public class ThemingUtils {
         int insetVertical = res
                 .getDimensionPixelSize(R.dimen.button_inset_vertical_material);
 
-        InsetDrawable inset =
-                new InsetDrawable(shapeDrawable, insetHorizontal, insetVertical, insetHorizontal,
-                        insetVertical);
-        return inset;
+        return new InsetDrawable(shapeDrawable, insetHorizontal, insetVertical, insetHorizontal,
+                insetVertical);
     }
 
     public static int[] createPrimaryColorArray(String[] colorNames) {

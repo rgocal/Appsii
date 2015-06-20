@@ -16,6 +16,7 @@
 
 package com.appsimobile.appsii;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -27,6 +28,7 @@ import android.provider.ContactsContract;
 import android.support.annotation.DrawableRes;
 import android.util.Log;
 
+import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.crashlytics.android.Crashlytics;
 
 import java.io.File;
@@ -124,9 +126,11 @@ public class BitmapUtils {
     }
 
     public static Bitmap decodeContactImage(Context context, Uri contactUri, int reqWidth,
-            int reqHeight) {
+            int reqHeight) throws PermissionDeniedException {
 
         try {
+            PermissionUtils.throwIfNotPermitted(context, Manifest.permission.READ_CONTACTS);
+
             InputStream avatarDataStream =
                     ContactsContract.Contacts.openContactPhotoInputStream(
                             context.getContentResolver(),
@@ -152,13 +156,14 @@ public class BitmapUtils {
 
             // Decode bitmap with inSampleSize set
             options.inJustDecodeBounds = false;
-            Bitmap bitmap = BitmapFactory.decodeStream(avatarDataStream, null, options);
-            return bitmap;
+            return BitmapFactory.decodeStream(avatarDataStream, null, options);
 //            return Bitmap.createScaledBitmap(bitmap, reqWidth, reqHeight, true);
         } catch (OutOfMemoryError e) {
             Log.wtf("Helper", "Out of memory while loading contact image; returning null", e);
             Crashlytics.logException(e);
             return null;
+        } catch (SecurityException e) {
+            throw new PermissionDeniedException(e);
         } catch (IOException e) {
             Log.wtf("Helper", "error loading contact image", e);
             return null;

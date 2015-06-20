@@ -16,6 +16,7 @@
 
 package com.appsimobile.appsii.module.home;
 
+import android.Manifest;
 import android.appwidget.AppWidgetHostView;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProviderInfo;
@@ -41,6 +42,7 @@ import android.os.RemoteException;
 import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
@@ -67,6 +69,7 @@ import com.appsimobile.appsii.AppsiApplication;
 import com.appsimobile.appsii.BitmapUtils;
 import com.appsimobile.appsii.DrawableCompat;
 import com.appsimobile.appsii.DrawableStartTintPainter;
+import com.appsimobile.appsii.PermissionDeniedException;
 import com.appsimobile.appsii.PopupMenuHelper;
 import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.annotation.VisibleForTesting;
@@ -78,6 +81,7 @@ import com.appsimobile.appsii.module.home.config.HomeItemConfigurationHelper;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
 import com.appsimobile.appsii.module.weather.WeatherUtils;
 import com.appsimobile.appsii.module.weather.loader.WeatherData;
+import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.appsimobile.paintjob.PaintJob;
 import com.appsimobile.paintjob.ViewPainters;
 
@@ -92,6 +96,10 @@ import java.util.TimeZone;
  * Created by nick on 20/01/15.
  */
 public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
+
+    static final String PERMISSION_ERROR_LOCATION_WEATHER = "_location_weather_";
+
+    static final String PERMISSION_ERROR_CONTACTS_PROFILE = "_contact_profile_image_";
 
     /**
      * A place to support very basic caching of the host-views. The cache is automatically
@@ -158,12 +166,12 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
     /**
      * The base height of the widgets. This is set to 72dp in the constructor
      */
-    int mBaseHeight;
+    final int mBaseHeight;
 
     /**
      * The height to increase the widget height with, for each step.
      */
-    int mHeightPerStep;
+    final int mHeightPerStep;
 
     long mUnsetId = -1L;
 
@@ -172,6 +180,8 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
      * which are started and stopped when this state changes.
      */
     boolean mStarted;
+
+    PermissionErrorListener mPermissionErrorListener;
 
     public HomeAdapter(Context context, long homeId) {
         this(context, new DefaultViewWrapperFactory(), homeId, true);
@@ -555,11 +565,11 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
     static class ClockViewHolder extends BaseViewHolder implements View.OnClickListener,
             HomeItemConfigurationHelper.ConfigurationListener, PopupMenu.OnMenuItemClickListener {
 
-        AnalogClock mAnalogClock;
+        final AnalogClock mAnalogClock;
 
-        HomeItemConfiguration mConfigurationHelper;
+        final HomeItemConfiguration mConfigurationHelper;
 
-        TextView mTextView;
+        final TextView mTextView;
 
         public ClockViewHolder(HomeViewWrapper view) {
             super(view);
@@ -632,11 +642,11 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
 
         private final int mWidgetColor;
 
-        HomeItemConfiguration mConfigurationHelper;
+        final HomeItemConfiguration mConfigurationHelper;
 
-        TextView mTextView;
+        final TextView mTextView;
 
-        Drawable mBluetoothDrawable;
+        final Drawable mBluetoothDrawable;
 
         private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
             @Override
@@ -664,9 +674,9 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
             }
         };
 
-        ImageView mImageView;
+        final ImageView mImageView;
 
-        private BluetoothAdapter mBluetoothAdapter;
+        private final BluetoothAdapter mBluetoothAdapter;
 
         public BluetoothViewHolder(HomeViewWrapper view) {
             super(view);
@@ -781,11 +791,12 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
             HomeItemConfigurationHelper.ConfigurationListener {
 
         @Nullable
+        final
         ImageView mWeatherConditionView;
 
-        TextView mTextView;
+        final TextView mTextView;
 
-        TextView mTemperatureView;
+        final TextView mTemperatureView;
 
         public AbsWeatherTemperatureViewHolder(HomeViewWrapper view, boolean showsWallpaper) {
             super(view, showsWallpaper);
@@ -914,7 +925,7 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
 
         boolean mAutoAdvanceRunning;
 
-        ArrayMap<View, AppWidgetProviderInfo> mWidgetsToAdvance = new ArrayMap<>();
+        final ArrayMap<View, AppWidgetProviderInfo> mWidgetsToAdvance = new ArrayMap<>();
 
         private long mAutoAdvanceSentTime;
 
@@ -1007,9 +1018,9 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
 
         int mAppWidgetId;
 
-        ImageView mWidgetPreview;
+        final ImageView mWidgetPreview;
 
-        TextView mNoWidgetTextView;
+        final TextView mNoWidgetTextView;
 
         public DisabledAppWidgetViewHolder(HomeViewWrapper view,
                 AppWidgetManager appWidgetManager) {
@@ -1052,9 +1063,9 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
 
         final int mTouchSlop;
 
-        View mChooseWidgetButton;
+        final View mChooseWidgetButton;
 
-        View mErrorLoadingWidgetButton;
+        final View mErrorLoadingWidgetButton;
 
         int mAppWidgetId;
 
@@ -1067,9 +1078,9 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
 
         int mHeight;
 
-        CardView mCardView;
+        final CardView mCardView;
 
-        int mDefaultColor;
+        final int mDefaultColor;
 
         boolean mInitializedSinceLastStop;
 
@@ -1355,13 +1366,13 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
 
         final WindmillDrawable mSmallWindmillDrawable;
 
-        ImageView mLargeWindmill;
+        final ImageView mLargeWindmill;
 
-        ImageView mSmallWindmill;
+        final ImageView mSmallWindmill;
 
-        TextView mTextView;
+        final TextView mTextView;
 
-        TextView mWindSpeedView;
+        final TextView mWindSpeedView;
 
         public AbsWeatherWindViewHolder(HomeViewWrapper view, boolean showsWallpaper) {
             super(view, showsWallpaper);
@@ -1549,30 +1560,30 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
         /**
          * The view containing the drawable that will draw the info
          */
-        ImageView mSunView;
+        final ImageView mSunView;
 
         /**
          * The main text view containing the location name
          */
-        TextView mTextView;
+        final TextView mTextView;
 
         /**
          * The drawable doing all the work of displaying the arc and the
          * dots
          */
-        SunriseDrawable mSunriseDrawable;
+        final SunriseDrawable mSunriseDrawable;
 
         /**
          * The text-view that displays the sunrise time
          */
-        TextView mSunriseView;
+        final TextView mSunriseView;
 
         /**
          * The text-view that displays the sunset time
          */
-        TextView mSunsetView;
+        final TextView mSunsetView;
 
-        Time sTempTime = new Time();
+        final Time sTempTime = new Time();
 
         public AbsWeatherSunViewHolder(HomeViewWrapper view, boolean showsWallpaper) {
             super(view, showsWallpaper);
@@ -1738,7 +1749,7 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
 
     static class OperationWrapper implements Operation {
 
-        ContentProviderOperation.Builder mBuilder;
+        final ContentProviderOperation.Builder mBuilder;
 
         public OperationWrapper(ContentProviderOperation.Builder builder) {
             mBuilder = builder;
@@ -1825,7 +1836,7 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
     class ProfileImageViewHolder extends BaseViewHolder implements View.OnClickListener,
             PopupMenu.OnMenuItemClickListener {
 
-        ImageView mImageView;
+        final ImageView mImageView;
 
         Bitmap mUserImage;
 
@@ -1833,7 +1844,7 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
 
         volatile int mViewHeight;
 
-        AsyncTask<Void, Void, Bitmap> mImageLoader;
+        ContactBitmapLoader mImageLoader;
 
         public ProfileImageViewHolder(HomeViewWrapper view) {
             super(view);
@@ -1897,6 +1908,17 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
         }
 
         private void loadUserImageIfNeeded() {
+            try {
+                loadUserImageIfNeededImpl();
+            } catch (PermissionDeniedException e) {
+                onPermissionDenied(e, Manifest.permission.READ_CONTACTS,
+                        PERMISSION_ERROR_CONTACTS_PROFILE);
+            }
+
+        }
+
+        private void loadUserImageIfNeededImpl() throws PermissionDeniedException {
+            PermissionUtils.throwIfNotPermitted(mContext, Manifest.permission.READ_CONTACTS);
             if (mImageLoader != null) {
                 mImageLoader.cancel(true);
             }
@@ -1906,7 +1928,7 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
                     mConfigurationHelper.getProperty(mHomeItem.mId, "lookupKey", null);
 
             mImageLoader = new ContactBitmapLoader(lookupKey, contactId);
-            mImageLoader.execute();
+            mImageLoader.execute(itemView.getContext());
         }
 
         @Override
@@ -1984,7 +2006,7 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
             return false;
         }
 
-        class ContactBitmapLoader extends AsyncTask<Void, Void, Bitmap> {
+        class ContactBitmapLoader extends AsyncTask<Context, Void, Bitmap> {
 
             private final String mLookupKey;
 
@@ -1996,11 +2018,12 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
             }
 
             @Override
-            protected Bitmap doInBackground(Void... params) {
+            protected Bitmap doInBackground(Context... params) {
+                Context context = params[0];
                 if (mLookupKey != null && mContactId != null) {
                     long id = Long.parseLong(mContactId);
                     Contact contact = RawContactsLoader.
-                            loadContact(itemView.getContext(), id, mLookupKey);
+                            loadContact(context, id, mLookupKey);
 
                     if (contact != null && contact.mBitmap != null) {
                         int w = contact.mBitmap.getWidth();
@@ -2021,16 +2044,24 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
                     }
                 }
 
-                Uri contactUri = ContactsContract.Profile.CONTENT_URI;
-                Bitmap result = BitmapUtils.
-                        decodeContactImage(mContext, contactUri, mViewWidth, mViewHeight);
+                Bitmap result;
+                try {
+                    Uri contactUri = ContactsContract.Profile.CONTENT_URI;
+                    result = BitmapUtils.
+                            decodeContactImage(mContext, contactUri, mViewWidth, mViewHeight);
 
-                if (result == null) {
-                    Uri lookupUri = getProfileContactUri();
-                    if (lookupUri != null) {
-                        result = BitmapUtils.decodeContactImage(
-                                mContext, lookupUri, mViewWidth, mViewHeight);
+                    if (result == null) {
+                        Uri lookupUri = getProfileContactUri();
+                        if (lookupUri != null) {
+                            result = BitmapUtils.decodeContactImage(
+                                    mContext, lookupUri, mViewWidth, mViewHeight);
+                        }
                     }
+                } catch (PermissionDeniedException e) {
+                    // this is already checked before we actually
+                    // start and create the loader. So if it happens
+                    // just return null.
+                    return null;
                 }
 
                 return result;
@@ -2041,8 +2072,28 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
                 applyUserImage(bitmap);
             }
         }
+    }
 
+    void onPermissionDenied(PermissionDeniedException e, String permission, String id) {
+        // This allows the HomePage to implement something to handle this
+        mPermissionErrorListener.onPermissionDenied(
+                permission, id, R.string.permission_reason_contacts_profile_image);
+    }
 
+    public void setPermissionErrorListener(
+            PermissionErrorListener permissionErrorListener) {
+        mPermissionErrorListener = permissionErrorListener;
+    }
+
+    interface PermissionErrorListener {
+
+        /**
+         * Informs about a permission error.
+         *
+         * @param id The id of the error. This is unique for the combination
+         * of the cell and the permission that was denied
+         */
+        void onPermissionDenied(String permission, String id, @StringRes int textResId);
     }
 
     class SimpleTextViewViewHolder extends AbsHomeViewHolder {
@@ -2083,7 +2134,7 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
         @VisibleForTesting
         OpsBuilder mOpsBuilder = new DefaultOpsBuilder();
 
-        List<HomeItem> mTemp = new LinkedList<>();
+        final List<HomeItem> mTemp = new LinkedList<>();
 
         public void moveRowDown(int rowPosition, List<ContentProviderOperation> ops) {
             if (isLastRow(rowPosition)) return;

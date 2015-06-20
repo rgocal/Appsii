@@ -27,9 +27,9 @@ import com.appsimobile.appsii.ExpandCollapseDrawable;
  */
 class HeaderViewHolder extends AgendaViewHolder implements View.OnClickListener {
 
-    private HeaderItem mHeaderItem;
+    private final ExpandListener mExpandListener;
 
-    private ExpandListener mExpandListener;
+    private HeaderItem mHeaderItem;
 
     public HeaderViewHolder(View view, ExpandListener listener) {
         super(view);
@@ -66,11 +66,6 @@ class HeaderViewHolder extends AgendaViewHolder implements View.OnClickListener 
         }
     }
 
-    @Override
-    public void onClick(View v) {
-        toggle();
-    }
-
     private void toggle() {
         boolean isExpanded = !mHeaderItem.mExpanded;
         mHeaderItem.mExpanded = isExpanded;
@@ -81,11 +76,16 @@ class HeaderViewHolder extends AgendaViewHolder implements View.OnClickListener 
         drawable.setExpanded(isExpanded, true);
 
         if (isExpanded) {
-            mExpandListener.onExpand(getPosition());
+            mExpandListener.onExpand(getLayoutPosition());
         } else {
-            mExpandListener.onCollapse(getPosition());
+            mExpandListener.onCollapse(getLayoutPosition());
         }
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        toggle();
     }
 
     interface ExpandListener {

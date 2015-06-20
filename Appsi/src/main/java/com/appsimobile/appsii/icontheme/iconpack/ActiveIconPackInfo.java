@@ -42,7 +42,7 @@ public class ActiveIconPackInfo {
 
     private IconPack mActiveIconPack;
 
-    private Context mContext;
+    private final Context mContext;
 
     public ActiveIconPackInfo(Context applicationContext) {
         mContext = applicationContext;

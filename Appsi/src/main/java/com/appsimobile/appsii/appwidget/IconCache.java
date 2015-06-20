@@ -38,7 +38,7 @@ public class IconCache {
 
     private final LauncherAppsCompat mLauncherApps;
 
-    private int mIconDpi;
+    private final int mIconDpi;
 
     public IconCache(Context context) {
         ActivityManager activityManager =

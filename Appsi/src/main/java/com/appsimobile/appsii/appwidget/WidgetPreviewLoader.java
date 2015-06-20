@@ -59,7 +59,7 @@ public class WidgetPreviewLoader {
 
     private final MainThreadExecutor mMainThreadExecutor = new MainThreadExecutor();
 
-    int mAppIconSize;
+    final int mAppIconSize;
 
     public WidgetPreviewLoader(Context context, IconCache iconCache) {
         mContext = context.getApplicationContext();
@@ -229,7 +229,7 @@ public class WidgetPreviewLoader {
 
     private static abstract class SoftReferenceThreadLocal<T> {
 
-        private ThreadLocal<SoftReference<T>> mThreadLocal;
+        private final ThreadLocal<SoftReference<T>> mThreadLocal;
 
         public SoftReferenceThreadLocal() {
             mThreadLocal = new ThreadLocal<>();
@@ -261,6 +261,9 @@ public class WidgetPreviewLoader {
 
     private static class PaintCache extends SoftReferenceThreadLocal<Paint> {
 
+        PaintCache() {
+        }
+
         @Override
         protected Paint initialValue() {
             return null;
@@ -268,6 +271,9 @@ public class WidgetPreviewLoader {
     }
 
     private static class RectCache extends SoftReferenceThreadLocal<Rect> {
+
+        RectCache() {
+        }
 
         @Override
         protected Rect initialValue() {

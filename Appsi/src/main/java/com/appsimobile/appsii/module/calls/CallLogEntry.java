@@ -47,7 +47,7 @@ public class CallLogEntry {
 
     BaseContactInfo mBaseContactInfo;
 
-    boolean mPrivateNumner;
+    boolean mPrivateNumber;
 
     String mFormattedNumber;
 

@@ -16,6 +16,7 @@
 
 package com.appsimobile.appsii.module.appsiagenda;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -26,7 +27,9 @@ import android.provider.CalendarContract;
 import android.support.annotation.NonNull;
 import android.text.format.Time;
 
-import com.appsimobile.util.ConvertedCursorListLoader;
+import com.appsimobile.appsii.PermissionDeniedException;
+import com.appsimobile.appsii.permissions.PermissionUtils;
+import com.appsimobile.util.ConvertedCursorLoader;
 import com.appsimobile.util.TimeUtils;
 
 import java.util.ArrayList;
@@ -35,7 +38,7 @@ import java.util.List;
 /**
  * Created by nick on 22/09/14.
  */
-public class AgendaLoader extends ConvertedCursorListLoader<AgendaEvent> {
+public class AgendaLoader extends ConvertedCursorLoader<AgendaEventsResult> {
 
 
     private static final String WHERE_CALENDARS_SELECTED =
@@ -53,6 +56,8 @@ public class AgendaLoader extends ConvertedCursorListLoader<AgendaEvent> {
     int mLastLoadedDay = TimeUtils.getJulianDay();
 
     private BroadcastReceiver mDayChangeReceiver;
+
+    private BroadcastReceiver mPermissionGrantedReceiver;
 
     public AgendaLoader(Context context, DatePickerController controller) {
 
@@ -80,9 +85,18 @@ public class AgendaLoader extends ConvertedCursorListLoader<AgendaEvent> {
         setSortOrder(DEFAULT_SORT_ORDER);
     }
 
+    @Override
+    protected void checkPermissions() throws PermissionDeniedException {
+        PermissionUtils.throwIfNotPermitted(getContext(), Manifest.permission.READ_CALENDAR);
+    }
 
     @Override
-    protected List<AgendaEvent> convertCursor(@NonNull Cursor c) {
+    protected AgendaEventsResult convertPermissionDeniedException(PermissionDeniedException e) {
+        return new AgendaEventsResult(e);
+    }
+
+    @Override
+    protected AgendaEventsResult convertCursor(@NonNull Cursor c) {
 
 
         List<AgendaEvent> result = new ArrayList<>();
@@ -113,11 +127,11 @@ public class AgendaLoader extends ConvertedCursorListLoader<AgendaEvent> {
             }
         }
 
-        return result;
+        return new AgendaEventsResult(result);
     }
 
     @Override
-    protected void cleanup(List<AgendaEvent> old) {
+    protected void cleanup(AgendaEventsResult old) {
 
     }
 
@@ -142,6 +156,18 @@ public class AgendaLoader extends ConvertedCursorListLoader<AgendaEvent> {
         IntentFilter filter = new IntentFilter(Intent.ACTION_DATE_CHANGED);
         getContext().registerReceiver(mDayChangeReceiver, filter);
 
+        mPermissionGrantedReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                int req = intent.getIntExtra(PermissionUtils.EXTRA_REQUEST_CODE, 0);
+                if (req == PermissionUtils.REQUEST_CODE_PERMISSION_READ_CALENDAR) {
+                    onContentChanged();
+                }
+            }
+        };
+        IntentFilter filter2 = new IntentFilter(PermissionUtils.ACTION_PERMISSION_RESULT);
+        getContext().registerReceiver(mPermissionGrantedReceiver, filter2);
+
     }
 
     @Override
@@ -151,6 +177,9 @@ public class AgendaLoader extends ConvertedCursorListLoader<AgendaEvent> {
         // on reset, we need to remove the receiver
         if (mDayChangeReceiver != null) {
             getContext().unregisterReceiver(mDayChangeReceiver);
+        }
+        if (mPermissionGrantedReceiver != null) {
+            getContext().unregisterReceiver(mPermissionGrantedReceiver);
         }
     }
 
@@ -179,7 +208,7 @@ public class AgendaLoader extends ConvertedCursorListLoader<AgendaEvent> {
 
         public static final int CALENDAR_DISPLAY_NAME = 10;
 
-        static String[] projection = {
+        static final String[] projection = {
                 CalendarContract.Instances.DISPLAY_COLOR,
                 CalendarContract.Instances.ALL_DAY,
                 CalendarContract.Instances.BEGIN,

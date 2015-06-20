@@ -33,9 +33,9 @@ public class ParallaxHelper {
 
     private static Paint sPaint;
 
-    private static Rect sSrcRect = new Rect();
+    private static final Rect sSrcRect = new Rect();
 
-    private static Rect sTargetRect = new Rect();
+    private static final Rect sTargetRect = new Rect();
 
     public static void draw(Canvas canvas, Bitmap parallaxBitmap, AbsListView listView) {
         if (sPaint == null) {

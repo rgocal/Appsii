@@ -34,17 +34,17 @@ public class SearchSuggestionContract {
      * This table holds the weather information for Appsii. Historic information is kept for past
      * events. This database is intended to be used for multiple locations
      */
-    public static interface SearchSuggestionColumns extends BaseColumns {
+    public interface SearchSuggestionColumns extends BaseColumns {
 
-        public static final String TABLE_NAME = "suggestions";
-        public static final String QUERY = "query";
-        public static final Uri CONTENT_URI =
+        String TABLE_NAME = "suggestions";
+        String QUERY = "query";
+        Uri CONTENT_URI =
                 Uri.parse("content://" + AUTHORITY + "/" + TABLE_NAME);
         /**
          * Long, The timestamp when this query was last executed
          * Can be used to determine if an update is needed.
          */
-        public static final String LAST_USED = "last_used";
+        String LAST_USED = "last_used";
 
     }
 

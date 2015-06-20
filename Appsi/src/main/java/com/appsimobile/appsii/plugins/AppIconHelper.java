@@ -38,7 +38,7 @@ public class AppIconHelper {
 
     private static final Canvas sScaleCanvas = new Canvas();
 
-    private static Paint sPaint = new Paint();
+    private static final Paint sPaint = new Paint();
 
     public static Bitmap getIcon(Context context, Uri path, Bitmap defaultBitmap,
             boolean largeIcon) {

@@ -39,12 +39,12 @@ public final class HomeViewHolder extends AbsHomeViewHolder implements View.OnCl
     /**
      * The overflow button to display an action menu on press.
      */
-    View mOverflowButton;
+    final View mOverflowButton;
 
     /**
      * The view showing the title of the home-page
      */
-    TextView mTextView;
+    final TextView mTextView;
 
     /**
      * The item we are bound to.
@@ -109,7 +109,7 @@ public final class HomeViewHolder extends AbsHomeViewHolder implements View.OnCl
     /**
      * A listener interface to which the actions selected are set to.
      */
-    static interface HomeViewActionListener {
+    interface HomeViewActionListener {
 
         /**
          * The user choose the delete action on the bound item

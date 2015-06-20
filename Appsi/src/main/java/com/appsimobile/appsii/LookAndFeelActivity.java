@@ -93,7 +93,7 @@ public class LookAndFeelActivity extends AppCompatActivity {
 
         private static final int TYPE_HEADER = 1;
 
-        private List<IconPackItem> mIconPacks = new ArrayList<IconPackItem>();
+        private final List<IconPackItem> mIconPacks = new ArrayList<IconPackItem>();
 
         public void initIconPacks(Context context, List<IconPack> iconPacks) {
             mIconPacks.clear();
@@ -181,9 +181,8 @@ public class LookAndFeelActivity extends AppCompatActivity {
             Context context = parent.getContext();
             if (convertView == null) {
                 LayoutInflater layoutInflater = LayoutInflater.from(context);
-                TextView result =
+                convertView =
                         (TextView) layoutInflater.inflate(R.layout.icon_pack_item, parent, false);
-                convertView = result;
             }
             Drawable back = null;
 
@@ -211,7 +210,7 @@ public class LookAndFeelActivity extends AppCompatActivity {
 
         Preference mThemeListPreference;
 
-        private IconPack mNoIconPack = new VoidIconPack();
+        private final IconPack mNoIconPack = new VoidIconPack();
 
         private Preference mIconThemePreference;
 
@@ -293,7 +292,7 @@ public class LookAndFeelActivity extends AppCompatActivity {
             dialog.getListView().setDivider(null);
         }
 
-        private void onIconPackPicked(IconPackItem iconPack) {
+        void onIconPackPicked(IconPackItem iconPack) {
             Uri uri = iconPack.mUri;
             mIconThemePreference.setSummary(iconPack.mName);
             String stringUri = uri == null ? null : uri.toString();

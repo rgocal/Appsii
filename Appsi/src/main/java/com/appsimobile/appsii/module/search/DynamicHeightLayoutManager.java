@@ -24,7 +24,7 @@ import android.view.ViewGroup;
 
 public class DynamicHeightLayoutManager extends LinearLayoutManager {
 
-    private int[] mMeasuredDimension = new int[2];
+    private final int[] mMeasuredDimension = new int[2];
 
     public DynamicHeightLayoutManager(Context context, int orientation, boolean reverseLayout) {
         super(context, orientation, reverseLayout);

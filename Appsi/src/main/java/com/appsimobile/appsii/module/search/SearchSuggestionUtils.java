@@ -35,9 +35,9 @@ public class SearchSuggestionUtils {
 
     private static SearchSuggestionUtils sInstance;
 
-    SearchSuggestionHandler mSearchSuggestionHandler;
+    final SearchSuggestionHandler mSearchSuggestionHandler;
 
-    Context mContext;
+    final Context mContext;
 
     private SearchSuggestionUtils(Context context) {
         mContext = context.getApplicationContext();

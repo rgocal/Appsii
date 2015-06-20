@@ -103,7 +103,7 @@ public class SunriseDrawable extends Drawable {
     /**
      * The size of the dot at the start and end in px
      */
-    int mDotRadius;
+    final int mDotRadius;
 
 
     int mBezier1x;
@@ -122,7 +122,7 @@ public class SunriseDrawable extends Drawable {
 
     int mBezier4y;
 
-    Context mContext;
+    final Context mContext;
 
     public SunriseDrawable(Context context) {
 

@@ -48,5 +48,12 @@
         android:minHeight="24dp"
         />
 
+    <FrameLayout
+        android:layout_below="@id/toolbar"
+        android:id="@+id/permission_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
 
 </RelativeLayout>

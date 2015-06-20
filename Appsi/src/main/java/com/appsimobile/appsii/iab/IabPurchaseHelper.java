@@ -242,7 +242,7 @@ public class IabPurchaseHelper extends BaseIabHelper {
          *
          * @param info The purchase information (null if purchase failed)
          */
-        public void onIabPurchaseSuccess(Purchase info);
+        void onIabPurchaseSuccess(Purchase info);
     }
 
 

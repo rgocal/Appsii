@@ -23,6 +23,7 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -115,12 +116,18 @@ public class ParallaxListViewHeader extends View {
         invalidate();
     }
 
+    final Rect mSrcRect = new Rect();
+
+    final Rect mDstRect = new Rect();
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         int top = getTop();
         canvas.translate(0, top / -2);
-        canvas.drawBitmap(mBitmap, 0, 0, null);
+        mSrcRect.set(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
+        mDstRect.set(0, 0, getWidth(), getHeight());
+        canvas.drawBitmap(mBitmap, mSrcRect, mDstRect, null);
         canvas.translate(0, top / 2);
     }
 

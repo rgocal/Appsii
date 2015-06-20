@@ -21,6 +21,6 @@ package com.appsimobile.appsii.module.home;
  */
 public interface OnWrapperClickedListener {
 
-    public void onWrapperClicked(HomeViewWrapper wrapper);
+    void onWrapperClicked(HomeViewWrapper wrapper);
 
 }

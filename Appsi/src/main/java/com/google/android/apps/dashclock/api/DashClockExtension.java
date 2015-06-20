@@ -132,7 +132,7 @@ import com.google.android.apps.dashclock.api.internal.IExtensionHost;
  */
 public abstract class DashClockExtension extends Service {
 
-    private static final String TAG = "DashClockExtension";
+    static final String TAG = "DashClockExtension";
 
     /**
      * Indicates that {@link #onUpdateData(int)} was triggered for an unknown reason. This should
@@ -211,15 +211,15 @@ public abstract class DashClockExtension extends Service {
      */
     private static final int PROTOCOL_VERSION_WORLD_READABILITY = 2;
 
-    private boolean mInitialized = false;
+    boolean mInitialized = false;
 
-    private boolean mIsWorldReadable = false;
+    boolean mIsWorldReadable = false;
 
-    private IExtensionHost mHost;
+    IExtensionHost mHost;
 
     private volatile Looper mServiceLooper;
 
-    private volatile Handler mServiceHandler;
+    volatile Handler mServiceHandler;
 
     protected DashClockExtension() {
         super();
@@ -266,7 +266,7 @@ public abstract class DashClockExtension extends Service {
         return mBinder;
     }
 
-    private IExtension.Stub mBinder = new IExtension.Stub() {
+    private final IExtension.Stub mBinder = new IExtension.Stub() {
         @Override
         public void onInitialize(IExtensionHost host, boolean isReconnect)
                 throws RemoteException {
@@ -419,7 +419,7 @@ public abstract class DashClockExtension extends Service {
      * The signature of the official DashClock app (net.nurik.roman.dashclock). Used to
      * compare caller when {@link #mIsWorldReadable} is false.
      */
-    private static final Signature DASHCLOCK_SIGNATURE = new Signature(""
+    static final Signature DASHCLOCK_SIGNATURE = new Signature(""
             + "308203523082023aa00302010202044c1132a9300d06092a864886f70d0101050500306b310b30090603"
             + "550406130255533110300e06035504081307556e6b6e6f776e3110300e06035504071307556e6b6e6f77"
             + "6e3110300e060355040a1307556e6b6e6f776e3110300e060355040b1307556e6b6e6f776e3114301206"

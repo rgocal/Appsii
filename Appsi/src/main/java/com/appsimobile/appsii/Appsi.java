@@ -129,22 +129,22 @@ public class Appsi extends Service
     public static final String ACTION_LOCAL_OPEN_SIDEBAR_FROM_SHORTCUT =
             "com.appsimobile.appsii.ACTION_LOCAL_OPEN_SIDEBAR_FROM_SHORTCUT";
 
-    static final int MESSAGE_CLOSE_SIDEBAR = 101;
-
     /**
      * FLAG for appsi to indicate it should open from the left
      */
-    public static int OPEN_FLAG_LEFT = 2;
+    public static final int OPEN_FLAG_LEFT = 2;
 
     /**
      * FLAG for appsi to indicate it should open from the right
      */
-    public static int OPEN_FLAG_RIGHT = 4;
+    public static final int OPEN_FLAG_RIGHT = 4;
 
     /**
      * FLAG for appsi to indicate it should open from the right
      */
-    public static int OPEN_FLAG_LIKE_NOTIFICATION_BAR = 8;
+    public static final int OPEN_FLAG_LIKE_NOTIFICATION_BAR = 8;
+
+    static final int MESSAGE_CLOSE_SIDEBAR = 101;
 
     // RECEIVERS
 
@@ -159,13 +159,17 @@ public class Appsi extends Service
      */
     static volatile boolean mCreated = false;
 
+    private final AccelerateInterpolator mOutInterpolator = new AccelerateInterpolator();
+
+    // CONFIGURATION OPTIONS
+
+    private final DecelerateInterpolator mInInterpolator = new DecelerateInterpolator();
+
     /**
      * Receives and handles the following LOCAL broadcasts:
      * {@link #ACTION_LOCAL_OPEN_SIDEBAR_FROM_SHORTCUT}
      */
     LocalReceiver mLocalActionsReceiver;
-
-    // CONFIGURATION OPTIONS
 
     /**
      * The percentage of screen space the sidebar should be wide
@@ -177,18 +181,47 @@ public class Appsi extends Service
      */
     Sidebar mSidebar;
 
+    // VIEWS
+
     /**
      * The layer we add views to. This layer automatically handles things like
      * showing and hiding the screen dimming
      */
     PopupLayer mPopupLayer;
 
+    private final Animator.AnimatorListener mCloseListener = new AnimatorAdapter() {
+        @Override
+        public void onAnimationEnd(Animator animation) {
+            mPopupLayer.removePopupChild(mSidebar);
+            mSidebar.setTranslationX(0);
+        }
+    };
+
+    // RUNTIME STATE
+
     /**
      * A handler used to post certain events to. And for content observers
      */
     Handler mHandler;
 
-    // VIEWS
+    /**
+     * Handles changes in the hotspots. Will remove, add and update hotspots as
+     * needed.
+     */
+    private final ContentObserver mHotspotsContentObserver = new ContentObserver(mHandler) {
+        @Override
+        public void onChange(boolean selfChange) {
+            onChange(selfChange, null);
+        }
+
+        // Implement the onChange(boolean, Uri) method to take advantage of the new Uri argument.
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            // simple reload the hotspots
+            reloadHotspots();
+        }
+
+    };
 
     /**
      * Used to query the keyguard status. When the key-guard is showing Appsi will
@@ -201,8 +234,6 @@ public class Appsi extends Service
      * other apps.
      */
     WindowManager mWindowManager;
-
-    // RUNTIME STATE
 
     /**
      * The total number of plugins currently added.
@@ -221,33 +252,6 @@ public class Appsi extends Service
     NotificationLikeOpener mNotificationLikeOpener;
 
     AnimationListener mScrollAnimationListener;
-
-    private Animator.AnimatorListener mCloseListener = new AnimatorAdapter() {
-        @Override
-        public void onAnimationEnd(Animator animation) {
-            mPopupLayer.removePopupChild(mSidebar);
-            mSidebar.setTranslationX(0);
-        }
-    };
-
-    /**
-     * Handles changes in the hotspots. Will remove, add and update hotspots as
-     * needed.
-     */
-    private ContentObserver mHotspotsContentObserver = new ContentObserver(mHandler) {
-        @Override
-        public void onChange(boolean selfChange) {
-            onChange(selfChange, null);
-        }
-
-        // Implement the onChange(boolean, Uri) method to take advantage of the new Uri argument.
-        @Override
-        public void onChange(boolean selfChange, Uri uri) {
-            // simple reload the hotspots
-            reloadHotspots();
-        }
-
-    };
 
     /**
      * receives and handles several broadcasts and updates Appsi accordingly. This
@@ -301,10 +305,6 @@ public class Appsi extends Service
 
     private LoaderManagerImpl mLoaderManager;
 
-    private AccelerateInterpolator mOutInterpolator = new AccelerateInterpolator();
-
-    private DecelerateInterpolator mInInterpolator = new DecelerateInterpolator();
-
     public Appsi() {
 
     }
@@ -345,7 +345,7 @@ public class Appsi extends Service
 
         prefs.registerOnSharedPreferenceChangeListener(this);
 
-        mHotspotHelper = new AppsiHotspotHelperImpl(this, this, mPopupLayer);
+        mHotspotHelper = new HotspotHelperImpl(this, this, mPopupLayer);
 
         mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
 
@@ -510,26 +510,6 @@ public class Appsi extends Service
     @Override
     public IBinder onBind(Intent intent) {
         return null;
-    }
-
-    String levelToString(int level) {
-        switch (level) {
-            case TRIM_MEMORY_BACKGROUND:
-                return "TRIM_MEMORY_BACKGROUND";
-            case TRIM_MEMORY_COMPLETE:
-                return "TRIM_MEMORY_COMPLETE";
-            case TRIM_MEMORY_MODERATE:
-                return "TRIM_MEMORY_MODERATE";
-            case TRIM_MEMORY_UI_HIDDEN:
-                return "TRIM_MEMORY_UI_HIDDEN";
-            case TRIM_MEMORY_RUNNING_CRITICAL:
-                return "TRIM_MEMORY_RUNNING_CRITICAL";
-            case TRIM_MEMORY_RUNNING_LOW:
-                return "TRIM_MEMORY_RUNNING_LOW";
-            case TRIM_MEMORY_RUNNING_MODERATE:
-                return "TRIM_MEMORY_RUNNING_LOW";
-        }
-        return String.valueOf(level);
     }
 
     private void startAppsiService() {
@@ -790,6 +770,26 @@ public class Appsi extends Service
 
     }
 
+    String levelToString(int level) {
+        switch (level) {
+            case TRIM_MEMORY_BACKGROUND:
+                return "TRIM_MEMORY_BACKGROUND";
+            case TRIM_MEMORY_COMPLETE:
+                return "TRIM_MEMORY_COMPLETE";
+            case TRIM_MEMORY_MODERATE:
+                return "TRIM_MEMORY_MODERATE";
+            case TRIM_MEMORY_UI_HIDDEN:
+                return "TRIM_MEMORY_UI_HIDDEN";
+            case TRIM_MEMORY_RUNNING_CRITICAL:
+                return "TRIM_MEMORY_RUNNING_CRITICAL";
+            case TRIM_MEMORY_RUNNING_LOW:
+                return "TRIM_MEMORY_RUNNING_LOW";
+            case TRIM_MEMORY_RUNNING_MODERATE:
+                return "TRIM_MEMORY_RUNNING_LOW";
+        }
+        return String.valueOf(level);
+    }
+
     void restartAppsiService() {
         stopAppsiService();
         Intent intent = new Intent(this, Appsi.class);
@@ -1036,6 +1036,10 @@ public class Appsi extends Service
 
     class NotificationLikeOpener implements SidebarHotspot.SwipeListener {
 
+        final int mVelocityTreshold;
+
+        final ScrollerCompat mScrollerCompat;
+
         int mTargetWidth;
 
         int mScreenWidth;
@@ -1044,17 +1048,13 @@ public class Appsi extends Service
 
         long mLastLocationUpdate;
 
-        int mVelocityTreshold;
-
         boolean mRemoveAfterScrollEnd;
-
-        WeakReference<View> mTargetView;
 
 //        Handler mHandler;
 
-        ScrollerCompat mScrollerCompat;
+        WeakReference<View> mTargetView;
 
-        private Runnable mUpdatePositionRunnable = new Runnable() {
+        private final Runnable mUpdatePositionRunnable = new Runnable() {
             @Override
             public void run() {
                 boolean running = mScrollerCompat.computeScrollOffset();

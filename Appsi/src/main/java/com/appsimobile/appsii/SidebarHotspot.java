@@ -28,6 +28,7 @@ import android.os.Message;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
@@ -89,7 +90,8 @@ public class SidebarHotspot extends View {
     private boolean mVisibleHotspots;
 
     /**
-     * The configuration this hotspot is bound to
+     * The hotspot-item this hotspot is bound to.
+     * This contains the properties of the hotspot.
      */
     private HotspotItem mHotspotItem;
 
@@ -260,10 +262,13 @@ public class SidebarHotspot extends View {
 
     void reloadHotspotData() {
 
+        Log.d("SidebarHotspot", "reloading hotspots");
+
         if (mHotspotItem == null) return;
 
         final long hotspotId = mHotspotItem.mId;
 
+        final Context context = getContext();
         if (mLoadDataTask != null) mLoadDataTask.cancel(true);
         mLoadDataTask =
                 new AsyncTask<Void, Void, List<HotspotPageEntry>>() {
@@ -271,8 +276,6 @@ public class SidebarHotspot extends View {
 
                     @Override
                     protected List<HotspotPageEntry> doInBackground(Void... params) {
-                        Context context = getContext();
-                        if (context == null) return null;
 
                         Cursor c = context.getContentResolver().
                                 query(HotspotPagesQuery.createUri(hotspotId),
@@ -424,7 +427,7 @@ public class SidebarHotspot extends View {
         LONG_PRESS,
     }
 
-    public static interface SidebarGestureCallback {
+    public interface SidebarGestureCallback {
 
         /**
          * Show the swyper
@@ -441,7 +444,7 @@ public class SidebarHotspot extends View {
         void removeIfNeeded(SidebarHotspot hotspot);
     }
 
-    public static interface SwipeListener {
+    public interface SwipeListener {
 
         /**
          * Update the location of the swype with the raw x and y coordinates
@@ -467,7 +470,7 @@ public class SidebarHotspot extends View {
         boolean mCouldBeTap;
 
 
-        int mMinMoveDip;
+        final int mMinMoveDip;
 
         int mStartX;
 
@@ -479,9 +482,9 @@ public class SidebarHotspot extends View {
 
         int mLastTapY = -1;
 
-        GestureDetector.OnDoubleTapListener mOnDoubleTapListener;
+        final GestureDetector.OnDoubleTapListener mOnDoubleTapListener;
 
-        Handler mHandler;
+        final Handler mHandler;
 
         TapGestureDetector(Context context, GestureDetector.OnDoubleTapListener doubleTapListener) {
             mMinMoveDip = (int) (mMinMovePx * context.getResources().getDisplayMetrics().density);
@@ -574,7 +577,7 @@ public class SidebarHotspot extends View {
     static class SharedPreferencesListener
             implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-        private WeakReference<SidebarHotspot> mSidebarHotspot;
+        private final WeakReference<SidebarHotspot> mSidebarHotspot;
 
         SharedPreferencesListener(SidebarHotspot sidebarHotspot) {
             mSidebarHotspot = new WeakReference<>(sidebarHotspot);

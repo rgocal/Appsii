@@ -20,9 +20,7 @@ import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
@@ -35,21 +33,39 @@ import android.widget.RelativeLayout;
 
 import java.util.List;
 
+/**
+ * This class is the basic implementation of the sidebar. It communicates various
+ * state events from Appsii to the SidebarPagerAdapter and manages the ViewPager
+ */
 public class Sidebar extends RelativeLayout
         implements LoaderListener, View.OnClickListener,
         SharedPreferences.OnSharedPreferenceChangeListener,
         AbstractSidebarPagerAdapter.FlagListener {
 
+    /** The delay before the sidebar is closed after an app-widget action was clicked */
     static final int DELAYED_CLOSE_DURATION = 2500;
 
+    /**
+     * The delay before the sidebar is closed after an app-widget action was clicked
+     * that needs user feedback
+     */
     static final int DELAYED_CLOSE_DURATION_WHEN_ASKED = 8000;
 
+    /**
+     * A bundle used to manage state in by any client after an app-widget close
+     * message is being shown
+     */
     final Bundle mCloseStateBundle = new Bundle();
 
+    /**
+     * A listener that can be called when the sidebar needs to be closed
+     */
     SidebarListener mSidebarListener;
 
-    boolean mLoadingData;
-
+    /**
+     * True when we are opening from the left side. False otherwise.
+     * Left and right are absolute and also used in rtl locales
+     */
     boolean mIsLeft;
 
     View mSidebarBackgroundView;
@@ -76,13 +92,10 @@ public class Sidebar extends RelativeLayout
 
     private SidebarPagerAdapter mAdapter;
 
-    private Handler mHandler;
 
     private SidebarContext mAppsiContext;
 
-    private LoaderManager mLoaderManager;
-
-    private OnPageChangeListenerImpl mOnPageChangeListener = new OnPageChangeListenerImpl();
+    private final OnPageChangeListenerImpl mOnPageChangeListener = new OnPageChangeListenerImpl();
 
     public Sidebar(Context context) {
         super(context);
@@ -114,7 +127,6 @@ public class Sidebar extends RelativeLayout
     }
 
     void setLoaderManager(LoaderManager loaderManager) {
-        mLoaderManager = loaderManager;
         mAppsiContext.setLoaderManager(loaderManager);
 
         mAdapter = new SidebarPagerAdapter(mAppsiContext);
@@ -175,13 +187,11 @@ public class Sidebar extends RelativeLayout
     protected void onFinishInflate() {
         super.onFinishInflate();
 
-        mHandler = new Handler();
-
         // we need to find the actionbar before we initialize the view
         // pager adapter. All views inside the adapter will assume a
         // special SidebarContext that provides access to the actionbar.
         mAppsiViewPager = (ViewPager) findViewById(R.id.appsi_view_pager);
-        mAppsiViewPager.setOnPageChangeListener(mOnPageChangeListener);
+        mAppsiViewPager.addOnPageChangeListener(mOnPageChangeListener);
 
         mSidebarBackgroundView = findViewById(R.id.sidebar_back);
         mLeftShadow = findViewById(R.id.sidebar_left_shadow);
@@ -304,16 +314,10 @@ public class Sidebar extends RelativeLayout
 
     @Override
     public void onStartLoad() {
-        mLoadingData = true;
-//        mSpinner.setVisibility(View.VISIBLE);
-//        mSpinner.startAnimation(mRotateAnim);
     }
 
     @Override
     public void onEndLoad() {
-        mLoadingData = false;
-//        mSpinner.setVisibility(View.GONE);
-//        mSpinner.clearAnimation();
     }
 
     public boolean getIsLeft() {
@@ -378,12 +382,12 @@ public class Sidebar extends RelativeLayout
         mAdapter.setSidebarClosed();
     }
 
-    public static interface OnCancelCloseListener {
+    public interface OnCancelCloseListener {
 
         void onCloseCancelled();
     }
 
-    public static interface SidebarListener {
+    public interface SidebarListener {
 
         void onCloseSidebar();
 
@@ -393,7 +397,7 @@ public class Sidebar extends RelativeLayout
     @TargetApi(11)
     public static class DepthPageTransformer extends AbstractPageTransformer {
 
-        private static float MIN_SCALE = 0.75f;
+        private static final float MIN_SCALE = 0.75f;
 
         @Override
         public void transformPage(View view, float position) {
@@ -428,12 +432,11 @@ public class Sidebar extends RelativeLayout
         }
     }
 
-    @TargetApi(11)
     public static class ZoomOutPageTransformer extends AbstractPageTransformer {
 
-        private static float MIN_SCALE = 0.85f;
+        private static final float MIN_SCALE = 0.85f;
 
-        private static float MIN_ALPHA = 0.5f;
+        private static final float MIN_ALPHA = 0.5f;
 
         @Override
         public void transformPage(View view, float position) {
@@ -469,7 +472,6 @@ public class Sidebar extends RelativeLayout
         }
     }
 
-    @TargetApi(11)
     public static class TabletPageTransformer extends AbstractPageTransformer {
 
         private static float MIN_SCALE = 0.85f;
@@ -492,7 +494,6 @@ public class Sidebar extends RelativeLayout
         }
     }
 
-    @TargetApi(11)
     public static class FadePageTransformer extends AbstractPageTransformer {
 
         @Override
@@ -510,7 +511,6 @@ public class Sidebar extends RelativeLayout
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     static abstract class AbstractPageTransformer implements ViewPager.PageTransformer {
 
         public void reset(View view) {

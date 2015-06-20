@@ -37,15 +37,15 @@ public class ColoredAgendaViewHolder extends RecyclerView.ViewHolder
 
     final StringBuilder mStringBuilder;
 
-    ItemAgendaViewHolder.OnItemClickListener mListener;
+    final ItemAgendaViewHolder.OnItemClickListener mListener;
 
     AgendaEvent mAgendaEvent;
 
-    TextView mTitleView;
+    final TextView mTitleView;
 
-    TextView mTimeView;
+    final TextView mTimeView;
 
-    AgendaViewLayout mBackgroundView;
+    final AgendaViewLayout mBackgroundView;
 
     public ColoredAgendaViewHolder(View itemView,
             ItemAgendaViewHolder.OnItemClickListener onAgendaItemClickListener) {

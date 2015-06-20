@@ -57,19 +57,19 @@ public class TimeZoneData {
 
     private static String[] mBackupCountryNames;
 
-    public String mDefaultTimeZoneId;
+    public final String mDefaultTimeZoneId;
 
     ArrayList<TimeZoneInfo> mTimeZones;
 
     LinkedHashMap<String, ArrayList<Integer>> mTimeZonesByCountry;
 
-    HashSet<String> mTimeZoneNames = new HashSet<String>();
+    final HashSet<String> mTimeZoneNames = new HashSet<String>();
 
     SparseArray<ArrayList<Integer>> mTimeZonesByOffsets;
 
     private long mTimeMillis;
 
-    private HashMap<String, String> mCountryCodeToNameMap = new HashMap<String, String>();
+    private final HashMap<String, String> mCountryCodeToNameMap = new HashMap<String, String>();
 
     private TimeZoneInfo mDefaultTimeZoneInfo;
 
@@ -79,11 +79,11 @@ public class TimeZoneData {
 
     private HashMap<String, TimeZoneInfo> mTimeZonesById;
 
-    private boolean[] mHasTimeZonesInHrOffset = new boolean[40];
+    private final boolean[] mHasTimeZonesInHrOffset = new boolean[40];
 
-    private Context mContext;
+    private final Context mContext;
 
-    private String mPalestineDisplayName;
+    private final String mPalestineDisplayName;
 
     public TimeZoneData(Context context, String defaultTimeZoneId, long timeMillis) {
         mContext = context;

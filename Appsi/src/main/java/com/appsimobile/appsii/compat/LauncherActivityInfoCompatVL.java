@@ -26,7 +26,7 @@ import android.os.Build;
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class LauncherActivityInfoCompatVL extends LauncherActivityInfoCompat {
 
-    private LauncherActivityInfo mLauncherActivityInfo;
+    private final LauncherActivityInfo mLauncherActivityInfo;
 
     LauncherActivityInfoCompatVL(LauncherActivityInfo launcherActivityInfo) {
         super();

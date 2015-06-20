@@ -77,11 +77,11 @@ class IntentViewHolder extends BaseViewHolder implements View.OnClickListener,
 
     private final int mWidgetColor;
 
-    HomeItemConfiguration mConfigurationHelper;
+    final HomeItemConfiguration mConfigurationHelper;
 
-    TextView mTextView;
+    final TextView mTextView;
 
-    ImageView mAppImage;
+    final ImageView mAppImage;
 
     @Nullable
     String mAction;

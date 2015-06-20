@@ -16,9 +16,13 @@
 
 package com.appsimobile.appsii.module.calls;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.AsyncTaskLoader;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
@@ -33,7 +37,9 @@ import android.text.TextUtils;
 import android.text.format.Time;
 import android.util.Log;
 
+import com.appsimobile.appsii.PermissionDeniedException;
 import com.appsimobile.appsii.module.BaseContactInfo;
+import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
@@ -48,7 +54,7 @@ import static android.provider.ContactsContract.CommonDataKinds;
 /**
  * A custom Loader that loads all of the installed applications.
  */
-public class CallLogLoader extends AsyncTaskLoader<List<CallLogEntry>> {
+public class CallLogLoader extends AsyncTaskLoader<CallLogResult> {
 
     public static final String UNKNOWN_NUMBER = "-1";
 
@@ -58,11 +64,14 @@ public class CallLogLoader extends AsyncTaskLoader<List<CallLogEntry>> {
 
     static final boolean LOGD = false;
 
-    List<CallLogEntry> mCallLogEntries;
+    CallLogResult mCallLogEntries;
 
     ContentObserver mCallLogObserver;
 
-    PhoneNumberUtil mPhoneNumberUtil = PhoneNumberUtil.getInstance();
+    final PhoneNumberUtil mPhoneNumberUtil = PhoneNumberUtil.getInstance();
+
+    BroadcastReceiver mPermissionGrantedReceiver;
+
 
     public CallLogLoader(Context context) {
         super(context);
@@ -104,7 +113,7 @@ public class CallLogLoader extends AsyncTaskLoader<List<CallLogEntry>> {
      * Handles a request to cancel a load.
      */
     @Override
-    public void onCanceled(List<CallLogEntry> apps) {
+    public void onCanceled(CallLogResult apps) {
         super.onCanceled(apps);
 
         // At this point we can release the resources associated with 'apps'
@@ -118,8 +127,18 @@ public class CallLogLoader extends AsyncTaskLoader<List<CallLogEntry>> {
      * data to be published by the loader.
      */
     @Override
-    public List<CallLogEntry> loadInBackground() {
+    public CallLogResult loadInBackground() {
         // Retrieve all known applications.
+
+        if (!PermissionUtils.holdsPermission(getContext(), Manifest.permission.READ_CONTACTS)) {
+            return new CallLogResult(
+                    new PermissionDeniedException(Manifest.permission.READ_CONTACTS));
+        }
+
+        if (!PermissionUtils.holdsPermission(getContext(), Manifest.permission.READ_CALL_LOG)) {
+            return new CallLogResult(
+                    new PermissionDeniedException(Manifest.permission.READ_CALL_LOG));
+        }
 
         final Context context = getContext();
 
@@ -139,7 +158,7 @@ public class CallLogLoader extends AsyncTaskLoader<List<CallLogEntry>> {
                 CallLog.Calls.DEFAULT_SORT_ORDER);
 
         if (cursor == null) {
-            return new ArrayList<>();
+            return new CallLogResult(new ArrayList<CallLogEntry>());
         }
 
         Phonenumber.PhoneNumber recycle = new Phonenumber.PhoneNumber();
@@ -208,7 +227,7 @@ public class CallLogLoader extends AsyncTaskLoader<List<CallLogEntry>> {
 
 //                if (entries.size() >= 9) break;
             }
-            return entries;
+            return new CallLogResult(entries);
         } finally {
             cursor.close();
         }
@@ -281,7 +300,7 @@ public class CallLogLoader extends AsyncTaskLoader<List<CallLogEntry>> {
         entry.mGeoCodedLocation = geocoder.getDescriptionForNumber(number, Locale.getDefault());
 
         int presentationType = getPresentationType(cursor);
-        entry.mPrivateNumner = isPrivateNumber(presentationType);
+        entry.mPrivateNumber = isPrivateNumber(presentationType);
 
         int numberType = cursor.getInt(CallLogQuery.CACHED_NUMBER_TYPE);
         String numberLabel = cursor.getString(CallLogQuery.CACHED_NUMBER_LABEL);
@@ -346,7 +365,7 @@ public class CallLogLoader extends AsyncTaskLoader<List<CallLogEntry>> {
      * Helper function to take care of releasing resources associated
      * with an actively loaded data set.
      */
-    protected void onReleaseResources(List<CallLogEntry> apps) {
+    protected void onReleaseResources(CallLogResult apps) {
         // For a simple List<> there is nothing to do.  For something
         // like a Cursor, we would close it here.
     }
@@ -357,7 +376,7 @@ public class CallLogLoader extends AsyncTaskLoader<List<CallLogEntry>> {
      * here just adds a little more logic.
      */
     @Override
-    public void deliverResult(List<CallLogEntry> apps) {
+    public void deliverResult(CallLogResult apps) {
         if (isReset()) {
             // An async query came in while the loader is stopped.  We
             // don't need the result.
@@ -365,7 +384,7 @@ public class CallLogLoader extends AsyncTaskLoader<List<CallLogEntry>> {
                 onReleaseResources(apps);
             }
         }
-        List<CallLogEntry> oldApps = mCallLogEntries;
+        CallLogResult oldApps = mCallLogEntries;
         mCallLogEntries = apps;
 
         if (isStarted()) {
@@ -410,6 +429,19 @@ public class CallLogLoader extends AsyncTaskLoader<List<CallLogEntry>> {
                     .registerContentObserver(CallLog.Calls.CONTENT_URI, true, mCallLogObserver);
         }
 
+        mPermissionGrantedReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                int req = intent.getIntExtra(PermissionUtils.EXTRA_REQUEST_CODE, 0);
+                if (req == PermissionUtils.REQUEST_CODE_PERMISSION_READ_CALL_LOG) {
+                    onContentChanged();
+                }
+            }
+        };
+        IntentFilter filter2 = new IntentFilter(PermissionUtils.ACTION_PERMISSION_RESULT);
+        getContext().registerReceiver(mPermissionGrantedReceiver, filter2);
+
+
         // Has something interesting in the configuration changed since we
         // last built the app list?
 
@@ -451,6 +483,11 @@ public class CallLogLoader extends AsyncTaskLoader<List<CallLogEntry>> {
             getContext().getContentResolver().unregisterContentObserver(mCallLogObserver);
             mCallLogObserver = null;
         }
+
+        if (mPermissionGrantedReceiver != null) {
+            getContext().unregisterReceiver(mPermissionGrantedReceiver);
+        }
+
     }
 
     static class ContactsByNumberQuery {

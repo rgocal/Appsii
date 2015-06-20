@@ -17,6 +17,8 @@
 package com.appsimobile.appsii.module.weather.loader;
 
 import android.location.Location;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
@@ -68,7 +70,7 @@ public class YahooWeatherApiClient {
 
     private static final int PARSE_STATE_TIMEZONE = 6;
 
-    private static XmlPullParserFactory sXmlPullParserFactory;
+    private static final XmlPullParserFactory sXmlPullParserFactory;
 
 
     public static List<WeatherData> getWeatherForWoeids(String[] woeids, String unit)
@@ -381,7 +383,7 @@ public class YahooWeatherApiClient {
 
         // Sorted by decreasing precision
         // (point of interest, locality3, locality2, locality1, admin3, admin2, admin1, etc.)
-        public List<String> woeids = new ArrayList<String>();
+        public final List<String> woeids = new ArrayList<String>();
 
         public String town;
 
@@ -390,7 +392,7 @@ public class YahooWeatherApiClient {
         public String timezone;
     }
 
-    public static class LocationSearchResult {
+    public static class LocationSearchResult implements Parcelable {
 
         public String woeid;
 
@@ -399,5 +401,42 @@ public class YahooWeatherApiClient {
         public String country;
 
         public String timezone;
+
+        public LocationSearchResult() {
+
+        }
+
+        protected LocationSearchResult(Parcel in) {
+            woeid = in.readString();
+            displayName = in.readString();
+            country = in.readString();
+            timezone = in.readString();
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(woeid);
+            dest.writeString(displayName);
+            dest.writeString(country);
+            dest.writeString(timezone);
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        public static final Creator<LocationSearchResult> CREATOR =
+                new Creator<LocationSearchResult>() {
+                    @Override
+                    public LocationSearchResult createFromParcel(Parcel in) {
+                        return new LocationSearchResult(in);
+                    }
+
+                    @Override
+                    public LocationSearchResult[] newArray(int size) {
+                        return new LocationSearchResult[size];
+                    }
+                };
     }
 }

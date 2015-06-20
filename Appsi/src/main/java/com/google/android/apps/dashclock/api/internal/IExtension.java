@@ -28,10 +28,10 @@ public interface IExtension extends android.os.IInterface {
     /**
      * Local-side IPC implementation stub class.
      */
-    public static abstract class Stub extends android.os.Binder
+    abstract class Stub extends android.os.Binder
             implements com.google.android.apps.dashclock.api.internal.IExtension {
 
-        private static final java.lang.String DESCRIPTOR =
+        static final java.lang.String DESCRIPTOR =
                 "com.google.android.apps.dashclock.api.internal.IExtension";
 
         /**
@@ -98,7 +98,7 @@ public interface IExtension extends android.os.IInterface {
         private static class Proxy
                 implements com.google.android.apps.dashclock.api.internal.IExtension {
 
-            private android.os.IBinder mRemote;
+            private final android.os.IBinder mRemote;
 
             Proxy(android.os.IBinder remote) {
                 mRemote = remote;
@@ -168,8 +168,8 @@ public interface IExtension extends android.os.IInterface {
      * be added below all other methods.
      * - Do NOT modify a signature once a protocol version is finalized.
      */// Protocol version 1 below
-    public void onInitialize(com.google.android.apps.dashclock.api.internal.IExtensionHost host,
+    void onInitialize(com.google.android.apps.dashclock.api.internal.IExtensionHost host,
             boolean isReconnect) throws android.os.RemoteException;
 
-    public void onUpdate(int reason) throws android.os.RemoteException;
+    void onUpdate(int reason) throws android.os.RemoteException;
 }

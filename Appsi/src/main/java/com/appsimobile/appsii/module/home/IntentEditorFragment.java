@@ -318,7 +318,7 @@ public class IntentEditorFragment extends Fragment implements View.OnClickListen
         }
     }
 
-    private void updateFieldVisibilityForType() {
+    void updateFieldVisibilityForType() {
         mVisibilityHelper.updateFieldVisibilityForType(mType, mShowAdvanced);
     }
 
@@ -727,21 +727,21 @@ public class IntentEditorFragment extends Fragment implements View.OnClickListen
 
     static class VisibilityHelper {
 
-        View mTypeContainer;
+        final View mTypeContainer;
 
-        View mActionContainer;
+        final View mActionContainer;
 
-        View mCategoryContainer;
+        final View mCategoryContainer;
 
-        View mPackageContainer;
+        final View mPackageContainer;
 
-        View mClassContainer;
+        final View mClassContainer;
 
-        View mCommandContainer;
+        final View mCommandContainer;
 
-        View mAdvancedHeader;
+        final View mAdvancedHeader;
 
-        View mRunAsRootView;
+        final View mRunAsRootView;
 
         VisibilityHelper(View view) {
             mTypeContainer = view.findViewById(R.id.type_container);

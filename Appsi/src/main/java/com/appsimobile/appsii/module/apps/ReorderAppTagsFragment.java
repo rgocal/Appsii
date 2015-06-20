@@ -170,7 +170,7 @@ public class ReorderAppTagsFragment extends Fragment implements DragSortListView
 
     public static class TagViewHolder extends ViewHolder {
 
-        TextView mTextView;
+        final TextView mTextView;
 
         public TagViewHolder(View view) {
             super(view);

@@ -31,9 +31,9 @@ abstract class BaseViewHolder extends AbsHomeViewHolder implements
 
     HomeItem mHomeItem;
 
-    HomeItemConfiguration mConfigurationHelper;
+    final HomeItemConfiguration mConfigurationHelper;
 
-    View mOverflow;
+    final View mOverflow;
 
     public BaseViewHolder(HomeViewWrapper view) {
         super(view);

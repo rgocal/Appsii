@@ -40,13 +40,13 @@ import java.util.List;
  */
 public class EditPackageDialog extends DialogFragment implements TextView.OnEditorActionListener {
 
+    final List<String> mPackageItems = new ArrayList<>();
+
     PackageDialogListener mPackageDialogListener;
 
     String mTitle;
 
     String mTag;
-
-    List<String> mPackageItems = new ArrayList<>();
 
     private AutoCompleteTextView mAutoCompleteTextView;
 

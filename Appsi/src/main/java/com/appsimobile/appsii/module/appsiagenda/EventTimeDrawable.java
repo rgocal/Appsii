@@ -33,6 +33,7 @@ import android.text.style.TextAppearanceSpan;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * A simple drawable that can render the start time of an event
@@ -46,17 +47,17 @@ public class EventTimeDrawable extends Drawable {
 
     public static final int AMPM_PM = 2;
 
-    static SimpleDateFormat sMonthFormat = new SimpleDateFormat("MMM");
+    static final SimpleDateFormat sMonthFormat = new SimpleDateFormat("MMM", Locale.getDefault());
 
-    static Date sFormatDate = new Date();
+    static final Date sFormatDate = new Date();
 
-    static Calendar sFormatCalendar = Calendar.getInstance();
+    static final Calendar sFormatCalendar = Calendar.getInstance();
 
     private static TextPaint sPaint;
 
     private final Context mContext;
 
-    SpannableStringBuilder mTimeBuilder;
+    final SpannableStringBuilder mTimeBuilder;
 
     SpannableStringBuilder mAmPmBuilder;
 
@@ -76,12 +77,12 @@ public class EventTimeDrawable extends Drawable {
 
     private Layout mAmpmLayout;
 
-    private Object mHourSpan;
+    private final Object mHourSpan;
 
-    private Object mMinuteSpan;
+    private final Object mMinuteSpan;
 
     @StyleRes
-    private int mAmpmStyle;
+    private final int mAmpmStyle;
 
     private int mAlpha = 255;
 

@@ -47,7 +47,7 @@ public class TimeZoneFilterTypeAdapter extends BaseAdapter implements Filterable
 
     public static final int FILTER_TYPE_GMT = 3;
 
-    private static final boolean DEBUG = false;
+    static final boolean DEBUG = false;
 
     OnClickListener mDummyListener = new OnClickListener() {
 
@@ -56,17 +56,17 @@ public class TimeZoneFilterTypeAdapter extends BaseAdapter implements Filterable
         }
     };
 
-    private ArrayList<FilterTypeResult> mLiveResults = new ArrayList<FilterTypeResult>();
+    ArrayList<FilterTypeResult> mLiveResults = new ArrayList<FilterTypeResult>();
 
-    private int mLiveResultsCount = 0;
+    int mLiveResultsCount = 0;
 
     private ArrayFilter mFilter;
 
-    private LayoutInflater mInflater;
+    private final LayoutInflater mInflater;
 
-    private TimeZoneData mTimeZoneData;
+    final TimeZoneData mTimeZoneData;
 
-    private OnSetFilterListener mListener;
+    final OnSetFilterListener mListener;
 
     public TimeZoneFilterTypeAdapter(Context context, TimeZoneData tzd, OnSetFilterListener l) {
         mTimeZoneData = tzd;
@@ -96,7 +96,7 @@ public class TimeZoneFilterTypeAdapter extends BaseAdapter implements Filterable
         if (convertView != null) {
             v = convertView;
         } else {
-            v = mInflater.inflate(R.layout.tzp_time_zone_filter_item, null);
+            v = mInflater.inflate(R.layout.tzp_time_zone_filter_item, parent, false);
             ViewHolder.setupViewHolder(v);
         }
 
@@ -161,11 +161,11 @@ public class TimeZoneFilterTypeAdapter extends BaseAdapter implements Filterable
 
     static class FilterTypeResult {
 
-        public int time;
+        public final int time;
 
-        int type;
+        final int type;
 
-        String constraint;
+        final String constraint;
 
         public FilterTypeResult(int type, String constraint, int time) {
             this.type = type;
@@ -180,6 +180,9 @@ public class TimeZoneFilterTypeAdapter extends BaseAdapter implements Filterable
     }    // This onClickListener is actually called from the AutoCompleteTextView's
 
     private class ArrayFilter extends Filter {
+
+        ArrayFilter() {
+        }
 
         @Override
         protected FilterResults performFiltering(CharSequence prefix) {

@@ -35,6 +35,10 @@
         <item name="android:padding">16dp</item>
     </style>
 
+    <style name="AccentColorButton" parent="PrimaryColorButton">
+        <item name="android:background">@drawable/button_bg_orange</item>
+    </style>
+
     <style name="PrimaryColorButtonBorderless" parent="Appsi.Dialog.Button.Borderless">
         <item name="android:background">?android:attr/selectableItemBackground</item>
         <item name="android:textColor">?attr/colorPrimary</item>

@@ -26,9 +26,9 @@ import java.util.Map;
  */
 public class Inventory {
 
-    Map<String, SkuDetails> mSkuMap = new HashMap<String, SkuDetails>();
+    final Map<String, SkuDetails> mSkuMap = new HashMap<String, SkuDetails>();
 
-    Map<String, Purchase> mPurchaseMap = new HashMap<String, Purchase>();
+    final Map<String, Purchase> mPurchaseMap = new HashMap<String, Purchase>();
 
     Inventory() {
     }

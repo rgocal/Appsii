@@ -16,15 +16,18 @@
 
 package com.appsimobile.appsii.compat;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.UserHandle;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class UserManagerCompatVL extends UserManagerCompatV17 {
 
     private final PackageManager mPm;
@@ -38,9 +41,9 @@ public class UserManagerCompatVL extends UserManagerCompatV17 {
     public List<UserHandleCompat> getUserProfiles() {
         List<UserHandle> users = mUserManager.getUserProfiles();
         if (users == null) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
-        ArrayList<UserHandleCompat> compatUsers = new ArrayList<UserHandleCompat>(
+        ArrayList<UserHandleCompat> compatUsers = new ArrayList<>(
                 users.size());
         for (UserHandle user : users) {
             compatUsers.add(UserHandleCompat.fromUser(user));

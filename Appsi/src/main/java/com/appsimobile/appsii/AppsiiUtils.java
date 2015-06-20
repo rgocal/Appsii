@@ -108,6 +108,16 @@ public final class AppsiiUtils {
         return in;
     }
 
+    public static void stopAppsi(Context context) {
+        Intent stop = new Intent(Appsi.ACTION_STOP_APPSI);
+        context.sendBroadcast(stop);
+    }
+
+    public static void startAppsi(Context context) {
+        Intent startServiceIntent = new Intent(context, Appsi.class);
+        context.startService(startServiceIntent);
+    }
+
     public interface AppsiiAccess {
 
         void closeSidebar();
@@ -115,7 +125,7 @@ public final class AppsiiUtils {
 
     static class AppsiiAccessImpl implements AppsiiAccess {
 
-        Appsi mAppsi;
+        final Appsi mAppsi;
 
         public AppsiiAccessImpl(Appsi appsi) {
             mAppsi = appsi;

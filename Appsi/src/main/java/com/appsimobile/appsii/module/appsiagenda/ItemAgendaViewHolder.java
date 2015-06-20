@@ -34,19 +34,19 @@ import com.appsimobile.appsii.R;
 class ItemAgendaViewHolder extends AgendaViewHolder implements View.OnClickListener,
         PopupMenu.OnMenuItemClickListener {
 
+    final ImageView mImageView;
+
+    final TextView mPrimaryText;
+
+    final TextView mSecondaryText;
+
+    final OnItemClickListener mOnItemClickListener;
+
+    final View mOverflow;
+
     private final Time mTime = new Time();
 
-    ImageView mImageView;
-
-    TextView mPrimaryText;
-
-    TextView mSecondaryText;
-
     AgendaEvent mAgendaEvent;
-
-    OnItemClickListener mOnItemClickListener;
-
-    View mOverflow;
 
     PopupMenu mPopupMenu;
 
@@ -151,7 +151,7 @@ class ItemAgendaViewHolder extends AgendaViewHolder implements View.OnClickListe
         mPopupMenu.show();
     }
 
-    public static interface OnItemClickListener {
+    public interface OnItemClickListener {
 
         void onItemClicked(AgendaEvent viewHolder);
 

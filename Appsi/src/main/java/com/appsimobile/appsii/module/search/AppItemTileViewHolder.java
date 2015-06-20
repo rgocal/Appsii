@@ -44,13 +44,13 @@ class AppItemTileViewHolder extends RecyclerView.ViewHolder implements View.OnCl
 
     final OnAppClickedListener mOnAppClickedListener;
 
-    TextView mTitle;
+    final TextView mTitle;
 
-    Button mActionButton;
+    final Button mActionButton;
 
-    RecyclerView mRecyclerView;
+    final RecyclerView mRecyclerView;
 
-    List<AppEntry> mItems = new ArrayList<>();
+    final List<AppEntry> mItems = new ArrayList<>();
 
     public AppItemTileViewHolder(
             View itemView,

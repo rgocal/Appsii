@@ -209,15 +209,13 @@ public class SVGBuilder {
                 data.reset();
                 if (r == 2 && magicInt == GZIPInputStream.GZIP_MAGIC) {
                     // Log.d(SVGParser.TAG, "SVG is gzipped");
-                    GZIPInputStream gin = new GZIPInputStream(data);
-                    data = gin;
+                    data = new GZIPInputStream(data);
                 }
             } catch (IOException ioe) {
                 throw new SVGParseException(ioe);
             }
 
-            final SVG svg = SVGParser.parse(new InputSource(data), handler);
-            return svg;
+            return SVGParser.parse(new InputSource(data), handler);
 
         } finally {
             if (closeInputStream) {

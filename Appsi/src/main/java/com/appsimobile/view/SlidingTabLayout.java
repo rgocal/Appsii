@@ -71,17 +71,17 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
     private static final int TAB_VIEW_TEXT_SIZE_SP = 12;
 
-    private int mTitleOffset;
+    private final int mTitleOffset;
 
     private int mTabViewLayoutId;
 
     private int mTabViewTextViewId;
 
-    private ViewPager mViewPager;
+    ViewPager mViewPager;
 
-    private ViewPager.OnPageChangeListener mViewPagerPageChangeListener;
+    ViewPager.OnPageChangeListener mViewPagerPageChangeListener;
 
-    private final SlidingTabStrip mTabStrip;
+    final SlidingTabStrip mTabStrip;
 
     public SlidingTabLayout(Context context) {
         this(context, null);
@@ -238,7 +238,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
         }
     }
 
-    private void scrollToTab(int tabIndex, int positionOffset) {
+    void scrollToTab(int tabIndex, int positionOffset) {
         final int tabStripChildCount = mTabStrip.getChildCount();
         if (tabStripChildCount == 0 || tabIndex < 0 || tabIndex >= tabStripChildCount) {
             return;
@@ -260,6 +260,9 @@ public class SlidingTabLayout extends HorizontalScrollView {
     private class InternalViewPagerListener implements ViewPager.OnPageChangeListener {
 
         private int mScrollState;
+
+        InternalViewPagerListener() {
+        }
 
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -306,6 +309,9 @@ public class SlidingTabLayout extends HorizontalScrollView {
     }
 
     private class TabClickListener implements View.OnClickListener {
+
+        TabClickListener() {
+        }
 
         @Override
         public void onClick(View v) {

@@ -61,7 +61,7 @@ public class LockableAsyncQueryHandler extends Handler {
 
     /* package */ final WeakReference<ContentResolver> mResolver;
 
-    private Handler mWorkerThreadHandler;
+    private final Handler mWorkerThreadHandler;
 
     public LockableAsyncQueryHandler(ContentResolver cr) {
         super();

@@ -47,7 +47,7 @@ public class AppListLoader extends AsyncTaskLoader<List<AppEntry>> {
 
     private final Map<ComponentName, CharSequence> mLabelCache;
 
-    PackageManager mPackageManager;
+    final PackageManager mPackageManager;
 
     List<AppEntry> mApps;
 

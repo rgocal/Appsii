@@ -39,26 +39,26 @@ public class ExpandCollapseDrawable extends Drawable {
 
     int mAlpha;
 
-    float[] mPositionsX = new float[]{.25f, .5f, .75f};
+    final float[] mPositionsX = new float[]{.25f, .5f, .75f};
 
-    float[] mExpandedYPositions = new float[]{.35f, .6f, .35f};
+    final float[] mExpandedYPositions = new float[]{.35f, .6f, .35f};
 
-    float[] mCollapsedYPositions = new float[]{.65f, .4f, .65f};
+    final float[] mCollapsedYPositions = new float[]{.65f, .4f, .65f};
 
     // we need a new array, don't reference mCollapsedYPositions
-    float[] mCurrentYPositions = new float[]{.6f, .4f, .6f};
+    final float[] mCurrentYPositions = new float[]{.6f, .4f, .6f};
 
     private ColorFilter mColorFilter;
 
     private boolean mExpanded;
 
-    private ObjectAnimator mY1Animator;
+    private final ObjectAnimator mY1Animator;
 
-    private ObjectAnimator mY2Animator;
+    private final ObjectAnimator mY2Animator;
 
-    private ObjectAnimator mY3Animator;
+    private final ObjectAnimator mY3Animator;
 
-    private Path mPath = new Path();
+    private final Path mPath = new Path();
 
     public ExpandCollapseDrawable(Resources resources) {
         this(resources, 0x3d000000);

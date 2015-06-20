@@ -301,7 +301,7 @@ public class PatternRelativeLayout extends RelativeLayout
         mBackgroundLoader.execute();
     }
 
-    private void updatePaint() {
+    void updatePaint() {
         if (mActivePattern == null) {
             //mPaint = null;
             mBitmapDrawable = null;

@@ -41,11 +41,11 @@ class PeopleAdapter extends RecyclerView.Adapter<AbstractPeopleViewHolder> {
 
     int mColumnCount = 1;
 
-    SparseArray<String> mFirstLetterPositions = new SparseArray<>();
+    final SparseArray<String> mFirstLetterPositions = new SparseArray<>();
 
     PeopleViewHolder.OnItemClickListener mOnItemClickListener;
 
-    private Context mContext;
+    private final Context mContext;
 
     private View mParallaxView;
 
@@ -53,6 +53,7 @@ class PeopleAdapter extends RecyclerView.Adapter<AbstractPeopleViewHolder> {
         mPeopleActionListener = peopleActionListener;
         mContext = context;
         setHasStableIds(true);
+        mContactInfos.add(null);
     }
 
     public void setColumnCount(int columnCount) {

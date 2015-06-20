@@ -46,9 +46,9 @@ class RawContactsLoader extends AsyncTaskLoader<Contact> {
 
     ForceLoadContentObserver mObserver;
 
-    long mId;
+    final long mId;
 
-    String mLookupKey;
+    final String mLookupKey;
 
 
     public RawContactsLoader(Context context, String lookupKey, long id) {
@@ -209,9 +209,8 @@ class RawContactsLoader extends AsyncTaskLoader<Contact> {
         Uri displayPhotoUri =
                 ContentUris.withAppendedId(ContactsContract.DisplayPhoto.CONTENT_URI, photoFileId);
         try {
-            AssetFileDescriptor fd = context.getContentResolver().openAssetFileDescriptor(
+            return context.getContentResolver().openAssetFileDescriptor(
                     displayPhotoUri, "r");
-            return fd;
         } catch (IOException e) {
             return null;
         }

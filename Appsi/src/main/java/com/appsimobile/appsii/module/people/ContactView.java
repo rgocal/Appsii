@@ -113,7 +113,7 @@ public class ContactView extends AbstractContactView
         }
     }
 
-    public static interface PeopleActionListener {
+    public interface PeopleActionListener {
 
         void onEditSelected(BaseContactInfo contactInfo);
     }

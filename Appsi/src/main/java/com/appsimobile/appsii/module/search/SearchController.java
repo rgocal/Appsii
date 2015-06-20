@@ -212,7 +212,7 @@ public class SearchController extends PageController
         */
     }
 
-    private void onSearchTextChanged(CharSequence charSequence) {
+    void onSearchTextChanged(CharSequence charSequence) {
         mQuery = String.valueOf(charSequence);
         if (mQuery.length() > 0) {
             getLoaderManager().restartLoader(PEOPLE_SEARCH_LOADER, null, mPeopleCallbacks);
@@ -344,6 +344,9 @@ public class SearchController extends PageController
 
     private static class RecognitionListenerImpl implements RecognitionListener {
 
+        RecognitionListenerImpl() {
+        }
+
         @Override
         public void onReadyForSpeech(Bundle params) {
 
@@ -393,9 +396,9 @@ public class SearchController extends PageController
 
     static class SearchSuggestionViewHolder extends RecyclerView.ViewHolder {
 
-        TextView mTitleView;
+        final TextView mTitleView;
 
-        AdapterView.OnItemClickListener mOnItemClickListener;
+        final AdapterView.OnItemClickListener mOnItemClickListener;
 
         public SearchSuggestionViewHolder(View itemView, final AdapterView.OnItemClickListener l) {
             super(itemView);

@@ -18,6 +18,9 @@ package com.appsimobile.appsii.preference;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.Nullable;
+
+import com.appsimobile.appsii.module.weather.loader.YahooWeatherApiClient;
 
 /**
  * Created by nick on 22/04/15.
@@ -47,8 +50,20 @@ public class PreferenceHelper {
         }
     }
 
+    public void setAutoStart(boolean autoStart) {
+        mSharedPreferences.edit().putBoolean("pref_autostart", autoStart).apply();
+    }
+
+    public boolean getAutoStart() {
+        return mSharedPreferences.getBoolean("pref_autostart", true);
+    }
+
     public String getDefaultWeatherTemperatureUnit() {
         return mSharedPreferences.getString("weather_default_unit", "c");
+    }
+
+    public void setDefaultWeatherTemperatureUnit(String unit) {
+        mSharedPreferences.edit().putString("weather_default_unit", unit).apply();
     }
 
     public String getDefaultWeatherTitleType() {
@@ -87,4 +102,42 @@ public class PreferenceHelper {
         return mSharedPreferences.getInt("pref_sidebar_size", 80);
     }
 
+    public void updateDefaultUserLocation(YahooWeatherApiClient.LocationSearchResult result) {
+        mSharedPreferences.edit().
+                putString("default_user_country", result.country).
+                putString("default_user_display_name", result.displayName).
+                putString("default_user_timezone", result.timezone).
+                putString("default_user_woeid", result.woeid).
+                apply();
+    }
+
+    @Nullable
+    public YahooWeatherApiClient.LocationSearchResult getDefaultUserLocation() {
+        if (!mSharedPreferences.contains("default_user_woeid")) return null;
+
+        YahooWeatherApiClient.LocationSearchResult result =
+                new YahooWeatherApiClient.LocationSearchResult();
+        result.country = getDefaultLocationCountry();
+        result.displayName = getDefaultLocationDisplayName();
+        result.timezone = getDefaultLocationTimezone();
+        result.woeid = getDefaultLocationWoeId();
+
+        return result;
+    }
+
+    public String getDefaultLocationWoeId() {
+        return mSharedPreferences.getString("default_user_woeid", null);
+    }
+
+    public String getDefaultLocationCountry() {
+        return mSharedPreferences.getString("default_user_country", null);
+    }
+
+    public String getDefaultLocationTimezone() {
+        return mSharedPreferences.getString("default_user_timezone", null);
+    }
+
+    public String getDefaultLocationDisplayName() {
+        return mSharedPreferences.getString("default_user_display_name", null);
+    }
 }

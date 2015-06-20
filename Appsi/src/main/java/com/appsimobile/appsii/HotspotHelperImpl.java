@@ -16,6 +16,7 @@
 
 package com.appsimobile.appsii;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -30,11 +31,12 @@ import android.view.View.OnClickListener;
 import android.view.WindowManager;
 
 import com.appsimobile.appsii.SidebarHotspot.SidebarGestureCallback;
+import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.crashlytics.android.Crashlytics;
 
 import java.util.List;
 
-public class AppsiHotspotHelperImpl extends AbstractHotspotHelper
+public class HotspotHelperImpl extends AbstractHotspotHelper
         implements OnClickListener, View.OnLongClickListener, SidebarGestureCallback,
         SidebarHotspot.SwipeListener {
 
@@ -47,11 +49,11 @@ public class AppsiHotspotHelperImpl extends AbstractHotspotHelper
     private final LongSparseArray<HotspotContainerHelper> mSidebarHotspots =
             new LongSparseArray<>();
 
-    HotspotHelperListener mCallback;
+    final HotspotHelperListener mCallback;
 
-    PopupLayer mPopupLayer;
+    final PopupLayer mPopupLayer;
 
-    LayoutInflater mLayoutInflater;
+    final LayoutInflater mLayoutInflater;
 
     boolean mDraggingHotspot;
 
@@ -67,7 +69,7 @@ public class AppsiHotspotHelperImpl extends AbstractHotspotHelper
 
     int mHotspotY;
 
-    View mFullScreenWatcher;
+    final View mFullScreenWatcher;
 
     boolean mFullScreenWatcherAttached;
 
@@ -77,7 +79,7 @@ public class AppsiHotspotHelperImpl extends AbstractHotspotHelper
 
     private List<HotspotItem> mHotspotItems;
 
-    public AppsiHotspotHelperImpl(Context context, HotspotHelperListener callback,
+    public HotspotHelperImpl(Context context, HotspotHelperListener callback,
             PopupLayer popupLayer) {
         super(context);
         mLayoutInflater = LayoutInflater.from(context);
@@ -130,37 +132,49 @@ public class AppsiHotspotHelperImpl extends AbstractHotspotHelper
 
     @Override
     public void addHotspots() {
-        removeHotspots();
-        mHotspotsActive = true;
-        if (mHotspotItems != null) {
-            int count = mHotspotItems.size();
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-            for (int i = 0; i < count; i++) {
-                HotspotItem conf = mHotspotItems.get(i);
+        try {
+            removeHotspots();
+            mHotspotsActive = true;
+            if (mHotspotItems != null) {
+                int count = mHotspotItems.size();
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+                for (int i = 0; i < count; i++) {
+                    HotspotItem conf = mHotspotItems.get(i);
 
 
-                HotspotContainerHelper hotspotContainerHelper = mSidebarHotspots.get(conf.mId);
-                boolean isAdded = hotspotContainerHelper != null;
-                if (!isAdded) {
-                    hotspotContainerHelper = createSidebarHotspot();
-                }
-                hotspotContainerHelper.bind(conf);
+                    HotspotContainerHelper hotspotContainerHelper = mSidebarHotspots.get(conf.mId);
+                    boolean isAdded = hotspotContainerHelper != null;
+                    if (!isAdded) {
+                        hotspotContainerHelper = createSidebarHotspot();
+                    }
+                    hotspotContainerHelper.bind(conf);
 
-                mSidebarHotspots.put(conf.mId, hotspotContainerHelper);
+                    mSidebarHotspots.put(conf.mId, hotspotContainerHelper);
 
-                if (!isAdded) {
-                    WindowManager.LayoutParams lp =
-                            configureHotspot(hotspotContainerHelper, conf, prefs);
-                    try {
-                        mWindowManager.addView(hotspotContainerHelper.mHotspotParent, lp);
-                    } catch (Exception e) {
-                        Log.w("AppsiMultipleHotspotImpl", "error adding hotspot", e);
-                        Crashlytics.logException(e);
+                    if (!isAdded) {
+                        WindowManager.LayoutParams lp =
+                                configureHotspot(hotspotContainerHelper, conf, prefs);
+                        try {
+                            PermissionUtils.throwIfNotPermitted(
+                                    mContext, Manifest.permission.SYSTEM_ALERT_WINDOW);
+
+                            mWindowManager.addView(hotspotContainerHelper.mHotspotParent, lp);
+                        } catch (PermissionDeniedException e) {
+                            throw e;
+                        } catch (Exception e) {
+                            Log.w("HotspotHelperImpl", "error adding hotspot", e);
+                            Crashlytics.logException(e);
+                        }
                     }
                 }
             }
+            addScreenWatcher();
+        } catch (PermissionDeniedException e) {
+            PermissionUtils.showPermissionNotification(mContext, 1001,
+                    Manifest.permission.SYSTEM_ALERT_WINDOW, 0);
+            mHotspotsActive = false;
+            AppsiiUtils.stopAppsi(mContext);
         }
-        addScreenWatcher();
     }
 
     private HotspotContainerHelper createSidebarHotspot() {
@@ -176,7 +190,8 @@ public class AppsiHotspotHelperImpl extends AbstractHotspotHelper
         return helper;
     }
 
-    private void addScreenWatcher() {
+    private void addScreenWatcher() throws PermissionDeniedException {
+        PermissionUtils.throwIfNotPermitted(mContext, Manifest.permission.SYSTEM_ALERT_WINDOW);
         mWindowManager.addView(mFullScreenWatcher, createInsetParams());
         mFullScreenWatcherAttached = true;
     }
@@ -243,7 +258,7 @@ public class AppsiHotspotHelperImpl extends AbstractHotspotHelper
                 try {
                     mWindowManager.updateViewLayout(hotspotContainerHelper.mHotspotParent, lp);
                 } catch (Exception e) {
-                    Log.w("AppsiMultipleHotspotImpl", "error adding hotspot", e);
+                    Log.w("HotspotHelperImpl", "error adding hotspot", e);
                 }
             }
         }
@@ -338,9 +353,9 @@ public class AppsiHotspotHelperImpl extends AbstractHotspotHelper
 
     static class HotspotContainerHelper {
 
-        View mHotspotParent;
+        final View mHotspotParent;
 
-        SidebarHotspot mSidebarHotspot;
+        final SidebarHotspot mSidebarHotspot;
 
         HotspotContainerHelper(View hotspotParent, SidebarHotspot sidebarHotspot) {
             mHotspotParent = hotspotParent;
@@ -355,16 +370,16 @@ public class AppsiHotspotHelperImpl extends AbstractHotspotHelper
             mSidebarHotspot.setVibrateOnTouch(vibrate);
         }
 
-        public void setOnClickListener(AppsiHotspotHelperImpl appsiHotspotHelper) {
+        public void setOnClickListener(HotspotHelperImpl appsiHotspotHelper) {
             mSidebarHotspot.setOnClickListener(appsiHotspotHelper);
         }
 
-        public void setOnLongClickListener(AppsiHotspotHelperImpl appsiHotspotHelper) {
+        public void setOnLongClickListener(HotspotHelperImpl appsiHotspotHelper) {
             mSidebarHotspot.setOnLongClickListener(appsiHotspotHelper);
         }
 
 
-        public void setCallback(AppsiHotspotHelperImpl appsiHotspotHelper) {
+        public void setCallback(HotspotHelperImpl appsiHotspotHelper) {
             mSidebarHotspot.setCallback(appsiHotspotHelper);
         }
 

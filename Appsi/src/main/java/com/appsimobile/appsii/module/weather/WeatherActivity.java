@@ -57,6 +57,7 @@ import com.appsimobile.appsii.BuildConfig;
 import com.appsimobile.appsii.DrawableStartTintPainter;
 import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.module.weather.loader.WeatherData;
+import com.appsimobile.appsii.preference.PreferenceHelper;
 import com.appsimobile.appsii.preference.PreferencesFactory;
 import com.appsimobile.paintjob.PaintJob;
 import com.appsimobile.paintjob.ViewPainters;
@@ -133,7 +134,7 @@ public class WeatherActivity extends Activity {
 
     boolean mIsDay;
 
-    private Bitmap mBitmap;
+    Bitmap mBitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,6 +150,16 @@ public class WeatherActivity extends Activity {
         if (woeid == null) {
             woeid = mSharedPreferences.getString(
                     WeatherLoadingService.PREFERENCE_LAST_KNOWN_WOEID, null);
+        }
+        if (woeid == null) {
+            PreferenceHelper preferenceHelper = PreferenceHelper.getInstance(this);
+            woeid = preferenceHelper.getDefaultLocationWoeId();
+        }
+
+        if (woeid == null) {
+            // TODO: we need a default location.
+            finish();
+            return;
         }
 
         mDisplayUnit = getIntent().getStringExtra(EXTRA_UNIT);
@@ -371,19 +382,19 @@ public class WeatherActivity extends Activity {
 
         final String mWeatherDisplayUnit;
 
-        ImageView mForecastImage;
+        final ImageView mForecastImage;
 
-        TextView mTemperatureHigh;
+        final TextView mTemperatureHigh;
 
-        TextView mTemperatureLow;
+        final TextView mTemperatureLow;
 
-        TextView mForecastDate;
+        final TextView mForecastDate;
 
-        TextView mForecastCondition;
+        final TextView mForecastCondition;
 
-        Drawable mLowDrawable;
+        final Drawable mLowDrawable;
 
-        Drawable mHighDrawable;
+        final Drawable mHighDrawable;
 
         PaintJob mPaintJob;
 
@@ -424,11 +435,21 @@ public class WeatherActivity extends Activity {
             setTemperatureText(mTemperatureLow, info.tempLow, info.unit, mWeatherDisplayUnit);
             mForecastCondition.setText(WeatherUtils.formatConditionCode(info.conditionCode));
 
-            sTime.setJulianDay(info.julianDay);
-            String time = DateUtils.formatDateTime(
-                    context, sTime.toMillis(false), DateUtils.FORMAT_SHOW_WEEKDAY);
+            int today = TimeUtils.getJulianDay();
 
-            mForecastDate.setText(time);
+            if (info.julianDay == today) {
+                mForecastDate.setText(R.string.today);
+
+            } else if (info.julianDay == today + 1) {
+                mForecastDate.setText(R.string.tomorrow);
+
+            } else {
+                sTime.setJulianDay(info.julianDay);
+                String time = DateUtils.formatDateTime(
+                        context, sTime.toMillis(false), DateUtils.FORMAT_SHOW_WEEKDAY);
+
+                mForecastDate.setText(time);
+            }
         }
     }
 
@@ -471,9 +492,7 @@ public class WeatherActivity extends Activity {
             int N = forecastForDays.size();
             for (int i = 0; i < N; i++) {
                 WeatherUtils.ForecastInfo forecastInfo = forecastForDays.valueAt(i);
-                if (forecastInfo.julianDay != TimeUtils.getJulianDay()) {
-                    mForecasts.add(forecastInfo);
-                }
+                mForecasts.add(forecastInfo);
             }
             Collections.sort(mForecasts);
             notifyDataSetChanged();

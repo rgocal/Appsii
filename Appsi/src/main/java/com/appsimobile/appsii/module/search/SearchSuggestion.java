@@ -48,7 +48,7 @@ public class SearchSuggestion implements Parcelable {
 
     }
 
-    private SearchSuggestion(Parcel in) {
+    SearchSuggestion(Parcel in) {
         query = in.readString();
         id = in.readLong();
         lastUsed = in.readLong();

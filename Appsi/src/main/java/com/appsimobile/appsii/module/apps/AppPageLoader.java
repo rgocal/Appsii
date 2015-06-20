@@ -53,7 +53,7 @@ public class AppPageLoader extends AsyncTaskLoader<AppPageData> {
 
     private final Map<ComponentName, CharSequence> mLabelCache;
 
-    PackageManager mPackageManager;
+    final PackageManager mPackageManager;
 
     AppPageData mApps;
 

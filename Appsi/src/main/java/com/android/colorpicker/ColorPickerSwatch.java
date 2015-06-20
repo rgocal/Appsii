@@ -30,13 +30,13 @@ import com.appsimobile.appsii.R;
  */
 public class ColorPickerSwatch extends FrameLayout implements View.OnClickListener {
 
-    private int mColor;
+    private final int mColor;
 
-    private ImageView mSwatchImage;
+    private final ImageView mSwatchImage;
 
-    private ImageView mCheckmarkImage;
+    private final ImageView mCheckmarkImage;
 
-    private OnColorSelectedListener mOnColorSelectedListener;
+    private final OnColorSelectedListener mOnColorSelectedListener;
 
     public ColorPickerSwatch(Context context, int color, boolean checked,
             OnColorSelectedListener listener) {
@@ -81,6 +81,6 @@ public class ColorPickerSwatch extends FrameLayout implements View.OnClickListen
         /**
          * Called when a specific color square has been selected.
          */
-        public void onColorSelected(int color);
+        void onColorSelected(int color);
     }
 }

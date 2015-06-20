@@ -127,8 +127,7 @@ public class TimeZonePickerUtils {
                     symbolStart, symbolEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
 
-        CharSequence gmtDisplayName = spannableText;
-        return gmtDisplayName;
+        return spannableText;
     }
 
     /**

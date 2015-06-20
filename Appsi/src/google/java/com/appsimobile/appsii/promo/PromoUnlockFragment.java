@@ -19,14 +19,10 @@ package com.appsimobile.appsii.promo;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
-import android.content.AsyncQueryHandler;
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -40,6 +36,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.appsimobile.appsii.AnalyticsManager;
+import com.appsimobile.appsii.PageHelper;
 import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.iab.FeatureManager;
 import com.appsimobile.appsii.iab.FeatureManagerHelper;
@@ -56,7 +53,7 @@ public class PromoUnlockFragment extends DialogFragment implements View.OnClickL
 
     final AnalyticsManager mAnalyticsManager = AnalyticsManager.getInstance();
 
-    AsyncQueryHandlerImpl mAsyncQueryHandler;
+//    AsyncQueryHandlerImpl mAsyncQueryHandler;
 
     ProgressBar mProgressBar;
 
@@ -168,8 +165,6 @@ public class PromoUnlockFragment extends DialogFragment implements View.OnClickL
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAsyncQueryHandler =
-                new AsyncQueryHandlerImpl(getActivity(), getActivity().getContentResolver());
         mLicenseCheckerFragment =
                 (LicenseCheckerFragment) getFragmentManager().findFragmentByTag("checker");
 
@@ -422,74 +417,74 @@ public class PromoUnlockFragment extends DialogFragment implements View.OnClickL
         }
     }
 
-    static interface UnlockListener {
+    interface UnlockListener {
 
         void onAppsiPluginUnlocked();
     }
-
-    static class AsyncQueryHandlerImpl extends AsyncQueryHandler {
-
-        final Context mContext;
-
-        public AsyncQueryHandlerImpl(Context context, ContentResolver cr) {
-            super(cr);
-            mContext = context;
-        }
-
-        public void ensurePageEnabled(int pageType) {
-            startQuery(1, pageType,
-                    HomeContract.Pages.CONTENT_URI,
-                    new String[]{HomeContract.Pages._ID},
-                    HomeContract.Pages.TYPE + "=?",
-                    new String[]{String.valueOf(pageType)},
-                    null
-            );
-        }
-
-        @Override
-        protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-            int pageType = (int) cookie;
-            int count = cursor.getCount();
-            cursor.close();
-            if (count == 0) {
-                enablePage(pageType);
-            }
-        }
-
-        public void enablePage(int pageType) {
-            ContentValues values = new ContentValues();
-            String displayName = getTitleForPageType(pageType);
-
-            values.put(HomeContract.Pages.TYPE, pageType);
-            values.put(HomeContract.Pages.DISPLAY_NAME, displayName);
-
-            startInsert(0, null, HomeContract.Pages.CONTENT_URI, values);
-        }
-
-        private String getTitleForPageType(int pageType) {
-            int resId;
-            switch (pageType) {
-                case HomeContract.Pages.PAGE_SETTINGS:
-                    resId = R.string.settings_page_name;
-                    break;
-                case HomeContract.Pages.PAGE_SMS:
-                    resId = R.string.sms_page_name;
-                    break;
-                case HomeContract.Pages.PAGE_AGENDA:
-                    resId = R.string.agenda_page_name;
-                    break;
-                case HomeContract.Pages.PAGE_CALLS:
-                    resId = R.string.calls_page_name;
-                    break;
-                case HomeContract.Pages.PAGE_PEOPLE:
-                    resId = R.string.people_page_name;
-                    break;
-                default:
-                    return null;
-            }
-            return mContext.getString(resId);
-        }
-    }
+//
+//    static class AsyncQueryHandlerImpl extends AsyncQueryHandler {
+//
+//        final Context mContext;
+//
+//        public AsyncQueryHandlerImpl(Context context, ContentResolver cr) {
+//            super(cr);
+//            mContext = context;
+//        }
+//
+//        public void ensurePageEnabled(int pageType) {
+//            startQuery(1, pageType,
+//                    HomeContract.Pages.CONTENT_URI,
+//                    new String[]{HomeContract.Pages._ID},
+//                    HomeContract.Pages.TYPE + "=?",
+//                    new String[]{String.valueOf(pageType)},
+//                    null
+//            );
+//        }
+//
+//        @Override
+//        protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+//            int pageType = (int) cookie;
+//            int count = cursor.getCount();
+//            cursor.close();
+//            if (count == 0) {
+//                enablePage(pageType);
+//            }
+//        }
+//
+//        public void enablePage(int pageType) {
+//            ContentValues values = new ContentValues();
+//            String displayName = getTitleForPageType(pageType);
+//
+//            values.put(HomeContract.Pages.TYPE, pageType);
+//            values.put(HomeContract.Pages.DISPLAY_NAME, displayName);
+//
+//            startInsert(0, null, HomeContract.Pages.CONTENT_URI, values);
+//        }
+//
+//        private String getTitleForPageType(int pageType) {
+//            int resId;
+//            switch (pageType) {
+//                case HomeContract.Pages.PAGE_SETTINGS:
+//                    resId = R.string.settings_page_name;
+//                    break;
+//                case HomeContract.Pages.PAGE_SMS:
+//                    resId = R.string.sms_page_name;
+//                    break;
+//                case HomeContract.Pages.PAGE_AGENDA:
+//                    resId = R.string.agenda_page_name;
+//                    break;
+//                case HomeContract.Pages.PAGE_CALLS:
+//                    resId = R.string.calls_page_name;
+//                    break;
+//                case HomeContract.Pages.PAGE_PEOPLE:
+//                    resId = R.string.people_page_name;
+//                    break;
+//                default:
+//                    return null;
+//            }
+//            return mContext.getString(resId);
+//        }
+//    }
 
     public static class LicenseCheckerFragment extends Fragment {
 
@@ -558,7 +553,10 @@ public class PromoUnlockFragment extends DialogFragment implements View.OnClickL
         @Override
         protected void onCheckComplete(String packageName) {
             if (FeatureManagerHelper.legacyAgendaUnlocked(mContext)) {
-                mAsyncQueryHandler.ensurePageEnabled(HomeContract.Pages.PAGE_AGENDA);
+                PageHelper pageHelper = PageHelper.getInstance(getActivity());
+                pageHelper.enablePageAccess(
+                        HomeContract.Pages.PAGE_AGENDA, false /* do not force add */);
+
                 markAgendaUnlocked();
                 Toast.makeText(mContext, R.string.unlock_success, Toast.LENGTH_SHORT).show();
                 mAnalyticsManager.trackAppsiEvent(AnalyticsManager.ACTION_APPSI_UNLOCK,
@@ -590,8 +588,10 @@ public class PromoUnlockFragment extends DialogFragment implements View.OnClickL
         @Override
         protected void onCheckComplete(String packageName) {
             if (FeatureManagerHelper.legacyPowerPackUnlocked(mContext)) {
-                mAsyncQueryHandler.ensurePageEnabled(HomeContract.Pages.PAGE_AGENDA);
-                mAsyncQueryHandler.ensurePageEnabled(HomeContract.Pages.PAGE_SETTINGS);
+                PageHelper pageHelper = PageHelper.getInstance(getActivity());
+
+                pageHelper.enablePageAccess(HomeContract.Pages.PAGE_AGENDA, false /* force */);
+                pageHelper.enablePageAccess(HomeContract.Pages.PAGE_SETTINGS, false /* force */);
                 markPowerPackUnlocked();
                 Toast.makeText(mContext, R.string.unlock_success, Toast.LENGTH_SHORT).show();
                 mAnalyticsManager.trackAppsiEvent(AnalyticsManager.ACTION_APPSI_UNLOCK,
@@ -624,7 +624,8 @@ public class PromoUnlockFragment extends DialogFragment implements View.OnClickL
         @Override
         protected void onCheckComplete(String packageName) {
             if (FeatureManagerHelper.legacySettingsUnlocked(mContext)) {
-                mAsyncQueryHandler.ensurePageEnabled(HomeContract.Pages.PAGE_SETTINGS);
+                PageHelper pageHelper = PageHelper.getInstance(getActivity());
+                pageHelper.enablePageAccess(HomeContract.Pages.PAGE_SETTINGS, false /* force */);
                 markSettingsUnlocked();
                 Toast.makeText(mContext, R.string.unlock_success, Toast.LENGTH_SHORT).show();
                 mAnalyticsManager.trackAppsiEvent(AnalyticsManager.ACTION_APPSI_UNLOCK,
@@ -657,7 +658,8 @@ public class PromoUnlockFragment extends DialogFragment implements View.OnClickL
         @Override
         protected void onCheckComplete(String packageName) {
             if (FeatureManagerHelper.legacyPeopleUnlocked(mContext)) {
-                mAsyncQueryHandler.ensurePageEnabled(HomeContract.Pages.PAGE_PEOPLE);
+                PageHelper pageHelper = PageHelper.getInstance(getActivity());
+                pageHelper.enablePageAccess(HomeContract.Pages.PAGE_PEOPLE, false /* force */);
                 markContactsUnlocked();
                 Toast.makeText(mContext, R.string.unlock_success, Toast.LENGTH_SHORT).show();
                 mAnalyticsManager.trackAppsiEvent(AnalyticsManager.ACTION_APPSI_UNLOCK,
@@ -687,7 +689,8 @@ public class PromoUnlockFragment extends DialogFragment implements View.OnClickL
         @Override
         protected void onCheckComplete(String packageName) {
             if (FeatureManagerHelper.legacyCallsUnlocked(mContext)) {
-                mAsyncQueryHandler.ensurePageEnabled(HomeContract.Pages.PAGE_CALLS);
+                PageHelper pageHelper = PageHelper.getInstance(getActivity());
+                pageHelper.enablePageAccess(HomeContract.Pages.PAGE_CALLS, false /* force */);
                 markCallsUnlocked();
                 Toast.makeText(mContext, R.string.unlock_success, Toast.LENGTH_SHORT).show();
                 mAnalyticsManager.trackAppsiEvent(AnalyticsManager.ACTION_APPSI_UNLOCK,
@@ -718,7 +721,9 @@ public class PromoUnlockFragment extends DialogFragment implements View.OnClickL
         @Override
         protected void onCheckComplete(String packageName) {
             if (FeatureManagerHelper.legacySmsUnlocked(mContext)) {
-                mAsyncQueryHandler.ensurePageEnabled(HomeContract.Pages.PAGE_SMS);
+                PageHelper pageHelper = PageHelper.getInstance(getActivity());
+
+                pageHelper.enablePageAccess(HomeContract.Pages.PAGE_SMS, false /* force */);
                 markSmsUnlocked();
                 Toast.makeText(mContext, R.string.unlock_success, Toast.LENGTH_SHORT).show();
                 mAnalyticsManager.trackAppsiEvent(AnalyticsManager.ACTION_APPSI_UNLOCK,

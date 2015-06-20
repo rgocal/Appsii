@@ -476,6 +476,7 @@
     <string name="close">Close</string>
     <string name="error_loading_widget">Error loading widget</string>
     <string name="cant_access_location">Could not determine your location. Location is used to get local weather information. Enable location services?</string>
+    <string name="location_permission_denied">Appsii does not have permission to access your location. Would you like to grant Appsii access to your location?</string>
     <string name="configure">Enable location access</string>
     <string name="nope">Nope</string>
     <string name="shell_command">Shell command</string>
@@ -504,4 +505,13 @@
     <string name="add_homepage">Add Homepage</string>
     <string name="use_location_image_as_backgroud">Use location image as background</string>
 
+    <string name="location_name">Your location: <xliff:g example="Amsterdam" id="item">%1$s</xliff:g></string>
+    <string name="grant_access">Grant access</string>
+    <string name="dont_ask_again">Don\'t ask again</string>
+    <string name="permission_reason_calendar">Appsii can\'t load the events in your calendar because the permission has not been granted. To see your events in Appsii, press the grant access button.</string>
+    <string name="permission_reason_contacts">Appsii can\'t load the people from your contact list because the permission has not been granted. To see your contacts in Appsii, press the grant access button.</string>
+    <string name="permission_reason_contacts_profile_image">Appsii can\'t load the profile image of the selected contact because the permission has not been granted. To see the profile image, press the grant access button.</string>
+    <string name="permission_reason_location_weather">Appsii can\'t access your location because the permission has not been granted. To load local weather, press the grant access button.</string>
+    <string name="permission_reason_calls">Appsii can\'t access your call log because the permission has not been granted. To show your recent calls, press the grant access button.</string>
+    <string name="next">Next</string>
 </resources>

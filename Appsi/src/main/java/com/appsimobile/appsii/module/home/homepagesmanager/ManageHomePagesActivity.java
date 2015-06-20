@@ -101,6 +101,10 @@ public class ManageHomePagesActivity extends AppCompatActivity
         mHomePagesRecycler.setLayoutManager(new LinearLayoutManager(this));
     }
 
+    public void onAddClicked() {
+        mAsyncQueryHandler.addEmptyHomePage();
+    }
+
     @Override
     public Loader<List<HomePageItem>> onCreateLoader(int id, Bundle args) {
         return new HomesLoader(this);
@@ -137,10 +141,6 @@ public class ManageHomePagesActivity extends AppCompatActivity
         startActivity(intent);
     }
 
-    public void onAddClicked() {
-        mAsyncQueryHandler.addEmptyHomePage();
-    }
-
     @Override
     public void onFinishEditDialog(long pageId, String title) {
         mAsyncQueryHandler.updatePageTitle(pageId, title);
@@ -162,7 +162,7 @@ public class ManageHomePagesActivity extends AppCompatActivity
          */
         final HomeViewHolder.HomeViewActionListener mActionListener;
 
-        SharedPreferences mPreferences;
+        final SharedPreferences mPreferences;
 
         boolean mGotItDismissed;
 

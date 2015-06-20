@@ -35,7 +35,7 @@ import java.util.Map;
  */
 public class TestOpsBuilder implements HomeAdapter.OpsBuilder {
 
-    List<OperationWrapper> mOperationWrappers = new ArrayList<>();
+    final List<OperationWrapper> mOperationWrappers = new ArrayList<>();
 
     void reset() {
         mOperationWrappers.clear();
@@ -74,11 +74,11 @@ public class TestOpsBuilder implements HomeAdapter.OpsBuilder {
 
         final int mType;
 
-        ContentProviderOperation.Builder mBuilder;
+        final ContentProviderOperation.Builder mBuilder;
 
-        ContentValues mContentValues = new ContentValues();
+        final ContentValues mContentValues = new ContentValues();
 
-        Map<String, Integer> mBackReferences = new HashMap<>();
+        final Map<String, Integer> mBackReferences = new HashMap<>();
 
         public OperationWrapper(ContentProviderOperation.Builder builder, int type, Uri uri) {
             mBuilder = builder;

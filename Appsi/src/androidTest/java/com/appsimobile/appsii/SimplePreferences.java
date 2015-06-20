@@ -38,7 +38,7 @@ public class SimplePreferences implements Preferences, SharedPreferences {
 
     final Handler mHandler = new Handler(Looper.getMainLooper());
 
-    List<OnSharedPreferenceChangeListener> mListeners = new LinkedList<>();
+    final List<OnSharedPreferenceChangeListener> mListeners = new LinkedList<>();
 
     @GuardedBy("this")
     SimplePreferenceState mState = new SimplePreferenceState();
@@ -129,9 +129,9 @@ public class SimplePreferences implements Preferences, SharedPreferences {
 
     private class SimpleEditor implements Editor {
 
-        SimplePreferenceState mState;
+        final SimplePreferenceState mState;
 
-        List<String> mChangedKeys = new LinkedList<>();
+        final List<String> mChangedKeys = new LinkedList<>();
 
 
         public SimpleEditor(

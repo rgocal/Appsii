@@ -53,7 +53,7 @@ public class AboutActivity extends AppCompatActivity {
             extends PreferenceFragmentImpl
             implements Preference.OnPreferenceClickListener {
 
-        AnalyticsManager mAnalyticsManager = AnalyticsManager.getInstance();
+        final AnalyticsManager mAnalyticsManager = AnalyticsManager.getInstance();
 
         public static AboutPreferenceFragment createInstance(
                 @XmlRes int preferenceResId) {
@@ -90,7 +90,7 @@ public class AboutActivity extends AppCompatActivity {
         }
 
         private void setPreferenceUri(String key, final String url,
-                final String trackinAction) {
+                final String trackingAction) {
             Preference gpPref = findPreference(key);
             gpPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
@@ -98,7 +98,7 @@ public class AboutActivity extends AppCompatActivity {
                     Uri uri = Uri.parse(url);
                     Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                     startActivity(intent);
-                    track(trackinAction, AnalyticsManager.CATEGORY_ABOUT);
+                    track(trackingAction, AnalyticsManager.CATEGORY_ABOUT);
                     return true;
                 }
             });

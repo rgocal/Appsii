@@ -205,6 +205,9 @@
             android:theme="@style/Appsi.Sidebar.Material.Teal.NoActionBarTranslucentNavigation">
         </activity>
 
+        <activity
+            android:name=".RequestPermissionActivity"
+            />
 
         <!-- main screen | Choose plugins -->
 

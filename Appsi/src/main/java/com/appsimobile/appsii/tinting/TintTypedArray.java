@@ -16,6 +16,7 @@
 
 package com.appsimobile.appsii.tinting;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -49,12 +50,14 @@ public class TintTypedArray {
 
     public static TintTypedArray obtainStyledAttributes(Context context, AttributeSet set,
             int[] attrs) {
+        @SuppressLint("Recycle")
         TypedArray array = context.obtainStyledAttributes(set, attrs);
         return new TintTypedArray(context, array);
     }
 
     public static TintTypedArray obtainStyledAttributes(Context context, AttributeSet set,
             int[] attrs, int defStyleAttr, int defStyleRes) {
+        @SuppressLint("Recycle")
         TypedArray array = context.obtainStyledAttributes(set, attrs, defStyleAttr, defStyleRes);
         return new TintTypedArray(context, array);
     }

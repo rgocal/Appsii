@@ -30,7 +30,6 @@ import android.graphics.RadialGradient;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.Shader.TileMode;
-import android.util.FloatMath;
 import android.util.Log;
 
 import org.xml.sax.Attributes;
@@ -105,7 +104,7 @@ public class SVGParser {
      *
      * @param s the path string from the XML
      */
-    private static Path doPath(String s) {
+    static Path doPath(String s) {
         int n = s.length();
         ParserHelper ph = new ParserHelper(s, 0);
         ph.skipWhitespace();
@@ -321,40 +320,40 @@ public class SVGParser {
         ry = Math.abs(ry);
 
         final float thrad = theta * (float) Math.PI / 180;
-        final float st = FloatMath.sin(thrad);
-        final float ct = FloatMath.cos(thrad);
+        final double st = Math.sin(thrad);
+        final double ct = Math.cos(thrad);
 
         final float xc = (lastX - x) / 2;
         final float yc = (lastY - y) / 2;
-        final float x1t = ct * xc + st * yc;
-        final float y1t = -st * xc + ct * yc;
+        final double x1t = ct * xc + st * yc;
+        final double y1t = -st * xc + ct * yc;
 
-        final float x1ts = x1t * x1t;
-        final float y1ts = y1t * y1t;
+        final double x1ts = x1t * x1t;
+        final double y1ts = y1t * y1t;
         float rxs = rx * rx;
         float rys = ry * ry;
 
-        float lambda = (x1ts / rxs + y1ts / rys) *
+        double lambda = (x1ts / rxs + y1ts / rys) *
                 1.001f; // add 0.1% to be sure that no out of range occurs due to
         // limited precision
         if (lambda > 1) {
-            float lambdasr = FloatMath.sqrt(lambda);
+            double lambdasr = Math.sqrt(lambda);
             rx *= lambdasr;
             ry *= lambdasr;
             rxs = rx * rx;
             rys = ry * ry;
         }
 
-        final float R =
-                FloatMath.sqrt((rxs * rys - rxs * y1ts - rys * x1ts) / (rxs * y1ts + rys * x1ts))
+        final double R =
+                Math.sqrt((rxs * rys - rxs * y1ts - rys * x1ts) / (rxs * y1ts + rys * x1ts))
                         * ((largeArc == sweepArc) ? -1 : 1);
-        final float cxt = R * rx * y1t / ry;
-        final float cyt = -R * ry * x1t / rx;
-        final float cx = ct * cxt - st * cyt + (lastX + x) / 2;
-        final float cy = st * cxt + ct * cyt + (lastY + y) / 2;
+        final double cxt = R * rx * y1t / ry;
+        final double cyt = -R * ry * x1t / rx;
+        final double cx = ct * cxt - st * cyt + (lastX + x) / 2;
+        final double cy = st * cxt + ct * cyt + (lastY + y) / 2;
 
-        final float th1 = angle(1, 0, (x1t - cxt) / rx, (y1t - cyt) / ry);
-        float dth = angle((x1t - cxt) / rx, (y1t - cyt) / ry, (-x1t - cxt) / rx, (-y1t - cyt) / ry);
+        final double th1 = angle(1, 0, (x1t - cxt) / rx, (y1t - cyt) / ry);
+        double dth = angle((x1t - cxt) / rx, (y1t - cyt) / ry, (-x1t - cxt) / rx, (-y1t - cyt) / ry);
 
         if (sweepArc == 0 && dth > 0) {
             dth -= 360;
@@ -365,26 +364,26 @@ public class SVGParser {
         // draw
         if ((theta % 360) == 0) {
             // no rotate and translate need
-            arcRectf.set(cx - rx, cy - ry, cx + rx, cy + ry);
-            p.arcTo(arcRectf, th1, dth);
+            arcRectf.set((float) (cx - rx), (float) (cy - ry), (float) (cx + rx), (float) (cy + ry));
+            p.arcTo(arcRectf, (float) th1, (float) dth);
         } else {
             // this is the hard and slow part :-)
             arcRectf.set(-rx, -ry, rx, ry);
 
             arcMatrix.reset();
             arcMatrix.postRotate(theta);
-            arcMatrix.postTranslate(cx, cy);
+            arcMatrix.postTranslate((float) cx, (float) cy);
             arcMatrix.invert(arcMatrix2);
 
             p.transform(arcMatrix2);
-            p.arcTo(arcRectf, th1, dth);
+            p.arcTo(arcRectf, (float) th1, (float) dth);
             p.transform(arcMatrix);
         }
     }
 
-    private static float angle(float x1, float y1, float x2, float y2) {
+    private static double angle(double x1, double y1, double x2, double y2) {
 
-        return (float) Math.toDegrees(Math.atan2(x1, y1) - Math.atan2(x2, y2)) % 360;
+        return Math.toDegrees(Math.atan2(x1, y1) - Math.atan2(x2, y2)) % 360;
     }
 
     static SVG parse(InputSource data, SVGHandler handler) throws SVGParseException {
@@ -422,7 +421,7 @@ public class SVGParser {
      * Parse a list of transforms such as: foo(n,n,n...) bar(n,n,n..._ ...) Delimiters are
      * whitespaces or commas
      */
-    private static Matrix parseTransform(String s) {
+    static Matrix parseTransform(String s) {
         Matrix matrix = new Matrix();
         while (true) {
             parseTransformItem(s, matrix);
@@ -598,7 +597,7 @@ public class SVGParser {
         return new NumberParse(numbers, p);
     }
 
-    private static NumberParse getNumberParseAttr(String name, Attributes attributes) {
+    static NumberParse getNumberParseAttr(String name, Attributes attributes) {
         int n = attributes.getLength();
         for (int i = 0; i < n; i++) {
             if (attributes.getLocalName(i).equals(name)) {
@@ -608,7 +607,7 @@ public class SVGParser {
         return null;
     }
 
-    private static Float getFloatAttr(String name, Attributes attributes) {
+    static Float getFloatAttr(String name, Attributes attributes) {
         return getFloatAttr(name, attributes, null);
     }
 
@@ -617,7 +616,7 @@ public class SVGParser {
         return parseFloatValue(v, defaultValue);
     }
 
-    private static String getStringAttr(String name, Attributes attributes) {
+    static String getStringAttr(String name, Attributes attributes) {
         int n = attributes.getLength();
         for (int i = 0; i < n; i++) {
             if (attributes.getLocalName(i).equals(name)) {
@@ -627,7 +626,7 @@ public class SVGParser {
         return null;
     }
 
-    private static Float parseFloatValue(String str, Float defaultValue) {
+    static Float parseFloatValue(String str, Float defaultValue) {
         if (str == null) {
             return defaultValue;
         } else if (str.endsWith("px")) {
@@ -640,16 +639,16 @@ public class SVGParser {
         return Float.parseFloat(str);
     }
 
-    private static float getFloatAttr(String name, Attributes attributes, float defaultValue) {
+    static float getFloatAttr(String name, Attributes attributes, float defaultValue) {
         String v = getStringAttr(name, attributes);
         return parseFloatValue(v, defaultValue);
     }
 
     private static class NumberParse {
 
-        private ArrayList<Float> numbers;
+        final ArrayList<Float> numbers;
 
-        private int nextCmd;
+        private final int nextCmd;
 
         public NumberParse(ArrayList<Float> numbers, int nextCmd) {
             this.numbers = numbers;
@@ -689,6 +688,9 @@ public class SVGParser {
         ArrayList<Integer> colors = new ArrayList<Integer>();
 
         Matrix matrix = null;
+
+        Gradient() {
+        }
 
         /*
                 public Gradient createChild(Gradient g) {
@@ -738,9 +740,9 @@ public class SVGParser {
 
     private static class StyleSet {
 
-        HashMap<String, String> styleMap = new HashMap<String, String>();
+        final HashMap<String, String> styleMap = new HashMap<String, String>();
 
-        private StyleSet(String string) {
+        StyleSet(String string) {
             String[] styles = string.split(";");
             for (String s : styles) {
                 String[] style = s.split(":");
@@ -759,9 +761,9 @@ public class SVGParser {
 
         StyleSet styles = null;
 
-        Attributes atts;
+        final Attributes atts;
 
-        private Properties(Attributes atts) {
+        Properties(Attributes atts) {
             this.atts = atts;
             String styleAttr = getStringAttr("style", atts);
             if (styleAttr != null) {
@@ -785,17 +787,16 @@ public class SVGParser {
         }
 
         public Integer getColor(String name) {
-            String v = name;
-            if (v == null) {
+            if (name == null) {
                 return null;
-            } else if (v.startsWith("#")) {
+            } else if (name.startsWith("#")) {
                 try { // #RRGGBB or #AARRGGBB
-                    return Color.parseColor(v);
+                    return Color.parseColor(name);
                 } catch (IllegalArgumentException iae) {
                     return null;
                 }
-            } else if (v.startsWith("rgb(") && v.endsWith(")")) {
-                String values[] = v.substring(4, v.length() - 1).split(",");
+            } else if (name.startsWith("rgb(") && name.endsWith(")")) {
+                String values[] = name.substring(4, name.length() - 1).split(",");
                 try {
                     return rgb(parseNum(values[0]), parseNum(values[1]), parseNum(values[2]));
                 } catch (NumberFormatException nfe) {
@@ -804,7 +805,31 @@ public class SVGParser {
                     return null;
                 }
             } else {
-                return SVGColors.mapColour(v);
+                return SVGColors.mapColour(name);
+            }
+        }
+        public boolean hasColor(String name) {
+            if (name == null) {
+                return false;
+            } else if (name.startsWith("#")) {
+                try { // #RRGGBB or #AARRGGBB
+                    Color.parseColor(name);
+                    return true;
+                } catch (IllegalArgumentException iae) {
+                    return false;
+                }
+            } else if (name.startsWith("rgb(") && name.endsWith(")")) {
+                String values[] = name.substring(4, name.length() - 1).split(",");
+                try {
+                    rgb(parseNum(values[0]), parseNum(values[1]), parseNum(values[2]));
+                    return true;
+                } catch (NumberFormatException nfe) {
+                    return false;
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    return false;
+                }
+            } else {
+                return true;
             }
         }
 
@@ -904,7 +929,7 @@ public class SVGParser {
 
         boolean fillSet = false;
 
-        Paint textPaint;
+        final Paint textPaint;
 
         boolean drawCharacters;
 
@@ -1042,8 +1067,8 @@ public class SVGParser {
                             x2 += x1;
                             y2 += y1;
 
-                            float width = FloatMath.ceil(x2 - x1);
-                            float height = FloatMath.ceil(y2 - y1);
+                            float width = (float) Math.ceil(x2 - x1);
+                            float height = (float) Math.ceil(y2 - y1);
                             canvas = picture.beginRecording((int) width, (int) height);
                             canvasRestoreCount = canvas.save();
                             canvas.clipRect(0f, 0f, width, height);
@@ -1055,8 +1080,8 @@ public class SVGParser {
                 }
                 // No viewbox
                 if (canvas == null) {
-                    int width = (int) FloatMath.ceil(getFloatAttr("width", atts));
-                    int height = (int) FloatMath.ceil(getFloatAttr("height", atts));
+                    int width = (int) Math.ceil(getFloatAttr("width", atts));
+                    int height = (int) Math.ceil(getFloatAttr("height", atts));
                     canvas = picture.beginRecording(width, height);
                     canvasRestoreCount = null;
                 }
@@ -1072,14 +1097,14 @@ public class SVGParser {
                     final Properties props = new Properties(atts);
 
                     final int colour;
-                    final Integer stopColour = props.getColor(props.getAttr("stop-color"));
-                    if (stopColour == null) {
+                    if (!props.hasColor("stop-color")) {
                         colour = 0;
                     } else {
+                        final int stopColour = props.getColor(props.getAttr("stop-color"));
                         float alpha = props.getFloat("stop-opacity", 1) *
                                 currentLayerAttributes().opacity;
                         int alphaInt = Math.round(255 * alpha);
-                        colour = stopColour.intValue() | (alphaInt << 24);
+                        colour = stopColour | (alphaInt << 24);
                     }
                     gradient.colors.add(colour);
 

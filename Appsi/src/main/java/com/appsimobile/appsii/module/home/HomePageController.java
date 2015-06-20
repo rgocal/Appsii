@@ -27,6 +27,7 @@ import android.content.res.Resources;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -49,17 +50,21 @@ import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.SidebarContext;
 import com.appsimobile.appsii.appwidget.AppsiiAppWidgetHost;
 import com.appsimobile.appsii.appwidget.AppsiiAppWidgetHost.AppsiAppWidgetHostView;
+import com.appsimobile.appsii.module.PermissionHelper;
 import com.appsimobile.appsii.module.ToolbarScrollListener;
 import com.appsimobile.appsii.module.home.config.HomeItemConfiguration;
 import com.appsimobile.appsii.module.home.config.HomeItemConfigurationHelper;
+import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.crashlytics.android.Crashlytics;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by nick on 10/08/14.
  */
-public class HomePageController extends PageController implements Toolbar.OnMenuItemClickListener {
+public class HomePageController extends PageController implements Toolbar.OnMenuItemClickListener,
+        HomeAdapter.PermissionErrorListener, PermissionHelper.PermissionListener {
 
     // TODO implement start/stop on primary item switch
 
@@ -70,7 +75,7 @@ public class HomePageController extends PageController implements Toolbar.OnMenu
 
     final long mPageId;
 
-    SidebarContext mContext;
+    final SidebarContext mContext;
 
     RecyclerView mRecyclerView;
 
@@ -88,6 +93,12 @@ public class HomePageController extends PageController implements Toolbar.OnMenu
     RecyclerViewTouchListener mRecyclerViewTouchListener;
 
     private Rect mRect;
+
+    ViewGroup mPermissionOverlay;
+
+    ArrayList<String> mDismissedPermissions;
+
+    PendingPermissionError mPendingPermissionError;
 
     public HomePageController(Context context, long pageId, String title) {
         super(context, title);
@@ -115,6 +126,7 @@ public class HomePageController extends PageController implements Toolbar.OnMenu
         mRecyclerView.setAdapter(mHomeAdapter);
         mRecyclerView.addItemDecoration(new GridLayoutDecoration(getContext()));
 
+        mPermissionOverlay = (ViewGroup) view.findViewById(R.id.permission_overlay);
 
         mRecyclerViewTouchListener = new RecyclerViewTouchListener();
         mRecyclerView.addOnItemTouchListener(mRecyclerViewTouchListener);
@@ -123,6 +135,9 @@ public class HomePageController extends PageController implements Toolbar.OnMenu
         MenuInflater menuInflater = new MenuInflater(getContext());
         menuInflater.inflate(R.menu.page_home, mToolbar.getMenu());
         mToolbar.setOnMenuItemClickListener(this);
+        if (mPendingPermissionError != null) {
+            showPendingPermissionError(mPendingPermissionError);
+        }
     }
 
     @Override
@@ -152,15 +167,21 @@ public class HomePageController extends PageController implements Toolbar.OnMenu
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mHomeAdapter = new HomeAdapter(getContext(), mPageId);
+        mHomeAdapter.setPermissionErrorListener(this);
         mLayoutManager = new GridLayoutManager(getContext(), 12);
         HomeAdapter.HomeSpanSizeLookup spanSizeLookup = mHomeAdapter.getHomeSpanSizeLookup();
         mLayoutManager.setSpanSizeLookup(spanSizeLookup);
         getLoaderManager().initLoader(HOME_LOADER_ID, null, mHomeLoaderCallbacks);
+        if (savedInstanceState != null) {
+            mDismissedPermissions =
+                    savedInstanceState.getStringArrayList("dismissed_permission_errors");
+        }
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putStringArrayList("dismissed_permission_errors", mDismissedPermissions);
     }
 
     @Override
@@ -351,6 +372,10 @@ public class HomePageController extends PageController implements Toolbar.OnMenu
     }
 
     void onHomeItemsLoaded(List<HomeItem> data) {
+        // clear any permission errors that might be pending
+        if (mPermissionOverlay != null) {
+            mPermissionOverlay.removeAllViews();
+        }
         if (mHomeAdapter == null) {
             Crashlytics.logException(new NullPointerException("adapter not initialized?!?"));
             return;
@@ -430,6 +455,47 @@ public class HomePageController extends PageController implements Toolbar.OnMenu
         }
 
         return resources.getResourceEntryName(view.getId());
+    }
+
+    @Override
+    public void onPermissionDenied(String permission, String id, @StringRes int textResId) {
+        if (PermissionUtils.shouldShowPermissionError(mContext, id)) {
+            if (mPermissionOverlay == null) {
+                if (mPendingPermissionError == null) {
+                    mPendingPermissionError = new PendingPermissionError(permission, id, textResId);
+                }
+            } else {
+                showPermissionError(permission, id, textResId);
+            }
+        }
+    }
+
+    private void showPendingPermissionError(PendingPermissionError pendingPermissionError) {
+        showPermissionError(pendingPermissionError.mPermission,
+                pendingPermissionError.mId, pendingPermissionError.mTextResId);
+    }
+
+    private void showPermissionError(String permission, String id, @StringRes int textResId) {
+        PermissionHelper permissionHelper =
+                new PermissionHelper(textResId, true, this, permission);
+        mPermissionOverlay.setTag(id);
+        permissionHelper.show(mPermissionOverlay);
+    }
+
+    @Override
+    public void onAccepted(PermissionHelper permissionHelper) {
+        Intent intent = PermissionUtils.
+                buildRequestPermissionsIntent(mContext, 1, permissionHelper.getPermissions());
+        mContext.startActivity(intent);
+    }
+
+    @Override
+    public void onCancelled(PermissionHelper permissionHelper, boolean dontShowAgain) {
+        if (dontShowAgain) {
+            String id = (String) mPermissionOverlay.getTag();
+            PermissionUtils.setDontShowPermissionAgain(mContext, id);
+        }
+
     }
 
     class HomeLoaderCallbacks implements LoaderManager.LoaderCallbacks<List<HomeItem>> {
@@ -578,6 +644,22 @@ public class HomePageController extends PageController implements Toolbar.OnMenu
             copy.setLocation(x, y);
             mEventQueue.dispatchTouchEvent(copy);
 
+        }
+    }
+
+    static class PendingPermissionError {
+
+        final String mPermission;
+
+        final String mId;
+
+        @StringRes
+        final int mTextResId;
+
+        PendingPermissionError(String permission, String id, int textResId) {
+            mPermission = permission;
+            mId = id;
+            mTextResId = textResId;
         }
     }
 

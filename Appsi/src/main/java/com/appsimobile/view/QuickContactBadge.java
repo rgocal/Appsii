@@ -63,27 +63,27 @@ public class QuickContactBadge extends ImageView implements OnClickListener {
 
     static final int PHONE_LOOKUP_STRING_COLUMN_INDEX = 1;
 
-    static final private int TOKEN_EMAIL_LOOKUP = 0;
+    static final int TOKEN_EMAIL_LOOKUP = 0;
 
-    static final private int TOKEN_PHONE_LOOKUP = 1;
+    static final int TOKEN_PHONE_LOOKUP = 1;
 
-    static final private int TOKEN_EMAIL_LOOKUP_AND_TRIGGER = 2;
+    static final int TOKEN_EMAIL_LOOKUP_AND_TRIGGER = 2;
 
-    static final private int TOKEN_PHONE_LOOKUP_AND_TRIGGER = 3;
+    static final int TOKEN_PHONE_LOOKUP_AND_TRIGGER = 3;
 
-    static final private String EXTRA_URI_CONTENT = "uri_content";
+    static final String EXTRA_URI_CONTENT = "uri_content";
 
     private final Context mContext;
 
     protected String[] mExcludeMimes = null;
 
-    private Uri mContactUri;
+    Uri mContactUri;
 
     private String mContactEmail;
 
     private String mContactPhone;
 
-    private boolean mForceSquareDimensions;
+    private final boolean mForceSquareDimensions;
 
     private QueryHandler mQueryHandler;
 
@@ -152,7 +152,7 @@ public class QuickContactBadge extends ImageView implements OnClickListener {
         onContactUriChanged();
     }
 
-    private void onContactUriChanged() {
+    void onContactUriChanged() {
         setEnabled(isAssigned());
     }
 

@@ -16,16 +16,14 @@
 
 package com.appsimobile.appsii.module.people;
 
+import android.Manifest;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.ContactsContract;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -36,22 +34,23 @@ import android.view.ViewGroup;
 import com.appsimobile.appsii.AnalyticsManager;
 import com.appsimobile.appsii.LoaderManager;
 import com.appsimobile.appsii.PageController;
+import com.appsimobile.appsii.PermissionDeniedException;
 import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.module.AppsiPreferences;
 import com.appsimobile.appsii.module.BaseContactInfo;
 import com.appsimobile.appsii.module.PeopleCache;
-import com.appsimobile.appsii.module.PeopleQuery;
+import com.appsimobile.appsii.module.PermissionHelper;
 import com.appsimobile.appsii.module.ToolbarScrollListener;
+import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.google.android.gms.common.annotation.KeepName;
-
-import java.util.List;
 
 /**
  * Created by nick on 25/05/14.
  */
 public class PeopleController extends PageController
-        implements LoaderManager.LoaderCallbacks<Cursor>,
-        PeopleViewHolder.OnItemClickListener, ContactView.PeopleActionListener {
+        implements LoaderManager.LoaderCallbacks<PeopleLoaderResult>,
+        PeopleViewHolder.OnItemClickListener, ContactView.PeopleActionListener,
+        PermissionHelper.PermissionListener {
 
     private static final int PEOPLE_LOADER = 7001;
 
@@ -67,9 +66,13 @@ public class PeopleController extends PageController
 
     private LetterItemDecoration mLetterItemDecoration;
 
+    boolean mPendingPermissionError;
+
     public PeopleController(Context context, String title) {
         super(context, title);
     }
+
+    ViewGroup mPermissionOverlay;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -91,6 +94,7 @@ public class PeopleController extends PageController
         mPeopleGrid = (RecyclerView) view.findViewById(R.id.contacts_recycler);
         mToolbar = (Toolbar) view.findViewById(R.id.toolbar);
         mToolbar.setTitle(mTitle);
+        mPermissionOverlay = (ViewGroup) view.findViewById(R.id.permission_overlay);
         setToolbarBackgroundAlpha(0);
 
         // TODO: define these in integers.xml
@@ -105,6 +109,10 @@ public class PeopleController extends PageController
         mPeopleGrid.addOnScrollListener(new ToolbarScrollListener(this, mToolbar));
 
         mPeopleGrid.setAdapter(mPeopleAdapter);
+
+        if (mPendingPermissionError) {
+            showPermissionError();
+        }
     }
 
     @Override
@@ -166,10 +174,7 @@ public class PeopleController extends PageController
         } else {
             setToolbarBackgroundAlpha(.001f);
         }
-
-
     }
-
 
     // this is called by an animator and is required!!
     @KeepName
@@ -180,37 +185,61 @@ public class PeopleController extends PageController
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Uri baseUri;
-        if (mCurFilter != null) {
-            baseUri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_FILTER_URI,
-                    Uri.encode(mCurFilter));
-        } else {
-            baseUri = ContactsContract.Contacts.CONTENT_URI.buildUpon()
-                    .appendQueryParameter(ContactsContract.DIRECTORY_PARAM_KEY,
-                            String.valueOf(ContactsContract.Directory.DEFAULT)).build();
-        }
-
-
-        // Now create and return a CursorLoader that will take care of
-        // creating a Cursor for the data being displayed.
-        String select = "((" + ContactsContract.Contacts.DISPLAY_NAME + " NOTNULL) AND ("
-                + ContactsContract.Contacts.DISPLAY_NAME + " != '' ))";
-        return new CursorLoader(getContext(), baseUri,
-                PeopleQuery.CONTACTS_SUMMARY_PROJECTION, select, null,
-                ContactsContract.Contacts.DISPLAY_NAME + " COLLATE LOCALIZED ASC");
+    public Loader<PeopleLoaderResult> onCreateLoader(int id, Bundle args) {
+        return new PeopleLoader(getContext());
     }
-
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        List<? extends BaseContactInfo> contactInfos = PeopleQuery.cursorToContactInfos(data);
-        mPeopleAdapter.setData(contactInfos);
+    public void onLoadFinished(Loader<PeopleLoaderResult> loader, PeopleLoaderResult data) {
+        if (data.mPermissionDeniedException != null) {
+            onPermissionDenied(data.mPermissionDeniedException);
+        } else {
+            mPeopleAdapter.setData(data.mResult);
+            if (mPermissionOverlay != null) {
+                mPermissionOverlay.removeAllViews();
+            }
+        }
         updateToolbarAlpha();
     }
 
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onAccepted(PermissionHelper permissionHelper) {
+        Intent intent = PermissionUtils.
+                buildRequestPermissionsIntent(getContext(),
+                        PermissionUtils.REQUEST_CODE_PERMISSION_READ_CONTACTS,
+                        permissionHelper.getPermissions());
+
+        getContext().startActivity(intent);
+
+    }
+
+    @Override
+    public void onCancelled(PermissionHelper permissionHelper, boolean dontShowAgain) {
+        // this option is not available so this method won't be called
+
+    }
+
+
+    private void onPermissionDenied(PermissionDeniedException permissionDeniedException) {
+        if (mPermissionOverlay == null) {
+            mPendingPermissionError = true;
+        } else {
+            showPermissionError();
+        }
+    }
+
+    private void showPermissionError() {
+        mPendingPermissionError = false;
+        PermissionHelper permissionHelper = new PermissionHelper(
+                R.string.permission_reason_contacts,
+                false, this, Manifest.permission.READ_CONTACTS);
+
+        permissionHelper.show(mPermissionOverlay);
+    }
+
+
+    @Override
+    public void onLoaderReset(Loader<PeopleLoaderResult> loader) {
         // This is called when the last Cursor provided to onLoadFinished()
         // above is about to be closed.  We need to make sure we are no
         // longer using it.

@@ -37,13 +37,13 @@ public class TimeZonePickerView extends LinearLayout implements TextWatcher, OnI
 
     private static final String TAG = "TimeZonePickerView";
 
-    TimeZoneResultAdapter mResultAdapter;
+    final TimeZoneResultAdapter mResultAdapter;
 
-    private Context mContext;
+    private final Context mContext;
 
-    private AutoCompleteTextView mAutoCompleteTextView;
+    private final AutoCompleteTextView mAutoCompleteTextView;
 
-    private TimeZoneFilterTypeAdapter mFilterAdapter;
+    private final TimeZoneFilterTypeAdapter mFilterAdapter;
 
     private boolean mHideFilterSearchOnStart = false;
 

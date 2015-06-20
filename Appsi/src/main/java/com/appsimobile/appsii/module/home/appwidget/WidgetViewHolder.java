@@ -36,9 +36,9 @@ public class WidgetViewHolder extends RecyclerView.ViewHolder implements View.On
 
     final OnWidgetClickedListener mOnWidgetClickedListener;
 
-    ImageView mImageView;
+    final ImageView mImageView;
 
-    TextView mWidgetTitleView;
+    final TextView mWidgetTitleView;
 
     @Nullable
     Bitmap mBitmap;
@@ -90,7 +90,7 @@ public class WidgetViewHolder extends RecyclerView.ViewHolder implements View.On
         mOnWidgetClickedListener.onWidgetClicked(mAppWidgetProviderInfo, this);
     }
 
-    static interface OnWidgetClickedListener {
+    interface OnWidgetClickedListener {
 
         void onWidgetClicked(AppWidgetProviderInfo info, WidgetViewHolder holder);
     }

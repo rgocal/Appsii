@@ -51,7 +51,7 @@ public final class HomeItemConfigurationHelper extends AbstractHomeItemConfigura
     QueryHandlerImpl mQueryHandler;
 
     @GuardedBy("this")
-    private LongSparseArray<ConfigurationProperty> mConfigurationProperties;
+    private final LongSparseArray<ConfigurationProperty> mConfigurationProperties;
 
     protected HomeItemConfigurationHelper(Context context) {
         super(context);
@@ -225,7 +225,7 @@ public final class HomeItemConfigurationHelper extends AbstractHomeItemConfigura
          * again.
          * SimpleCookie instances must not be leaked outside this class.
          */
-        List<SimpleCookie> mCookiePool = new LinkedList<>();
+        final List<SimpleCookie> mCookiePool = new LinkedList<>();
 
         public QueryHandlerImpl(ContentResolver cr) {
             super(cr);

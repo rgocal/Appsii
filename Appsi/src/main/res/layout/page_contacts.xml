@@ -47,6 +47,13 @@
         android:paddingTop="24dp"
         />
 
+    <FrameLayout
+        android:id="@+id/permission_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        />
+
     <com.appsimobile.appsii.StatusbarUnderlay
         android:id="@+id/underlay"
         android:layout_width="match_parent"

@@ -85,7 +85,7 @@ public class LetterTileDrawable extends Drawable {
 
     private final Paint mPaint;
 
-    Rect mCircleRect = new Rect();
+    final Rect mCircleRect = new Rect();
 
     boolean mSquare;
 

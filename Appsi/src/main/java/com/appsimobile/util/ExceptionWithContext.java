@@ -27,7 +27,7 @@ public class ExceptionWithContext
     /**
      * {@code non-null;} human-oriented context of the exception
      */
-    private StringBuffer context;
+    private final StringBuffer context;
 
     /**
      * Augments the given exception with the given context, and return the

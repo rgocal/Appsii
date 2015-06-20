@@ -43,14 +43,14 @@ import java.util.List;
  */
 public class LauncherAppsCompatV16 extends LauncherAppsCompat {
 
-    private PackageManager mPm;
+    private final PackageManager mPm;
 
-    private Context mContext;
+    private final Context mContext;
 
-    private List<OnAppsChangedCallbackCompat> mCallbacks
+    private final List<OnAppsChangedCallbackCompat> mCallbacks
             = new ArrayList<OnAppsChangedCallbackCompat>();
 
-    private PackageMonitor mPackageMonitor;
+    private final PackageMonitor mPackageMonitor;
 
     LauncherAppsCompatV16(Context context) {
         mPm = context.getPackageManager();
@@ -167,11 +167,14 @@ public class LauncherAppsCompatV16 extends LauncherAppsCompat {
         mContext.registerReceiver(mPackageMonitor, filter);
     }
 
-    private synchronized List<OnAppsChangedCallbackCompat> getCallbacks() {
+    synchronized List<OnAppsChangedCallbackCompat> getCallbacks() {
         return new ArrayList<>(mCallbacks);
     }
 
     private class PackageMonitor extends BroadcastReceiver {
+
+        PackageMonitor() {
+        }
 
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();

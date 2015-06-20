@@ -37,7 +37,7 @@ public class SVGDrawable extends PictureDrawable {
 
     private final String TAG = "SVGDrawable";
 
-    private SVGState mSvgState;
+    private final SVGState mSvgState;
 
     /**
      * @param picture
@@ -120,9 +120,9 @@ public class SVGDrawable extends PictureDrawable {
 
         int mChangingConfigurations;
 
-        private SVG mSvg;
+        private final SVG mSvg;
 
-        private SVGState(SVG svg) {
+        SVGState(SVG svg) {
             this.mSvg = svg;
         }
 

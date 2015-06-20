@@ -48,7 +48,7 @@ public class SeekPreference extends DialogPreference implements SeekBar.OnSeekBa
 
     private final int mMin;
 
-    CharSequence mSummary;
+    final CharSequence mSummary;
 
     int mLastSetValue;
 

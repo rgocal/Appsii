@@ -35,13 +35,13 @@ public class LetterItemDecoration extends RecyclerView.ItemDecoration {
 
     final Paint mPaint;
 
-    int mColor;
+    final int mColor;
 
-    float m72Dps;
+    final float m72Dps;
 
-    float m12Dps;
+    final float m12Dps;
 
-    float m24dps;
+    final float m24dps;
 
     private int mOffset;
 

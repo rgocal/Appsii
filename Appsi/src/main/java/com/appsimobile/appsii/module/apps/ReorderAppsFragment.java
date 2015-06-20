@@ -251,15 +251,15 @@ public class ReorderAppsFragment extends Fragment implements DragSortListView.Re
 
     public static class TaggedAppViewHolder extends ViewHolder {
 
-        TextView mTextView;
+        final TextView mTextView;
 
-        View mDragHandle;
+        final View mDragHandle;
 
-        View mUndoDelete;
+        final View mUndoDelete;
 
         AppIconLoaderTaskImpl mAppIconLoaderTask;
 
-        Context mContext;
+        final Context mContext;
 
         public TaggedAppViewHolder(View view) {
             super(view);

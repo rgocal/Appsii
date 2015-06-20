@@ -35,7 +35,7 @@ abstract class BasePeopleAdapter extends RecyclerView.Adapter<CallLogViewHolder>
 
     private OnItemClickListener mOnItemClickListener;
 
-    private Context mContext;
+    private final Context mContext;
 
     public BasePeopleAdapter(Context context) {
         mContext = context;
@@ -77,7 +77,7 @@ abstract class BasePeopleAdapter extends RecyclerView.Adapter<CallLogViewHolder>
         mOnItemClickListener = onItemClickListener;
     }
 
-    public static interface OnItemClickListener {
+    public interface OnItemClickListener {
 
         void onItemClick(CallLogViewHolder item);
     }

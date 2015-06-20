@@ -233,7 +233,7 @@ public class AnimatedExpandableListView extends ExpandableListView {
         return isGroupExpanded(groupPos);
     }
 
-    private int getAnimationDuration() {
+    int getAnimationDuration() {
         return ANIMATION_DURATION;
     }
 
@@ -256,6 +256,9 @@ public class AnimatedExpandableListView extends ExpandableListView {
          * height.
          */
         int dummyHeight = -1;
+
+        GroupInfo() {
+        }
     }
 
     /**
@@ -264,17 +267,17 @@ public class AnimatedExpandableListView extends ExpandableListView {
      */
     public static abstract class AnimatedExpandableListAdapter extends BaseExpandableListAdapter {
 
-        private static final int STATE_IDLE = 0;
+        static final int STATE_IDLE = 0;
 
         private static final int STATE_EXPANDING = 1;
 
         private static final int STATE_COLLAPSING = 2;
 
-        private SparseArray<GroupInfo> groupInfo = new SparseArray<GroupInfo>();
+        private final SparseArray<GroupInfo> groupInfo = new SparseArray<GroupInfo>();
 
         private AnimatedExpandableListView parent;
 
-        private void setParent(AnimatedExpandableListView parent) {
+        void setParent(AnimatedExpandableListView parent) {
             this.parent = parent;
         }
 
@@ -292,14 +295,14 @@ public class AnimatedExpandableListView extends ExpandableListView {
             return info;
         }
 
-        private void startExpandAnimation(int groupPosition, int firstChildPosition) {
+        void startExpandAnimation(int groupPosition, int firstChildPosition) {
             GroupInfo info = getGroupInfo(groupPosition);
             info.animating = true;
             info.firstChildPosition = firstChildPosition;
             info.expanding = true;
         }
 
-        private void startCollapseAnimation(int groupPosition, int firstChildPosition) {
+        void startCollapseAnimation(int groupPosition, int firstChildPosition) {
             GroupInfo info = getGroupInfo(groupPosition);
             info.animating = true;
             info.firstChildPosition = firstChildPosition;
@@ -501,7 +504,7 @@ public class AnimatedExpandableListView extends ExpandableListView {
         public abstract View getRealChildView(int groupPosition, int childPosition,
                 boolean isLastChild, View convertView, ViewGroup parent);
 
-        private void stopAnimation(int groupPosition) {
+        void stopAnimation(int groupPosition) {
             GroupInfo info = getGroupInfo(groupPosition);
             info.animating = false;
         }
@@ -510,7 +513,7 @@ public class AnimatedExpandableListView extends ExpandableListView {
 
     private static class DummyView extends View {
 
-        private List<View> views = new ArrayList<View>();
+        private final List<View> views = new ArrayList<View>();
 
         private Drawable divider;
 
@@ -580,15 +583,15 @@ public class AnimatedExpandableListView extends ExpandableListView {
 
     private static class ExpandAnimation extends Animation {
 
-        private int baseHeight;
+        private final int baseHeight;
 
-        private int delta;
+        private final int delta;
 
-        private View view;
+        private final View view;
 
-        private GroupInfo groupInfo;
+        private final GroupInfo groupInfo;
 
-        private ExpandAnimation(View v, int startHeight, int endHeight, GroupInfo info) {
+        ExpandAnimation(View v, int startHeight, int endHeight, GroupInfo info) {
             baseHeight = startHeight;
             delta = endHeight - startHeight;
             view = v;

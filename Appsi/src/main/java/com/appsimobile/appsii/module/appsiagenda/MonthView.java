@@ -107,9 +107,9 @@ public abstract class MonthView extends View {
      */
     public static final String VIEW_PARAMS_SHOW_WK_NUM = "show_wk_num";
 
-    protected static int DEFAULT_HEIGHT = 32;
+    protected static final int DEFAULT_HEIGHT = 32;
 
-    protected static int MIN_HEIGHT = 10;
+    protected static final int MIN_HEIGHT = 10;
 
     protected static final int DEFAULT_SELECTED_DAY = -1;
 
@@ -127,7 +127,7 @@ public abstract class MonthView extends View {
 
     private static final int SELECTED_CIRCLE_ALPHA = 60;
 
-    protected static int DAY_SEPARATOR_WIDTH = 1;
+    protected static final int DAY_SEPARATOR_WIDTH = 1;
 
     protected static int MINI_DAY_NUMBER_TEXT_SIZE;
 
@@ -147,9 +147,9 @@ public abstract class MonthView extends View {
     // affects the padding on the sides of this view
     protected int mEdgePadding;
 
-    private String mDayOfWeekTypeface;
+    private final String mDayOfWeekTypeface;
 
-    private String mMonthTitleTypeface;
+    private final String mMonthTitleTypeface;
 
     protected Paint mMonthNumPaint;
 
@@ -192,7 +192,7 @@ public abstract class MonthView extends View {
     protected int mWeekStart = DEFAULT_WEEK_START;
 
     // How many days to display
-    protected int mNumDays = DEFAULT_NUM_DAYS;
+    protected final int mNumDays = DEFAULT_NUM_DAYS;
 
     // The number of days + a spot for week number if it is displayed
     protected int mNumCells = mNumDays;
@@ -217,15 +217,15 @@ public abstract class MonthView extends View {
     // Whether to prevent setting the accessibility delegate
     private boolean mLockAccessibilityDelegate;
 
-    protected int mDayTextColor;
+    protected final int mDayTextColor;
 
-    protected int mTodayNumberColor;
+    protected final int mTodayNumberColor;
 
-    protected int mDisabledDayTextColor;
+    protected final int mDisabledDayTextColor;
 
-    protected int mMonthTitleColor;
+    protected final int mMonthTitleColor;
 
-    protected int mMonthTitleBGColor;
+    protected final int mMonthTitleBGColor;
 
     public MonthView(Context context) {
         this(context, null);
@@ -651,7 +651,7 @@ public abstract class MonthView extends View {
      *
      * @param day The day that was clicked
      */
-    private void onDayClick(int day) {
+    void onDayClick(int day) {
         // If the min / max date are set, only process the click if it's a valid selection.
         if (isOutOfRange(mYear, mMonth, day)) {
             return;
@@ -899,6 +899,6 @@ public abstract class MonthView extends View {
      */
     public interface OnDayClickListener {
 
-        public void onDayClick(MonthView view, MonthAdapter.CalendarDay day);
+        void onDayClick(MonthView view, MonthAdapter.CalendarDay day);
     }
 }

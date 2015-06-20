@@ -54,7 +54,7 @@ public class ShortcutActivity extends Activity implements View.OnClickListener {
 
 //    DatasetAdapter mDatasetAdapter = new DatasetAdapter();
 
-    private List<DatasetInfo> mDatasetInfo = new ArrayList<DatasetInfo>();
+    private final List<DatasetInfo> mDatasetInfo = new ArrayList<DatasetInfo>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

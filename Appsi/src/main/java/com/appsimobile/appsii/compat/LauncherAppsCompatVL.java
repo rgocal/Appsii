@@ -42,7 +42,7 @@ public class LauncherAppsCompatVL extends LauncherAppsCompat {
 
     private final Map<OnAppsChangedCallbackCompat, WrappedCallback> mCallbacks = new HashMap<>();
 
-    private LauncherApps mLauncherApps;
+    private final LauncherApps mLauncherApps;
 
     LauncherAppsCompatVL(Context context) {
         super();
@@ -122,7 +122,7 @@ public class LauncherAppsCompatVL extends LauncherAppsCompat {
 
     private static class WrappedCallback extends LauncherApps.Callback {
 
-        private LauncherAppsCompat.OnAppsChangedCallbackCompat mCallback;
+        private final LauncherAppsCompat.OnAppsChangedCallbackCompat mCallback;
 
         public WrappedCallback(LauncherAppsCompat.OnAppsChangedCallbackCompat callback) {
             mCallback = callback;

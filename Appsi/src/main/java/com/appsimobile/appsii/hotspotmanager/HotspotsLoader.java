@@ -22,6 +22,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import com.appsimobile.appsii.HotspotItem;
+import com.appsimobile.appsii.PermissionDeniedException;
 import com.appsimobile.appsii.module.HotspotQuery;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
 import com.appsimobile.util.ConvertedCursorLoader;
@@ -53,6 +54,15 @@ public class HotspotsLoader extends ConvertedCursorLoader<List<HotspotItem>> {
         setSelection(null);
         setSelectionArgs(null);
         setSortOrder(null);
+    }
+
+    @Override
+    protected void checkPermissions() throws PermissionDeniedException {
+    }
+
+    @Override
+    protected List<HotspotItem> convertPermissionDeniedException(PermissionDeniedException e) {
+        return null;
     }
 
     @Override

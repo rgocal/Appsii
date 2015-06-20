@@ -23,7 +23,7 @@ package com.appsimobile.appsii.iab;
  */
 public class IabException extends Exception {
 
-    IabResult mResult;
+    final IabResult mResult;
 
     public IabException(IabResult r) {
         this(r, null);

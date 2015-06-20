@@ -37,11 +37,11 @@ import com.appsimobile.appsii.R;
  */
 public class WindmillDrawable extends Drawable implements Animator.AnimatorListener {
 
-    Drawable mFanDrawable;
+    final Drawable mFanDrawable;
 
-    Drawable mBodyDrawable;
+    final Drawable mBodyDrawable;
 
-    int mTopOffset;
+    final int mTopOffset;
 
     int mRotation;
 

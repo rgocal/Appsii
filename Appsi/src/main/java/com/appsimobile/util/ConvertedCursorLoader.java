@@ -26,6 +26,8 @@ import android.os.CancellationSignal;
 import android.os.OperationCanceledException;
 import android.support.annotation.NonNull;
 
+import com.appsimobile.appsii.PermissionDeniedException;
+
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.util.Arrays;
@@ -81,6 +83,7 @@ public abstract class ConvertedCursorLoader<T> extends AsyncTaskLoader<T> {
             mCancellationSignal = new CancellationSignal();
         }
         try {
+            checkPermissions();
             Cursor cursor = getContext().getContentResolver().query(mUri, mProjection, mSelection,
                     mSelectionArgs, mSortOrder, mCancellationSignal);
 
@@ -95,12 +98,24 @@ public abstract class ConvertedCursorLoader<T> extends AsyncTaskLoader<T> {
                 return convertCursor(cursor);
             }
             return null;
+        } catch (SecurityException e) {
+            return convertPermissionDeniedException(new PermissionDeniedException(e));
+        } catch (PermissionDeniedException e) {
+            return convertPermissionDeniedException(e);
         } finally {
             synchronized (this) {
                 mCancellationSignal = null;
             }
         }
     }
+
+    protected abstract void checkPermissions() throws PermissionDeniedException;
+
+    /**
+     * This method should be implemented to deliver the security exception
+     * that occurred.
+     */
+    protected abstract T convertPermissionDeniedException(PermissionDeniedException e);
 
     protected abstract T convertCursor(@NonNull Cursor cursor);
 

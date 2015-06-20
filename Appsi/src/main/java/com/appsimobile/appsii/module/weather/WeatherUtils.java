@@ -40,9 +40,9 @@ import java.io.OutputStream;
  */
 public class WeatherUtils {
 
-    public static int FLAG_TEMPERATURE_NO_UNIT = 1;
+    public static final int FLAG_TEMPERATURE_NO_UNIT = 1;
 
-    static Time sTime = new Time();
+    static final Time sTime = new Time();
 
     private WeatherUtils() {
     }
@@ -528,13 +528,13 @@ public class WeatherUtils {
 
         public String unit;
 
-        private static int intCompare(int lhs, int rhs) {
-            return lhs < rhs ? -1 : (lhs == rhs ? 0 : 1);
-        }
-
         @Override
         public int compareTo(@NonNull ForecastInfo another) {
             return intCompare(julianDay, another.julianDay);
+        }
+
+        private static int intCompare(int lhs, int rhs) {
+            return lhs < rhs ? -1 : (lhs == rhs ? 0 : 1);
         }
 
     }

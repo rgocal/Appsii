@@ -32,7 +32,7 @@ public class WeatherSyncAdapter extends AbstractThreadedSyncAdapter {
 
     // Global variables
     // Define a variable to contain a content resolver instance
-    ContentResolver mContentResolver;
+    final ContentResolver mContentResolver;
 
     /**
      * Set up the sync adapter

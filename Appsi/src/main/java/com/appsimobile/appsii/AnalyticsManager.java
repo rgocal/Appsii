@@ -99,6 +99,8 @@ public class AnalyticsManager {
 
     public static final String CATEGORY_ABOUT = "about";
 
+    public static final String CATEGORY_WELCOME = "welcome";
+
     static AnalyticsManager sInstance;
 
     final Context mContext;

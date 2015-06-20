@@ -396,7 +396,7 @@ public class HomeContentProvider extends ContentProvider {
             return count;
         } catch (SQLiteConstraintException e) {
             SQLiteConstraintException ex =
-                    new SQLiteConstraintException("Constraint violation on delete of" + uri);
+                    new SQLiteConstraintException("Constraint violation on delete of: " + uri);
             ex.initCause(e);
             throw ex;
         }
@@ -678,21 +678,7 @@ public class HomeContentProvider extends ContentProvider {
             long defaultHotspotId = insertDefaultHotspotsV7(v, db, homePageId);
 
 
-            v.clear();
-            v.put(HotspotPagesColumns._HOTPSOT_ID, defaultHotspotId);
-            v.put(HotspotPagesColumns._PAGE_ID, homePageId);
-            v.put(HotspotPagesColumns.POSITION, 0);
-            db.insert(HomeContract.HOTSPOT_PAGES_TABLE_NAME, null, v);
-
-            v.clear();
-            v.put(HotspotPagesColumns._HOTPSOT_ID, defaultHotspotId);
-            v.put(HotspotPagesColumns._PAGE_ID, appsPageId);
-            v.put(HotspotPagesColumns.POSITION, 1);
-            db.insert(HomeContract.HOTSPOT_PAGES_TABLE_NAME, null, v);
-
             insertDefaultHomePageValuesV7(db, v, homePageId);
-
-
         }
 
         private long insertDefaultHotspotsV7(ContentValues values, SQLiteDatabase db,
@@ -1156,22 +1142,6 @@ public class HomeContentProvider extends ContentProvider {
             v.put(HomeContract.PageColumns.DISPLAY_NAME, callsPageName);
             v.put(HomeContract.PageColumns.TYPE, HomeContract.Pages.PAGE_CALLS);
             long callsPageId = db.insert(PAGES_TABLE_NAME, null, v);
-
-
-            long defaultHotspotId = insertDefaultHotspotsV7(v, db, homePageId);
-
-
-            v.clear();
-            v.put(HotspotPagesColumns._HOTPSOT_ID, defaultHotspotId);
-            v.put(HotspotPagesColumns._PAGE_ID, homePageId);
-            v.put(HotspotPagesColumns.POSITION, 0);
-            db.insert(HomeContract.HOTSPOT_PAGES_TABLE_NAME, null, v);
-
-            v.clear();
-            v.put(HotspotPagesColumns._HOTPSOT_ID, defaultHotspotId);
-            v.put(HotspotPagesColumns._PAGE_ID, appsPageId);
-            v.put(HotspotPagesColumns.POSITION, 1);
-            db.insert(HomeContract.HOTSPOT_PAGES_TABLE_NAME, null, v);
 
             insertDefaultHomePageValuesV7(db, v, homePageId);
         }

@@ -48,7 +48,7 @@ public class RecentTaskInfoAppEntry implements AppEntry {
     @GuardedBy("this")
     private boolean mMounted;
 
-    private ComponentName mComponentName;
+    private final ComponentName mComponentName;
 
     public RecentTaskInfoAppEntry(RecentTaskInfo info, ActivityInfo activityInfo,
             CharSequence label) {

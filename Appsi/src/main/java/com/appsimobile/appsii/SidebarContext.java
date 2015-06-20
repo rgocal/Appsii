@@ -26,7 +26,7 @@ public class SidebarContext extends ContextWrapper {
 
     public boolean mIsFullScreen;
 
-    AnalyticsManager mAnalyticsManager = AnalyticsManager.getInstance();
+    final AnalyticsManager mAnalyticsManager = AnalyticsManager.getInstance();
 
     private LoaderManager mLoaderManager;
 

@@ -28,10 +28,10 @@ public interface IExtensionHost extends android.os.IInterface {
     /**
      * Local-side IPC implementation stub class.
      */
-    public static abstract class Stub extends android.os.Binder
+    abstract class Stub extends android.os.Binder
             implements com.google.android.apps.dashclock.api.internal.IExtensionHost {
 
-        private static final java.lang.String DESCRIPTOR =
+        static final java.lang.String DESCRIPTOR =
                 "com.google.android.apps.dashclock.api.internal.IExtensionHost";
 
         /**
@@ -115,7 +115,7 @@ public interface IExtensionHost extends android.os.IInterface {
         private static class Proxy
                 implements com.google.android.apps.dashclock.api.internal.IExtensionHost {
 
-            private android.os.IBinder mRemote;
+            private final android.os.IBinder mRemote;
 
             Proxy(android.os.IBinder remote) {
                 mRemote = remote;
@@ -224,14 +224,14 @@ public interface IExtensionHost extends android.os.IInterface {
      * be added below all other methods.
      * - Do NOT modify a signature once a protocol version is finalized.
      */// Protocol version 1 below
-    public void publishUpdate(com.google.android.apps.dashclock.api.ExtensionData data) throws
+    void publishUpdate(com.google.android.apps.dashclock.api.ExtensionData data) throws
             android.os.RemoteException;
 
-    public void addWatchContentUris(java.lang.String[] contentUris)
+    void addWatchContentUris(java.lang.String[] contentUris)
             throws android.os.RemoteException;
 
-    public void setUpdateWhenScreenOn(boolean updateWhenScreenOn) throws android.os.RemoteException;
+    void setUpdateWhenScreenOn(boolean updateWhenScreenOn) throws android.os.RemoteException;
 // Protcol version 2 below
 
-    public void removeAllWatchContentUris() throws android.os.RemoteException;
+    void removeAllWatchContentUris() throws android.os.RemoteException;
 }

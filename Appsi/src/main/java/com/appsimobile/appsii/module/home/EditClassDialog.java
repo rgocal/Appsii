@@ -49,7 +49,7 @@ public class EditClassDialog extends DialogFragment implements TextView.OnEditor
 
     String mPackageName;
 
-    List<String> mClassNameItems = new ArrayList<>();
+    final List<String> mClassNameItems = new ArrayList<>();
 
     private AutoCompleteTextView mAutoCompleteTextView;
 

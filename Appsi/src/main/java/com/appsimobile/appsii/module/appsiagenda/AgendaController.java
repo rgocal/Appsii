@@ -16,6 +16,7 @@
 
 package com.appsimobile.appsii.module.appsiagenda;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.LayoutTransition;
 import android.content.ActivityNotFoundException;
@@ -55,9 +56,12 @@ import com.appsimobile.appsii.DrawableCompat;
 import com.appsimobile.appsii.ExpandCollapseDrawable;
 import com.appsimobile.appsii.LoaderManager;
 import com.appsimobile.appsii.PageController;
+import com.appsimobile.appsii.PermissionDeniedException;
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.module.PermissionHelper;
 import com.appsimobile.appsii.module.SpacingItemDecoration;
 import com.appsimobile.appsii.module.ToolbarScrollListener;
+import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.appsimobile.appsii.preference.PreferencesFactory;
 import com.appsimobile.util.TimeUtils;
 import com.crashlytics.android.Crashlytics;
@@ -75,7 +79,8 @@ import java.util.TimeZone;
  */
 public class AgendaController extends PageController
         implements View.OnClickListener,
-        LayoutTransition.TransitionListener, Toolbar.OnMenuItemClickListener {
+        LayoutTransition.TransitionListener, Toolbar.OnMenuItemClickListener,
+        PermissionHelper.PermissionListener {
 
     // TODO: use View.setOnSystemUiVisibilityChangeListener(); to detect system ui-changes
 
@@ -98,6 +103,13 @@ public class AgendaController extends PageController
             R.attr.colorToolbarTitleText,
             R.attr.appsiSidebarBackground,
     };
+
+    /**
+     * The height of the header container. This is set through a dimension.
+     * This dimension is used here as well to get the height when the view
+     * is being initialized.
+     */
+    final int mHeaderWrapperHeight;
 
     /**
      * A formatter that can be used to format date times using DateUtils
@@ -163,17 +175,19 @@ public class AgendaController extends PageController
     View mHeaderContainer;
 
     /**
-     * The height of the header container. This is set through a dimension.
-     * This dimension is used here as well to get the height when the view
-     * is being initialized.
-     */
-    int mHeaderWrapperHeight;
-
-    /**
      * The controller object for the date-picker. Tracks the state and the possible start/
      * end dates for the date-picker
      */
     DatePickerControllerImpl mDatePickerController;
+
+    final Animator.AnimatorListener mCloseListener = new AnimatorAdapter() {
+        @Override
+        public void onAnimationEnd(Animator animation) {
+            mHeaderContainer.setVisibility(View.INVISIBLE);
+            mAgendaRecycler.setBackground(null);
+            updateToolbarTitleAndMonthPosition();
+        }
+    };
 
     int mAppsiBackgroundColor;
 
@@ -187,14 +201,9 @@ public class AgendaController extends PageController
 
     int mLastVisiblePosition;
 
-    Animator.AnimatorListener mCloseListener = new AnimatorAdapter() {
-        @Override
-        public void onAnimationEnd(Animator animation) {
-            mHeaderContainer.setVisibility(View.INVISIBLE);
-            mAgendaRecycler.setBackground(null);
-            updateToolbarTitleAndMonthPosition();
-        }
-    };
+    ViewGroup mPermissionOverlay;
+
+    boolean mPendingPermissionError;
 
     /**
      * The shared-preferences we can get the configuration from
@@ -227,57 +236,9 @@ public class AgendaController extends PageController
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         mAgendaRecycler = (RecyclerView) view.findViewById(R.id.agenda_recycler_view);
         mAgendaRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        mAgendaRecycler.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
-            float mInitialTouchX;
+        mAgendaRecycler.addOnItemTouchListener(new AgendaOnItemTouchListener());
+        mPermissionOverlay = (ViewGroup) view.findViewById(R.id.permission_overlay);
 
-            float mInitialTouchY;
-
-            float mLastSetValue;
-
-            @Override
-            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-                mInitialTouchX = e.getRawX();
-                mInitialTouchY = e.getRawY();
-                mLastSetValue = 0;
-                return mHeaderExpanded;
-            }
-
-            @Override
-            public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-                if (mHeaderExpanded) {
-                    int action = e.getAction();
-                    if (action == MotionEvent.ACTION_MOVE) {
-                        int deltaY = (int) (mInitialTouchY - e.getRawY());
-                        if (deltaY <= 0) {
-                            mAgendaRecycler.setTranslationY(mHeaderWrapperHeight);
-                            mLastSetValue = 0;
-                        } else if (deltaY > mHeaderWrapperHeight) {
-                            mAgendaRecycler.setTranslationY(0);
-                            mLastSetValue = deltaY;
-                        } else {
-                            mAgendaRecycler.setTranslationY(mHeaderWrapperHeight - deltaY);
-                            mLastSetValue = deltaY;
-                        }
-                    } else if (action == MotionEvent.ACTION_UP ||
-                            action == MotionEvent.ACTION_CANCEL) {
-                        int h = mHeaderWrapperHeight;
-                        if (mLastSetValue < h / 4) {
-                            expandHeader();
-                            mToolbar.animate().translationY(0);
-                        } else {
-                            collapseHeader();
-//                            hideToolbar();
-                        }
-                        mLastSetValue = 0;
-                    }
-                }
-            }
-
-            @Override
-            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
-            }
-        });
         // setup the header view
         mHeaderView = (RecyclerView) view.findViewById(R.id.agenda_month_recycler);
 
@@ -388,6 +349,10 @@ public class AgendaController extends PageController
             }
         });
         setupDecorations();
+
+        if (mPendingPermissionError) {
+            showPermissionError();
+        }
     }
 
     @Override
@@ -485,23 +450,6 @@ public class AgendaController extends PageController
         }
     }
 
-    void expandHeader() {
-        mHeaderExpanded = true;
-        copyAgendaPositionToDatePickerController();
-        mHeaderContainer.setVisibility(View.VISIBLE);
-//        mHeaderContainer.animate().translationY(0).setListener(null);
-        mAgendaRecycler.setBackgroundColor(mAppsiBackgroundColor);
-        mAgendaRecycler.animate().translationY(mHeaderWrapperHeight).setListener(null);
-        mTitleCompoundDrawable.setExpanded(true, true);
-        applyToolbarColor(mPrimaryColor);
-    }
-
-    void collapseHeader() {
-        mHeaderExpanded = false;
-        mAgendaRecycler.animate().translationY(0).setListener(mCloseListener);
-        mTitleCompoundDrawable.setExpanded(false, true);
-    }
-
     void scrollAgendaViewToDate(int year, int month, int day, boolean fromTap) {
         int agendaPosition = mAgendaAdapter.positionOfDate(year, month, day);
 
@@ -561,26 +509,19 @@ public class AgendaController extends PageController
 
     }
 
-    /**
-     * Updates the position in
-     */
-    void copyAgendaPositionToDatePickerController() {
+    private void showPermissionError() {
+        mPendingPermissionError = false;
+        PermissionHelper permissionHelper = new PermissionHelper(
+                R.string.permission_reason_calendar,
+                false, this, Manifest.permission.READ_CALENDAR);
 
-        // first acquire the current year, we need that for the method that
-        // updates the header text
-        mTime.setToNow();
-        int yearNow = mTime.year;
+        permissionHelper.show(mPermissionOverlay);
+    }
 
-        // Next, get the time at the first visible position
-        int firstVisiblePosition = getFirstVisiblePositionInAgendaView();
-        if (mAgendaAdapter.getTimeAtPosition(mTime, firstVisiblePosition)) {
-            int positionInMonthAdapter = mDatePickerController.getPositionOfTime(mTime);
-
-            // Now get the position of that time in the month-picker view
-            mDatePickerController.onDayOfMonthSelected(mTime.year, mTime.month, mTime.monthDay,
-                    false);
-            mSimpleMonthAdapter.notifyItemChanged(positionInMonthAdapter);
-        }
+    void collapseHeader() {
+        mHeaderExpanded = false;
+        mAgendaRecycler.animate().translationY(0).setListener(mCloseListener);
+        mTitleCompoundDrawable.setExpanded(false, true);
     }
 
     /**
@@ -708,9 +649,39 @@ public class AgendaController extends PageController
         return true;
     }
 
+    void onAgendaDaysResult(AgendaDaysResult data) {
+        if (data.mException != null) {
+            onPermissionDenied(data.mException);
+        } else {
+            onAgendaDaysLoaded(data.mResult);
+            if (mPermissionOverlay != null) {
+                mPermissionOverlay.removeAllViews();
+            }
+        }
+    }
+
+    private void onPermissionDenied(PermissionDeniedException permissionDeniedException) {
+        if (mPermissionOverlay == null) {
+            mPendingPermissionError = true;
+        } else {
+            showPermissionError();
+        }
+    }
+
     void onAgendaDaysLoaded(SparseBooleanArray data) {
         mDatePickerController.setEventDays(data);
         mSimpleMonthAdapter.notifyDataSetChanged();
+    }
+
+    void onAgendaEventsResult(AgendaEventsResult data) {
+        if (data.mPermissionDeniedException != null) {
+            onPermissionDenied(data.mPermissionDeniedException);
+        } else {
+            onAgendaEventsLoaded(data.mAgendaEvents);
+            if (mPermissionOverlay != null) {
+                mPermissionOverlay.removeAllViews();
+            }
+        }
     }
 
     void onAgendaEventsLoaded(List<AgendaEvent> data) {
@@ -736,6 +707,39 @@ public class AgendaController extends PageController
             expandHeader();
         } else {
             collapseHeader();
+        }
+    }
+
+    void expandHeader() {
+        mHeaderExpanded = true;
+        copyAgendaPositionToDatePickerController();
+        mHeaderContainer.setVisibility(View.VISIBLE);
+//        mHeaderContainer.animate().translationY(0).setListener(null);
+        mAgendaRecycler.setBackgroundColor(mAppsiBackgroundColor);
+        mAgendaRecycler.animate().translationY(mHeaderWrapperHeight).setListener(null);
+        mTitleCompoundDrawable.setExpanded(true, true);
+        applyToolbarColor(mPrimaryColor);
+    }
+
+    /**
+     * Updates the position in
+     */
+    void copyAgendaPositionToDatePickerController() {
+
+        // first acquire the current year, we need that for the method that
+        // updates the header text
+        mTime.setToNow();
+        int yearNow = mTime.year;
+
+        // Next, get the time at the first visible position
+        int firstVisiblePosition = getFirstVisiblePositionInAgendaView();
+        if (mAgendaAdapter.getTimeAtPosition(mTime, firstVisiblePosition)) {
+            int positionInMonthAdapter = mDatePickerController.getPositionOfTime(mTime);
+
+            // Now get the position of that time in the month-picker view
+            mDatePickerController.onDayOfMonthSelected(mTime.year, mTime.month, mTime.monthDay,
+                    false);
+            mSimpleMonthAdapter.notifyItemChanged(positionInMonthAdapter);
         }
     }
 
@@ -806,6 +810,21 @@ public class AgendaController extends PageController
         setupDecorations();
     }
 
+    @Override
+    public void onAccepted(PermissionHelper permissionHelper) {
+        Intent intent = PermissionUtils.
+                buildRequestPermissionsIntent(getContext(),
+                        PermissionUtils.REQUEST_CODE_PERMISSION_READ_CALENDAR,
+                        Manifest.permission.READ_CALENDAR);
+
+        getContext().startActivity(intent);
+    }
+
+    @Override
+    public void onCancelled(PermissionHelper permissionHelper, boolean dontShowAgain) {
+        // this option is not available so this method won't be called
+    }
+
     //0416 566 090 9-11 14-16
 
     private static class DatePickerControllerImpl implements DatePickerController {
@@ -816,9 +835,9 @@ public class AgendaController extends PageController
 
         final Time mTime = new Time(Time.TIMEZONE_UTC);
 
-        MonthAdapter.CalendarDay mSelected;
+        final MonthAdapter.CalendarDay mSelected;
 
-        private List<OnDateChangedListener> mListeners = new LinkedList<>();
+        private final List<OnDateChangedListener> mListeners = new LinkedList<>();
 
         private SparseBooleanArray mEventDays;
 
@@ -1169,20 +1188,20 @@ public class AgendaController extends PageController
         }
     }
 
-    class AgendaEventsLoaderManager implements LoaderManager.LoaderCallbacks<List<AgendaEvent>> {
+    class AgendaEventsLoaderManager implements LoaderManager.LoaderCallbacks<AgendaEventsResult> {
 
         @Override
-        public Loader<List<AgendaEvent>> onCreateLoader(int id, Bundle args) {
+        public Loader<AgendaEventsResult> onCreateLoader(int id, Bundle args) {
             return new AgendaLoader(getContext(), mDatePickerController);
         }
 
         @Override
-        public void onLoadFinished(Loader<List<AgendaEvent>> loader, List<AgendaEvent> data) {
-            onAgendaEventsLoaded(data);
+        public void onLoadFinished(Loader<AgendaEventsResult> loader, AgendaEventsResult data) {
+            onAgendaEventsResult(data);
         }
 
         @Override
-        public void onLoaderReset(Loader<List<AgendaEvent>> loader) {
+        public void onLoaderReset(Loader<AgendaEventsResult> loader) {
             // This is called when the last Cursor provided to onLoadFinished()
             // above is about to be closed.  We need to make sure we are no
             // longer using it.
@@ -1192,20 +1211,20 @@ public class AgendaController extends PageController
 
     }
 
-    class AgendaDaysLoaderManager implements LoaderManager.LoaderCallbacks<SparseBooleanArray> {
+    class AgendaDaysLoaderManager implements LoaderManager.LoaderCallbacks<AgendaDaysResult> {
 
         @Override
-        public Loader<SparseBooleanArray> onCreateLoader(int id, Bundle args) {
+        public Loader<AgendaDaysResult> onCreateLoader(int id, Bundle args) {
             return new AgendaDaysLoader(getContext(), mDatePickerController);
         }
 
         @Override
-        public void onLoadFinished(Loader<SparseBooleanArray> loader, SparseBooleanArray data) {
-            onAgendaDaysLoaded(data);
+        public void onLoadFinished(Loader<AgendaDaysResult> loader, AgendaDaysResult data) {
+            onAgendaDaysResult(data);
         }
 
         @Override
-        public void onLoaderReset(Loader<SparseBooleanArray> loader) {
+        public void onLoaderReset(Loader<AgendaDaysResult> loader) {
             // This is called when the last Cursor provided to onLoadFinished()
             // above is about to be closed.  We need to make sure we are no
             // longer using it.
@@ -1231,4 +1250,56 @@ public class AgendaController extends PageController
         }
     }
 
+    class AgendaOnItemTouchListener implements RecyclerView.OnItemTouchListener {
+
+        float mInitialTouchX;
+
+        float mInitialTouchY;
+
+        float mLastSetValue;
+
+        @Override
+        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+            mInitialTouchX = e.getRawX();
+            mInitialTouchY = e.getRawY();
+            mLastSetValue = 0;
+            return mHeaderExpanded;
+        }
+
+        @Override
+        public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+            if (mHeaderExpanded) {
+                int action = e.getAction();
+                if (action == MotionEvent.ACTION_MOVE) {
+                    int deltaY = (int) (mInitialTouchY - e.getRawY());
+                    if (deltaY <= 0) {
+                        mAgendaRecycler.setTranslationY(mHeaderWrapperHeight);
+                        mLastSetValue = 0;
+                    } else if (deltaY > mHeaderWrapperHeight) {
+                        mAgendaRecycler.setTranslationY(0);
+                        mLastSetValue = deltaY;
+                    } else {
+                        mAgendaRecycler.setTranslationY(mHeaderWrapperHeight - deltaY);
+                        mLastSetValue = deltaY;
+                    }
+                } else if (action == MotionEvent.ACTION_UP ||
+                        action == MotionEvent.ACTION_CANCEL) {
+                    int h = mHeaderWrapperHeight;
+                    if (mLastSetValue < h / 4) {
+                        expandHeader();
+                        mToolbar.animate().translationY(0);
+                    } else {
+                        collapseHeader();
+//                            hideToolbar();
+                    }
+                    mLastSetValue = 0;
+                }
+            }
+        }
+
+        @Override
+        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+        }
+    }
 }

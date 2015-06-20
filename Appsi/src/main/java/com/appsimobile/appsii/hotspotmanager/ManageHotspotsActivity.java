@@ -187,11 +187,11 @@ public class ManageHotspotsActivity extends AppCompatActivity
 
         final HotspotActionListener mActionListener;
 
-        List<HotspotItem> mHotspotItems = new ArrayList<>();
+        final List<HotspotItem> mHotspotItems = new ArrayList<>();
 
         boolean mGotItDismissed;
 
-        SharedPreferences mPreferences;
+        final SharedPreferences mPreferences;
 
         HotspotAdapter(Context context, HotspotActionListener actionListener) {
             mActionListener = actionListener;

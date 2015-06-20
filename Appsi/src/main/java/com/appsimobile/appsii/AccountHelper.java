@@ -51,26 +51,26 @@ public class AccountHelper {
     // The account name
     public static final String ACCOUNT = "Appsii";
 
-    private static final Lock sAcountHelperLock = new ReentrantLock();
+    private static final Lock sAccountHelperLock = new ReentrantLock();
 
     private static volatile AccountHelper sInstance;
 
     Account mAccount;
 
-    private Context mContext;
+    private final Context mContext;
 
     public AccountHelper(Context context) {
         mContext = context;
     }
 
     public static AccountHelper getInstance(Context context) {
-        sAcountHelperLock.lock();
+        sAccountHelperLock.lock();
         try {
             if (sInstance == null) {
                 sInstance = new AccountHelper(context.getApplicationContext());
             }
         } finally {
-            sAcountHelperLock.unlock();
+            sAccountHelperLock.unlock();
         }
         return sInstance;
     }
@@ -121,19 +121,17 @@ public class AccountHelper {
                 AUTHORITY,
                 Bundle.EMPTY,
                 SYNC_INTERVAL);
-        ContentResolver.setIsSyncable(mAccount, AUTHORITY, 1);
-        ContentResolver.setSyncAutomatically(mAccount, AUTHORITY, true);
-        if (WeatherLoadingService.hasTimeoutExpired(mContext)) {
-            ContentResolver.requestSync(mAccount, AUTHORITY, Bundle.EMPTY);
-        }
+        // start of as not syncable
+        ContentResolver.setIsSyncable(mAccount, AUTHORITY, -1);
+
     }
 
     public void requestSync() {
-//        if (ContentResolver.getIsSyncable(mAccount, AUTHORITY) > 0) {
         Log.w("AccountHelper",
                 "request sync " + ContentResolver.getIsSyncable(mAccount, AUTHORITY));
-        ContentResolver.requestSync(mAccount, AUTHORITY, new Bundle());
-//        }
+        Bundle extras = new Bundle();
+        extras.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        ContentResolver.requestSync(mAccount, AUTHORITY, extras);
     }
 
     public void requestSync(String woeid) {
@@ -141,6 +139,18 @@ public class AccountHelper {
                 "request sync " + ContentResolver.getIsSyncable(mAccount, AUTHORITY));
         Bundle bundle = new Bundle();
         bundle.putString(WeatherLoadingService.EXTRA_INCLUDE_WOEID, woeid);
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
         ContentResolver.requestSync(mAccount, AUTHORITY, bundle);
+    }
+
+    public void configureAutoSyncAndSync() {
+        createAccountIfNeeded();
+
+        ContentResolver.setIsSyncable(mAccount, AUTHORITY, 1);
+        ContentResolver.setSyncAutomatically(mAccount, AUTHORITY, true);
+        if (WeatherLoadingService.hasTimeoutExpired(mContext)) {
+            ContentResolver.requestSync(mAccount, AUTHORITY, Bundle.EMPTY);
+        }
+
     }
 }

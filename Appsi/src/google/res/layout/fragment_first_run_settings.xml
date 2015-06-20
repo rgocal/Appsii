@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2015. Appsi Mobile
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
+  -->
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:layout_alignParentBottom="true"
+        >
+
+        <Button
+            android:id="@+id/next_button"
+            style="@style/PrimaryColorButtonBorderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:text="@string/next"
+            android:textColor="@color/white"
+            />
+    </RelativeLayout>
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="?attr/actionBarSize"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp"
+                android:src="@drawable/logo_large"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="12dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="?attr/colorPrimary"
+                android:text="Let\'s get ready"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="12dp"
+                android:text="Alright, you see that hotspot? With that hotspot you can open Appsii\'s panel. You can add as many of those as you\'d like."
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                />
+
+            <TextView
+                android:id="@+id/pages_caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="12dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                android:textColor="?attr/colorPrimary"
+                android:text="@string/pages"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="12dp"
+                android:text="Now choose the pages to add to the panel. You can change and reorder the pages later in settings.\nThe home page is a special page that can contain nearly anything you can think of. You can completely configure it and you can even add widgets to it! Please select the pages to add."
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                />
+
+            <CheckBox
+                android:id="@+id/home_checkbox"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/home_screen_name"
+                android:layout_marginEnd="16dp"
+                android:checked="true"
+                android:paddingStart="12dp"
+                />
+
+            <CheckBox
+                android:id="@+id/apps_checkbox"
+                android:layout_marginStart="8dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/apps_page_name"
+                android:layout_marginEnd="16dp"
+                android:checked="true"
+                android:paddingStart="12dp"
+                />
+
+            <TextView
+                android:id="@+id/permissions_caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="12dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                android:textColor="?attr/colorPrimary"
+                android:text="Permissions"
+                />
+
+            <TextView
+                android:id="@+id/permissions_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="12dp"
+                android:text="To use the home page Appsii needs to create an internal account on your device to synchronize data, and to provide you with your local weather, Appsii needs access to your location. The location permission is not required for Appsii to function properly."
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                />
+
+            <Button
+                android:id="@+id/permissions_button"
+                style="@style/PrimaryColorButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="16dp"
+                android:text="Grant access"
+                />
+        </LinearLayout>
+    </ScrollView>
+
+
+</RelativeLayout>

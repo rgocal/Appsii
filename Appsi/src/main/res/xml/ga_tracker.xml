@@ -73,7 +73,7 @@
         ShortcutActivity
     </screenName>
 
-    <bool name="ga_reportUncaughtExceptions">true</bool>
+    <bool name="ga_reportUncaughtExceptions">false</bool>
 
     <string name="ga_trackingId">UA-55656267-1</string>
 </resources>

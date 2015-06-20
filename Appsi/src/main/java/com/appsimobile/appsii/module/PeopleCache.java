@@ -30,7 +30,7 @@ import java.util.Set;
  */
 public class PeopleCache {
 
-    static PeopleCache sInstance = new PeopleCache();
+    static final PeopleCache sInstance = new PeopleCache();
 
     private final LruCache<Uri, Bitmap> mMemoryCache;
 

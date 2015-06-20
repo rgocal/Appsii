@@ -55,18 +55,18 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class LicenseChecker {
 
-    private static final String TAG = "LicenseChecker";
+    static final String TAG = "LicenseChecker";
 
     private static final String KEY_FACTORY_ALGORITHM = "RSA";
 
     // Timeout value (in milliseconds) for calls to service.
-    private static final int TIMEOUT_MS = 8 * 1000;
+    static final int TIMEOUT_MS = 8 * 1000;
 
     private static final SecureRandom RANDOM = new SecureRandom();
 
-    private static final boolean DEBUG_LICENSE_ERROR = true;
+    static final boolean DEBUG_LICENSE_ERROR = true;
 
-    private final Context mContext;
+    final Context mContext;
 
     private final Policy mPolicy;
 
@@ -74,13 +74,13 @@ public class LicenseChecker {
 
     private final String mVersionCode;
 
-    private PublicKey mPublicKey;
+    final PublicKey mPublicKey;
 
     /**
      * A handler for running tasks on a background thread. We don't want license
      * processing to block the UI thread.
      */
-    private Handler mHandler;
+    final Handler mHandler;
 
 
     /**
@@ -235,9 +235,9 @@ public class LicenseChecker {
 
     class LicensingConnection {
 
-        ServiceConnection mServiceConnection;
+        final ServiceConnection mServiceConnection;
 
-        ILicensingService mLicensingService;
+        final ILicensingService mLicensingService;
 
         public LicensingConnection(ServiceConnection connection,
                 ILicensingService licensingService) {
@@ -249,11 +249,11 @@ public class LicenseChecker {
 
     private class ResultListener extends ILicenseResultListener.Stub {
 
-        private static final int ERROR_CONTACTING_SERVER = 0x101;
+        static final int ERROR_CONTACTING_SERVER = 0x101;
 
-        private static final int ERROR_INVALID_PACKAGE_NAME = 0x102;
+        static final int ERROR_INVALID_PACKAGE_NAME = 0x102;
 
-        private static final int ERROR_NON_MATCHING_UID = 0x103;
+        static final int ERROR_NON_MATCHING_UID = 0x103;
 
         final CountDownLatch mCountDownLatch = new CountDownLatch(1);
 
@@ -261,9 +261,9 @@ public class LicenseChecker {
 
         final AtomicInteger mResult = new AtomicInteger(Policy.NOT_LICENSED);
 
-        private final LicenseValidator mValidator;
+        final LicenseValidator mValidator;
 
-        private Runnable mOnTimeout;
+        private final Runnable mOnTimeout;
 
         public ResultListener(LicenseValidator validator) {
             mValidator = validator;
@@ -331,7 +331,7 @@ public class LicenseChecker {
             });
         }
 
-        private void clearTimeout() {
+        void clearTimeout() {
             Log.i(TAG, "Clearing timeout.");
             mHandler.removeCallbacks(mOnTimeout);
         }

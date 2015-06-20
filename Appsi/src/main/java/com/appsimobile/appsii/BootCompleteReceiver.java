@@ -19,8 +19,8 @@ package com.appsimobile.appsii;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
+
+import com.appsimobile.appsii.preference.PreferenceHelper;
 
 /**
  * A receiver that handles the boot complete and user present events.
@@ -28,11 +28,9 @@ import android.preference.PreferenceManager;
 public class BootCompleteReceiver extends BroadcastReceiver {
 
     public static void autoStartAppsi(Context context) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        boolean autostart = prefs.getBoolean("pref_autostart", true);
-        if (autostart) {
-            Intent startServiceIntent = new Intent(context, Appsi.class);
-            context.startService(startServiceIntent);
+        PreferenceHelper prefs = PreferenceHelper.getInstance(context);
+        if (prefs.getAutoStart()) {
+            AppsiiUtils.startAppsi(context);
         }
     }
 

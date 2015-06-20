@@ -150,7 +150,7 @@ public class HomeViewWrapper extends FrameLayout {
         }
     }
 
-    static interface HomeItemListener {
+    interface HomeItemListener {
 
         /**
          * Called when the home view has become active and is allowed to load
