@@ -37,6 +37,8 @@ import static android.Manifest.permission.READ_CALL_LOG;
 import static android.Manifest.permission.READ_CONTACTS;
 
 /**
+ * The implementation of the setting fragment in the first run for the community
+ * edition.
  * Created by nick on 10/06/15.
  */
 public final class FirstRunSettingsFragment extends AbstractFirstRunSettingsFragment
@@ -190,9 +192,8 @@ public final class FirstRunSettingsFragment extends AbstractFirstRunSettingsFrag
             // enable both pages
             pageHelper.enablePageAccess(Pages.PAGE_HOME, true);
             pageHelper.enablePageAccess(Pages.PAGE_APPS, true);
-            pageHelper.enablePageAccess(Pages.PAGE_AGENDA, true);
-            pageHelper.enablePageAccess(Pages.PAGE_PEOPLE, true);
-            pageHelper.enablePageAccess(Pages.PAGE_CALLS, true);
+            // we do not change the other pages, these require permissions
+            // to function
             mInitiallyEnabled = true;
         }
 
