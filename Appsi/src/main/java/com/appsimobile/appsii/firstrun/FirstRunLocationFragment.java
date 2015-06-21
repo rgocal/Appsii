@@ -43,8 +43,6 @@ import com.appsimobile.appsii.preference.PreferenceHelper;
 public final class FirstRunLocationFragment extends Fragment implements View.OnClickListener,
         YahooLocationChooserDialogFragment.LocationResultListener, LocationReceiver {
 
-    private OnLocationCompletedListener mOnFirstRunCompletedListener;
-
     View mChooseLocationButton;
 
     TextView mDefaultLocationName;
@@ -62,6 +60,8 @@ public final class FirstRunLocationFragment extends Fragment implements View.OnC
 
     RadioButton mImperialRadioButton;
 
+    private OnLocationCompletedListener mOnFirstRunCompletedListener;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,16 +76,9 @@ public final class FirstRunLocationFragment extends Fragment implements View.OnC
             mLocationResult = savedInstanceState.getParcelable("location");
             mSetToLocalSystem = savedInstanceState.getBoolean("set_to_local_system");
         } else {
-            PreferenceHelper preferenceHelper = PreferenceHelper.getInstance(getContext());
+            PreferenceHelper preferenceHelper = PreferenceHelper.getInstance(getActivity());
             mLocationResult = preferenceHelper.getDefaultUserLocation();
         }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelable("location", mLocationResult);
-        outState.putBoolean("set_to_local_system", mSetToLocalSystem);
     }
 
     @Nullable
@@ -134,11 +127,6 @@ public final class FirstRunLocationFragment extends Fragment implements View.OnC
         }
     }
 
-    public void setOnLocationCompletedListener(
-            OnLocationCompletedListener onLocationCompletedListener) {
-        mOnFirstRunCompletedListener = onLocationCompletedListener;
-    }
-
     @Override
     public void onStart() {
         super.onStart();
@@ -156,11 +144,23 @@ public final class FirstRunLocationFragment extends Fragment implements View.OnC
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("location", mLocationResult);
+        outState.putBoolean("set_to_local_system", mSetToLocalSystem);
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
         if (mLocationLoader != null) {
             mLocationLoader.destroy();
         }
+    }
+
+    public void setOnLocationCompletedListener(
+            OnLocationCompletedListener onLocationCompletedListener) {
+        mOnFirstRunCompletedListener = onLocationCompletedListener;
     }
 
     @Override

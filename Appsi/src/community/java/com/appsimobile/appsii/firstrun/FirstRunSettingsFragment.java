@@ -123,7 +123,7 @@ public final class FirstRunSettingsFragment extends AbstractFirstRunSettingsFrag
     }
 
     private boolean checkAndRequestPermission(int rc, String... permission) {
-        if (!PermissionUtils.holdsAllPermissions(getContext(), permission)) {
+        if (!PermissionUtils.holdsAllPermissions(getActivity(), permission)) {
             PermissionUtils.requestPermission(this, rc, permission);
             return false;
         }

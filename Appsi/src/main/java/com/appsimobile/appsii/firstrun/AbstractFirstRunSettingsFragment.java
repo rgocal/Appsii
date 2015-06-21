@@ -77,7 +77,7 @@ public abstract class AbstractFirstRunSettingsFragment
         mOnSettingsCompletedListener.onSettingsCompleted();
     }
 
-    @Override
+    //@Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
             @NonNull int[] grantResults) {
 
@@ -85,7 +85,7 @@ public abstract class AbstractFirstRunSettingsFragment
                 grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             mNextButton.setEnabled(true);
             mPermissionsButton.setEnabled(false);
-            AccountHelper.getInstance(getContext()).createAccountIfNeeded();
+            AccountHelper.getInstance(getActivity()).createAccountIfNeeded();
         }
 
     }

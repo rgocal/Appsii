@@ -22,7 +22,6 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
@@ -67,10 +66,10 @@ public final class PermissionUtils {
             throws PermissionDeniedException {
         if (!runtimePermissionsAvailable()) return;
 
-        int result = context.checkSelfPermission(permissionName);
-        if (result != PackageManager.PERMISSION_GRANTED) {
-            throw new PermissionDeniedException(permissionName);
-        }
+//        int result = context.checkSelfPermission(permissionName);
+//        if (result != PackageManager.PERMISSION_GRANTED) {
+//            throw new PermissionDeniedException(permissionName);
+//        }
     }
 
     /**
@@ -87,19 +86,22 @@ public final class PermissionUtils {
      * devices that do not have runtime permissions (pre-M).
      */
     public static boolean holdsPermission(Context context, String permissionName) {
-        if (!runtimePermissionsAvailable()) return true;
-        int result = context.checkSelfPermission(permissionName);
-        return result == PackageManager.PERMISSION_GRANTED;
+        return true;
+//        if (!runtimePermissionsAvailable()) return true;
+//        int result = context.checkSelfPermission(permissionName);
+//        return result == PackageManager.PERMISSION_GRANTED;
     }
 
     public static boolean holdsAllPermissions(Context context, String... permissionNames) {
-        if (!runtimePermissionsAvailable()) return true;
-        for (String permissionName : permissionNames) {
-            if (context.checkSelfPermission(permissionName) != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
-        }
         return true;
+//        if (!runtimePermissionsAvailable()) return true;
+//        for (String permissionName : permissionNames) {
+//            if (context.checkSelfPermission(permissionName) != PackageManager
+// .PERMISSION_GRANTED) {
+//                return false;
+//            }
+//        }
+//        return true;
     }
 
     /**
@@ -129,7 +131,7 @@ public final class PermissionUtils {
 
         if (!runtimePermissionsAvailable()) return;
 
-        activity.requestPermissions(permissions, requestCode);
+//        activity.requestPermissions(permissions, requestCode);
     }
 
     public static void requestPermission(
@@ -137,7 +139,7 @@ public final class PermissionUtils {
 
         if (!runtimePermissionsAvailable()) return;
 
-        fragment.requestPermissions(permissions, requestCode);
+//        fragment.requestPermissions(permissions, requestCode);
     }
 
     /**

@@ -33,13 +33,13 @@ repositories {
 }
 
 android {
-    compileSdkVersion 'android-MNC'
+    compileSdkVersion 22
     buildToolsVersion '23.0.0 rc2'
 
     defaultConfig {
         applicationId "com.appsimobile.appsii"
         minSdkVersion 17
-        targetSdkVersion 'MNC'
+        targetSdkVersion 22
         versionCode 16
         versionName "beta-0.9.9"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

@@ -35,13 +35,13 @@ public class RequestPermissionActivity extends Activity {
         Intent intent = getIntent();
         String[] permissions = intent.getStringArrayExtra(PermissionUtils.EXTRA_PERMISSIONS);
         int requestCode = intent.getIntExtra(PermissionUtils.EXTRA_REQUEST_CODE, 0);
-        requestPermissions(permissions, requestCode);
+        PermissionUtils.requestPermission(this, requestCode, permissions);
     }
 
-    @Override
+    //@Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
             @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        //super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         sendGrantedBroadcast(requestCode, permissions, grantResults);
     }
 

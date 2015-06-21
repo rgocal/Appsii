@@ -169,20 +169,23 @@ public class ReorderController implements DragSortListView.DropListener,
         switch (pageType) {
             case HomeContract.Pages.PAGE_AGENDA:
                 if (!PermissionUtils.holdsPermission(mContext, Manifest.permission.READ_CALENDAR)) {
-                    mContext.requestPermissions(new String[]{Manifest.permission.READ_CALENDAR},
-                            PermissionUtils.REQUEST_CODE_PERMISSION_READ_CALENDAR);
+                    PermissionUtils.requestPermission(mContext,
+                            PermissionUtils.REQUEST_CODE_PERMISSION_READ_CALENDAR,
+                            Manifest.permission.READ_CALENDAR);
                 }
                 break;
             case HomeContract.Pages.PAGE_PEOPLE:
                 if (!PermissionUtils.holdsPermission(mContext, Manifest.permission.READ_CONTACTS)) {
-                    mContext.requestPermissions(new String[]{Manifest.permission.READ_CONTACTS},
-                            PermissionUtils.REQUEST_CODE_PERMISSION_READ_CONTACTS);
+                    PermissionUtils.requestPermission(mContext,
+                            PermissionUtils.REQUEST_CODE_PERMISSION_READ_CONTACTS,
+                            Manifest.permission.READ_CONTACTS);
                 }
                 break;
             case HomeContract.Pages.PAGE_CALLS:
                 if (!PermissionUtils.holdsPermission(mContext, Manifest.permission.READ_CALL_LOG)) {
-                    mContext.requestPermissions(new String[]{Manifest.permission.READ_CALL_LOG},
-                            PermissionUtils.REQUEST_CODE_PERMISSION_READ_CALL_LOG);
+                    PermissionUtils.requestPermission(mContext,
+                            PermissionUtils.REQUEST_CODE_PERMISSION_READ_CALL_LOG,
+                            Manifest.permission.READ_CALL_LOG);
                 }
                 break;
         }

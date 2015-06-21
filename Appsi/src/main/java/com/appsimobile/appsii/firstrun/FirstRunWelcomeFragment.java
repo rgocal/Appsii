@@ -38,8 +38,6 @@ import com.appsimobile.appsii.preference.PreferenceHelper;
  */
 public final class FirstRunWelcomeFragment extends Fragment implements View.OnClickListener {
 
-    private OnWelcomeCompletedListener mOnFirstRunCompletedListener;
-
     View mPermissionsCaption;
 
     View mPermissionsText;
@@ -49,6 +47,8 @@ public final class FirstRunWelcomeFragment extends Fragment implements View.OnCl
     Button mNextButton;
 
     Switch mAutoStartSwitch;
+
+    private OnWelcomeCompletedListener mOnFirstRunCompletedListener;
 
     @Nullable
     @Override
@@ -72,11 +72,6 @@ public final class FirstRunWelcomeFragment extends Fragment implements View.OnCl
         mNextButton.setOnClickListener(this);
     }
 
-    public void setOnFirstRunCompletedListener(
-            OnWelcomeCompletedListener onFirstRunCompletedListener) {
-        mOnFirstRunCompletedListener = onFirstRunCompletedListener;
-    }
-
     @Override
     public void onResume() {
         super.onResume();
@@ -96,6 +91,11 @@ public final class FirstRunWelcomeFragment extends Fragment implements View.OnCl
         }
     }
 
+    public void setOnFirstRunCompletedListener(
+            OnWelcomeCompletedListener onFirstRunCompletedListener) {
+        mOnFirstRunCompletedListener = onFirstRunCompletedListener;
+    }
+
     @Override
     public void onClick(View v) {
         int id = v.getId();
@@ -109,18 +109,18 @@ public final class FirstRunWelcomeFragment extends Fragment implements View.OnCl
         }
     }
 
+    private void onPermissionButtonPressed() {
+        PermissionUtils.requestPermission(
+                this, 1, Manifest.permission.SYSTEM_ALERT_WINDOW);
+    }
+
     private void onNextButtonPressed() {
         PreferenceHelper preferenceHelper = PreferenceHelper.getInstance(getActivity());
         preferenceHelper.setAutoStart(mAutoStartSwitch.isChecked());
         mOnFirstRunCompletedListener.onWelcomeCompleted();
     }
 
-    private void onPermissionButtonPressed() {
-        PermissionUtils.requestPermission(
-                this, 1, Manifest.permission.SYSTEM_ALERT_WINDOW);
-    }
-
-    @Override
+    //@Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
             @NonNull int[] grantResults) {
 

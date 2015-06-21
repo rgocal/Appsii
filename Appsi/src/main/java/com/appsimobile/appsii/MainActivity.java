@@ -68,6 +68,29 @@ public class MainActivity extends AppCompatActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
     }
 
+    private void showFirstRunFragment() {
+        FragmentManager fm = getFragmentManager();
+        FirstRunFragment fragment = (FirstRunFragment) fm.findFragmentByTag(FRAGMENT_FIRST_RUN);
+        if (fragment == null) {
+            fragment = new FirstRunFragment();
+            fm.beginTransaction().
+                    replace(R.id.container, fragment, FRAGMENT_FIRST_RUN).
+                    commit();
+        }
+    }
+
+    private void showPreferencesFragment() {
+        FragmentManager fm = getFragmentManager();
+        MainPreferencesFragment prefs =
+                (MainPreferencesFragment) fm.findFragmentByTag(FRAGMENT_PREFS);
+
+        if (prefs == null) {
+            fm.beginTransaction().
+                    replace(R.id.container, new MainPreferencesFragment(), FRAGMENT_PREFS).
+                    commit();
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -88,27 +111,15 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    private void showPreferencesFragment() {
-        FragmentManager fm = getFragmentManager();
-        MainPreferencesFragment prefs =
-                (MainPreferencesFragment) fm.findFragmentByTag(FRAGMENT_PREFS);
-
-        if (prefs == null) {
-            fm.beginTransaction().
-                    replace(R.id.container, new MainPreferencesFragment(), FRAGMENT_PREFS).
-                    commit();
-        }
+    private void showSystemAlertWindowPermissionErrorIfNotFirstRun() {
+        if (mFirstRun) return;
+        PermissionUtils.requestPermission(this, 1, Manifest.permission.SYSTEM_ALERT_WINDOW);
+        // TODO: implement better
     }
 
-    private void showFirstRunFragment() {
-        FragmentManager fm = getFragmentManager();
-        FirstRunFragment fragment = (FirstRunFragment) fm.findFragmentByTag(FRAGMENT_FIRST_RUN);
-        if (fragment == null) {
-            fragment = new FirstRunFragment();
-            fm.beginTransaction().
-                    replace(R.id.container, fragment, FRAGMENT_FIRST_RUN).
-                    commit();
-        }
+    @Override
+    public void onFirstRunCompleted() {
+        onFirstRunFragmentComplete();
     }
 
     private void onFirstRunFragmentComplete() {
@@ -128,17 +139,6 @@ public class MainActivity extends AppCompatActivity
                 replace(R.id.container, new MainPreferencesFragment(), FRAGMENT_PREFS).
                 setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN).
                 commit();
-    }
-
-    private void showSystemAlertWindowPermissionErrorIfNotFirstRun() {
-        if (mFirstRun) return;
-        requestPermissions(new String[] {Manifest.permission.SYSTEM_ALERT_WINDOW}, 1);
-        // TODO: implement
-    }
-
-    @Override
-    public void onFirstRunCompleted() {
-        onFirstRunFragmentComplete();
     }
 
     public static class MainPreferencesFragment extends PreferenceFragment {

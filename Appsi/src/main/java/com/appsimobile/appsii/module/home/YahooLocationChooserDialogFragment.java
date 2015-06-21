@@ -80,20 +80,6 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
 
     public static final int LOCATION_REQUEST_RESULT_PERMISSION_DENIED = 3;
 
-    View mGrantAccessContainer;
-
-    Button mCancelGrantLocationAccessButton;
-
-    Button mConfirmGrantLocationAccessButton;
-
-    @IntDef({LOCATION_REQUEST_RESULT_DISABLED,
-            LOCATION_REQUEST_RESULT_READY,
-            LOCATION_REQUEST_RESULT_UPDATING_LOCATION,
-            LOCATION_REQUEST_RESULT_PERMISSION_DENIED})
-    public @interface LocationRequestResult {
-
-    }
-
     /**
      * Time between search queries while typing.
      */
@@ -101,6 +87,12 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
 
     @VisibleForTesting
     static LocationUpdateHelper sLocationUpdateHelper;
+
+    View mGrantAccessContainer;
+
+    Button mCancelGrantLocationAccessButton;
+
+    Button mConfirmGrantLocationAccessButton;
 
     boolean mHasUpdatedLocationInfo;
 
@@ -118,22 +110,6 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
 
     View mCurrentLocationContainer;
 
-    View mEnableLocationContainer;
-
-    LocationResultListener mLocationResultListener;
-
-    SearchResultsListAdapter mSearchResultsAdapter;
-
-    ListView mSearchResultsList;
-
-    Button mApplyCurrentLocationButton;
-
-    Button mCancelCurrentLocationButton;
-
-    Button mCancelUseLocationButton;
-
-    Button mConfirmUseLocationButton;
-
     final Runnable mShowLocationRunnable = new Runnable() {
         @Override
         public void run() {
@@ -149,6 +125,22 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
             onLocationInfoAvailable(mCurrentCountry, mCurrentTownName);
         }
     };
+
+    View mEnableLocationContainer;
+
+    LocationResultListener mLocationResultListener;
+
+    SearchResultsListAdapter mSearchResultsAdapter;
+
+    ListView mSearchResultsList;
+
+    Button mApplyCurrentLocationButton;
+
+    Button mCancelCurrentLocationButton;
+
+    Button mCancelUseLocationButton;
+
+    Button mConfirmUseLocationButton;
 
     boolean mNoHints;
 
@@ -321,14 +313,14 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
         return sLocationUpdateHelper.startLocationUpdateIfNeeded(activity);
     }
 
-    void showLocationProviderDisabled() {
-        mHasUpdatedLocationInfo = false;
-        mEnableLocationContainer.setVisibility(View.VISIBLE);
-    }
-
     void showLocationPermissionDenied() {
         mHasUpdatedLocationInfo = false;
         mGrantAccessContainer.setVisibility(View.VISIBLE);
+    }
+
+    void showLocationProviderDisabled() {
+        mHasUpdatedLocationInfo = false;
+        mEnableLocationContainer.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -471,17 +463,25 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
         dismiss();
     }
 
-    void onGrantLocationAccessClicked() {
-        requestPermissions(new String[]{ACCESS_COARSE_LOCATION}, 7);
-        dismiss();
-    }
-
     void onCancelEnableLocationClicked() {
         mEnableLocationContainer.setVisibility(View.GONE);
     }
 
+    void onGrantLocationAccessClicked() {
+        PermissionUtils.requestPermission(this, 7, ACCESS_COARSE_LOCATION);
+        dismiss();
+    }
+
     void onCancelLocationAccessClicked() {
         mGrantAccessContainer.setVisibility(View.GONE);
+    }
+
+    @IntDef({LOCATION_REQUEST_RESULT_DISABLED,
+            LOCATION_REQUEST_RESULT_READY,
+            LOCATION_REQUEST_RESULT_UPDATING_LOCATION,
+            LOCATION_REQUEST_RESULT_PERMISSION_DENIED})
+    public @interface LocationRequestResult {
+
     }
 
     interface LocationUpdateHelper {

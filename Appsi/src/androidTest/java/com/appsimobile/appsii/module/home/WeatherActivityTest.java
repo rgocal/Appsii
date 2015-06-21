@@ -178,7 +178,8 @@ public class WeatherActivityTest extends ActivityInstrumentationTestCase2<CellWe
                 getInstance(mWeatherActivity);
 
         onView(withId(R.id.weather_location)).perform(click());
-        onView(withId(R.id.location_title)).check(matches(withText(R.string.location_disabled)));
+        onView(withId(R.id.location_title)).check(
+                matches(withText(R.string.location_permission_denied)));
 
         onView(withId(R.id.location_search)).
                 check(matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)));
