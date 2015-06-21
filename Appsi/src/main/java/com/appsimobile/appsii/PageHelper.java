@@ -35,11 +35,11 @@ import com.appsimobile.appsii.module.home.provider.HomeContract;
  */
 public class PageHelper {
 
+    static PageHelper sInstance;
+
     final AsyncQueryHandlerImpl mQueryHandler;
 
     final ContentResolver mContentResolver;
-
-    static PageHelper sInstance;
 
     private PageHelper(Context context) {
         context = context.getApplicationContext();
@@ -246,6 +246,19 @@ public class PageHelper {
             startInsert(INSERT_ENABLE_PAGE, null, HomeContract.Pages.CONTENT_URI, values);
         }
 
+        /**
+         * Query the hotspots in the system. The provided uri is the uri
+         * of the page we want to add to each of the found hotspots.
+         */
+        private void queryHotspots(Uri pageUri) {
+            startQuery(QUERY_HOTSPOTS, pageUri,
+                    HomeContract.Hotspots.CONTENT_URI,
+                    new String[]{HomeContract.Hotspots._ID},
+                    null,
+                    null,
+                    null);
+        }
+
         private String getTitleForPageType(int pageType) {
             int resId;
             switch (pageType) {
@@ -269,19 +282,6 @@ public class PageHelper {
             if (token == INSERT_ENABLE_PAGE) {
                 queryHotspots(uri);
             }
-        }
-
-        /**
-         * Query the hotspots in the system. The provided uri is the uri
-         * of the page we want to add to each of the found hotspots.
-         */
-        private void queryHotspots(Uri pageUri) {
-            startQuery(QUERY_HOTSPOTS, pageUri,
-                    HomeContract.Hotspots.CONTENT_URI,
-                    new String[]{HomeContract.Hotspots._ID},
-                    null,
-                    null,
-                    null);
         }
     }
 

@@ -72,6 +72,15 @@ public class YahooWeatherApiClient {
 
     private static final XmlPullParserFactory sXmlPullParserFactory;
 
+    static {
+        try {
+            sXmlPullParserFactory = XmlPullParserFactory.newInstance();
+            sXmlPullParserFactory.setNamespaceAware(true);
+        } catch (XmlPullParserException e) {
+            Log.e(TAG, "Could not instantiate XmlPullParserFactory", e);
+            throw new RuntimeException(e);
+        }
+    }
 
     public static List<WeatherData> getWeatherForWoeids(String[] woeids, String unit)
             throws CantGetWeatherException {
@@ -370,15 +379,6 @@ public class YahooWeatherApiClient {
                 = "kGO140TV34HVTae_DDS93fM_w3AJmtmI23gxUFnHKWyrOGcRzoFjYpw8Ato6BxhvbTg-";
     }
 
-    static {
-        try {
-            sXmlPullParserFactory = XmlPullParserFactory.newInstance();
-            sXmlPullParserFactory.setNamespaceAware(true);
-        } catch (XmlPullParserException e) {
-            Log.e(TAG, "Could not instantiate XmlPullParserFactory", e);
-        }
-    }
-
     public static class LocationInfo {
 
         // Sorted by decreasing precision
@@ -393,6 +393,19 @@ public class YahooWeatherApiClient {
     }
 
     public static class LocationSearchResult implements Parcelable {
+
+        public static final Creator<LocationSearchResult> CREATOR =
+                new Creator<LocationSearchResult>() {
+                    @Override
+                    public LocationSearchResult createFromParcel(Parcel in) {
+                        return new LocationSearchResult(in);
+                    }
+
+                    @Override
+                    public LocationSearchResult[] newArray(int size) {
+                        return new LocationSearchResult[size];
+                    }
+                };
 
         public String woeid;
 
@@ -414,29 +427,16 @@ public class YahooWeatherApiClient {
         }
 
         @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
         public void writeToParcel(Parcel dest, int flags) {
             dest.writeString(woeid);
             dest.writeString(displayName);
             dest.writeString(country);
             dest.writeString(timezone);
         }
-
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-
-        public static final Creator<LocationSearchResult> CREATOR =
-                new Creator<LocationSearchResult>() {
-                    @Override
-                    public LocationSearchResult createFromParcel(Parcel in) {
-                        return new LocationSearchResult(in);
-                    }
-
-                    @Override
-                    public LocationSearchResult[] newArray(int size) {
-                        return new LocationSearchResult[size];
-                    }
-                };
     }
 }

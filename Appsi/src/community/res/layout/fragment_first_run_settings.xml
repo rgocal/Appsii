@@ -18,7 +18,6 @@
 
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -67,7 +66,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="12dp"
-                android:text="@string/first_usage_weather_options"
+                android:text="@string/first_usage_lets_get_ready"
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"
                 android:textColor="?attr/colorPrimary"
                 />
@@ -78,17 +77,18 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="12dp"
-                android:text="@string/first_usage_weather_description"
+                android:text="@string/first_usage_hotspot_description"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 />
 
             <TextView
+                android:id="@+id/pages_caption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="12dp"
-                android:text="@string/defaults"
-                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                android:text="@string/pages"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 android:textColor="?attr/colorPrimary"
                 />
 
@@ -98,72 +98,95 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="12dp"
-                android:text="@string/first_usage_units_description"
+                android:text="@string/first_usage_pages_description"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 />
 
-            <RadioGroup
+            <CheckBox
+                android:id="@+id/home_checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                >
+                android:checked="true"
+                android:paddingStart="12dp"
+                android:text="@string/home_screen_name"
+                />
 
-                <RadioButton
-                    android:id="@+id/default_metric"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/metric_description"/>
+            <CheckBox
+                android:id="@+id/apps_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="8dp"
+                android:checked="true"
+                android:paddingStart="12dp"
+                android:text="@string/apps_page_name"
+                />
 
-                <RadioButton
-                    android:id="@+id/default_imperial"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/imperial_description"/>
+            <CheckBox
+                android:id="@+id/agenda_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="8dp"
+                android:paddingStart="12dp"
+                android:text="@string/agenda_page_name"
+                />
 
-            </RadioGroup>
+            <CheckBox
+                android:id="@+id/people_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="8dp"
+                android:paddingStart="12dp"
+                android:text="@string/people_page_name"
+                />
 
+            <CheckBox
+                android:id="@+id/call_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="8dp"
+                android:paddingStart="12dp"
+                android:text="@string/calls_page_name"
+                />
 
             <TextView
+                android:id="@+id/permissions_caption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="12dp"
-                android:text="@string/default_location"
-                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                android:text="@string/permissions"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 android:textColor="?attr/colorPrimary"
                 />
 
             <TextView
+                android:id="@+id/permissions_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="12dp"
-                android:text="@string/first_usage_location_description"
+                android:text="@string/first_usage_account_permission_description"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 />
-
-            <TextView
-                android:id="@+id/welcome_fallback_location_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                tools:text="Your location: New York"/>
 
             <Button
-                android:id="@+id/welcome_fallback_location"
+                android:id="@+id/permissions_button"
                 style="@style/PrimaryColorButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:layout_marginEnd="16dp"
                 android:layout_marginTop="16dp"
-                android:text="@string/choose_location"
+                android:text="@string/grant_access"
                 />
-
         </LinearLayout>
     </ScrollView>
 

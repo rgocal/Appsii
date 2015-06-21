@@ -40,34 +40,14 @@ import com.appsimobile.appsii.permissions.PermissionUtils;
 /**
  * Created by nick on 10/06/15.
  */
-public final class FirstRunSettingsFragment extends Fragment implements View.OnClickListener,
-        CompoundButton.OnCheckedChangeListener {
-
-    private OnSettingsCompletedListener mOnSettingsCompletedListener;
-
-    Button mNextButton;
-
-    View mPermissionsCaption;
-
-    View mPermissionsText;
-
-    View mPermissionsButton;
+public final class FirstRunSettingsFragment extends AbstractFirstRunSettingsFragment
+        implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
     CheckBox mHomeCheckbox;
 
     CheckBox mAppsCheckbox;
 
     boolean mInitiallyEnabled;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // We know we came from step 1, and step 1
-        // can't be completed without setting the
-        // permissions if needed. So we can start
-        // Appsii safely from here.
-        AppsiiUtils.startAppsi(getActivity());
-    }
 
     @Nullable
     @Override
@@ -86,16 +66,8 @@ public final class FirstRunSettingsFragment extends Fragment implements View.OnC
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mPermissionsCaption = view.findViewById(R.id.permissions_caption);
-        mPermissionsText = view.findViewById(R.id.permissions_text);
-        mPermissionsButton = view.findViewById(R.id.permissions_button);
-
         mAppsCheckbox = (CheckBox) view.findViewById(R.id.apps_checkbox);
         mHomeCheckbox = (CheckBox) view.findViewById(R.id.home_checkbox);
-
-        mNextButton = (Button) view.findViewById(R.id.next_button);
-        mNextButton.setOnClickListener(this);
-        mPermissionsButton.setOnClickListener(this);
 
         final PageHelper pageHelper = PageHelper.getInstance(getActivity());
 
@@ -114,76 +86,6 @@ public final class FirstRunSettingsFragment extends Fragment implements View.OnC
 
         mHomeCheckbox.setOnCheckedChangeListener(this);
         mAppsCheckbox.setOnCheckedChangeListener(this);
-    }
-
-    public void setOnSettingsCompletedListener(
-            OnSettingsCompletedListener onSettingsCompletedListener) {
-        mOnSettingsCompletedListener = onSettingsCompletedListener;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        updatePermissions();
-    }
-
-    private void updatePermissions() {
-        if (PermissionUtils.runtimePermissionsAvailable()) {
-            boolean holdsPermission = PermissionUtils.holdsPermission(getActivity(),
-                    Manifest.permission.AUTHENTICATE_ACCOUNTS);
-            mNextButton.setEnabled(holdsPermission);
-            mPermissionsButton.setEnabled(!holdsPermission);
-        } else {
-            mPermissionsCaption.setVisibility(View.GONE);
-            mPermissionsText.setVisibility(View.GONE);
-            mPermissionsButton.setVisibility(View.GONE);
-        }
-    }
-
-    @Override
-    public void onClick(View v) {
-        int id = v.getId();
-        switch (id) {
-            case R.id.permissions_button:
-                onPermissionButtonPressed();
-                break;
-            case R.id.next_button:
-                onNextButtonPressed();
-                break;
-        }
-    }
-
-    private void onNextButtonPressed() {
-        mOnSettingsCompletedListener.onSettingsCompleted();
-    }
-
-    private void onPermissionButtonPressed() {
-        PermissionUtils.requestPermission(
-                this, 1,
-                Manifest.permission.AUTHENTICATE_ACCOUNTS,
-                Manifest.permission.ACCESS_COARSE_LOCATION);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-            @NonNull int[] grantResults) {
-
-        if (requestCode == 1 && Manifest.permission.AUTHENTICATE_ACCOUNTS.equals(permissions[0]) &&
-                grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            mNextButton.setEnabled(true);
-            mPermissionsButton.setEnabled(false);
-            AccountHelper.getInstance(getContext()).createAccountIfNeeded();
-        }
-
-        if (requestCode == 1 && Manifest.permission.ACCESS_COARSE_LOCATION.equals(permissions[1]) &&
-                grantResults[1] != PackageManager.PERMISSION_GRANTED) {
-            showLocationChooser();
-        }
-    }
-
-    private void showLocationChooser() {
-
-        // TODO: implement
     }
 
     @Override
@@ -208,11 +110,6 @@ public final class FirstRunSettingsFragment extends Fragment implements View.OnC
                 break;
         }
 
-    }
-
-    interface OnSettingsCompletedListener {
-
-        void onSettingsCompleted();
     }
 
 }

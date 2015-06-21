@@ -25,8 +25,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
         android:layout_alignParentBottom="true"
+        android:background="?attr/colorPrimary"
         >
 
         <Button
@@ -34,9 +34,9 @@
             style="@style/PrimaryColorButtonBorderless"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
             android:layout_alignParentEnd="true"
-            android:text="Next"
+            android:layout_centerVertical="true"
+            android:text="@string/next"
             android:textColor="@color/white"
             />
     </RelativeLayout>
@@ -66,9 +66,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="12dp"
+                android:text="@string/welcome_to_appsii"
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"
                 android:textColor="?attr/colorPrimary"
-                android:text="Welcome to Appsii!"
                 />
 
             <TextView
@@ -77,7 +77,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="12dp"
-                android:text="Appsii can be opened by swiping from the hotspot. The sidebar can contain multiple pages to open or launch anything you need."
+                android:text="@string/first_usage_wizard_description"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 />
 
@@ -86,9 +86,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="12dp"
+                android:text="@string/pref_autostart_title"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 android:textColor="?attr/colorPrimary"
-                android:text="Auto start"
                 />
 
             <TextView
@@ -97,18 +97,18 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="12dp"
-                android:text="It is recommended to automatically start Appsii when your device is started. You can disable this if you prefer to start Appsii manually."
+                android:text="@string/first_usage_autostart_description"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 />
 
             <Switch
                 android:id="@+id/pref_autostart"
-                android:text="@string/pref_autostart_title"
-                android:layout_marginTop="12dp"
-                android:layout_marginStart="16dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="12dp"
                 android:checked="true"
+                android:text="@string/pref_autostart_title"
                 />
 
 
@@ -118,9 +118,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="12dp"
+                android:text="@string/permissions"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 android:textColor="?attr/colorPrimary"
-                android:text="Permissions"
                 />
 
             <TextView
@@ -130,7 +130,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="12dp"
-                android:text="Appsii needs to draw over other applications in order to function properly. To start using Appsii press the button below to grant Appsii the permissions to do so."
+                android:text="@string/first_usage_draw_over_permission_description"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 />
 
@@ -142,7 +142,7 @@
                 android:layout_gravity="end"
                 android:layout_marginEnd="16dp"
                 android:layout_marginTop="16dp"
-                android:text="Grant access"
+                android:text="@string/grant_access"
                 />
 
         </LinearLayout>

@@ -244,7 +244,7 @@
     <string name="paging_animation_depth">Depth</string>
     <string name="paging_animation_tablet">Cover flow</string>
 
-    <string name="pref_autostart_title">Auto-start Appsii</string>
+    <string name="pref_autostart_title">Auto start</string>
 
     <string name="edit">Edit</string>
 
@@ -514,4 +514,26 @@
     <string name="permission_reason_location_weather">Appsii can\'t access your location because the permission has not been granted. To load local weather, press the grant access button.</string>
     <string name="permission_reason_calls">Appsii can\'t access your call log because the permission has not been granted. To show your recent calls, press the grant access button.</string>
     <string name="next">Next</string>
+    <string name="first_usage_lets_get_ready">Let\'s get ready</string>
+    <string name="first_usage_hotspot_description">Alright, you see that hotspot? With that hotspot you can open Appsii\'s panel. You can add as many of those as you\'d like.</string>
+    <string name="first_usage_pages_description">Now choose the pages to add to the panel. You can change and reorder the pages later in settings.\nThe home page is a special page that can contain nearly anything you can think of. You can completely configure it and you can even add widgets to it! Please select the pages to add.</string>
+    <string name="permissions">Permissions</string>
+    <string name="first_usage_account_permission_description">To use the home page Appsii needs to create an internal account on your device to synchronize data, and to provide you with your local weather, Appsii needs access to your location. The location permission is not required for Appsii to function properly.</string>
+    <string name="first_usage_appsii_done">Appsii is now ready for use.</string>
+    <string name="join_the_community">Join the community</string>
+    <string name="community_description">Join the Appsii community on Google+ to learn more about Appsii and to share your feedback with the developer. In the about menu there are several links you can use to learn more about Appsii, to suggest ideas or to report bugs.</string>
+    <string name="join">Join</string>
+    <string name="first_usage_weather_options">Weather options</string>
+    <string name="first_usage_weather_description">To display the weather properly, Appsii needs to know a few final things.</string>
+    <string name="defaults">Defaults</string>
+    <string name="first_usage_units_description">Please select the kind of units Appsii should use to display your weather info.</string>
+    <string name="metric_description">Use Metric (℃, km/h, etc)</string>
+    <string name="imperial_description">Use Imperial (℉, mph, etc)</string>
+    <string name="default_location">Default location</string>
+    <string name="first_usage_location_description">Now choose your default location. Your default location is used when location services are disabled or location access is not allowed.</string>
+    <string name="choose_location">Choose location</string>
+    <string name="welcome_to_appsii">Welcome to Appsii!</string>
+    <string name="first_usage_wizard_description">In the next few pages, you will be able to configure Appsii. You can always change these settings later in the settings menu.</string>
+    <string name="first_usage_autostart_description">It is recommended to automatically start Appsii when your device is started. You can disable this if you prefer to start Appsii manually.</string>
+    <string name="first_usage_draw_over_permission_description">Appsii needs to draw over other applications in order to function properly. To start using Appsii press the button below to grant Appsii the permissions to do so.</string>
 </resources>

@@ -25,8 +25,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
         android:layout_alignParentBottom="true"
+        android:background="?attr/colorPrimary"
         >
 
         <Button
@@ -34,8 +34,8 @@
             style="@style/PrimaryColorButtonBorderless"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
             android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
             android:text="@string/done"
             android:textColor="@color/white"
             />
@@ -66,9 +66,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="12dp"
+                android:text="@string/done"
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"
                 android:textColor="?attr/colorPrimary"
-                android:text="Done"
                 />
 
             <TextView
@@ -77,7 +77,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="12dp"
-                android:text="Appsii has now been configured."
+                android:text="@string/first_usage_appsii_done"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 />
 
@@ -86,9 +86,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="12dp"
+                android:text="@string/join_the_community"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 android:textColor="?attr/colorPrimary"
-                android:text="Join the community"
                 />
 
             <TextView
@@ -97,7 +97,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="12dp"
-                android:text="Join the Appsii community on Google+ to learn more about Appsii and to share your feedback with the developer. In the about menu there are several links you can use to learn more about Appsii, to suggest ideas or to report bugs."
+                android:text="@string/community_description"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 />
 
@@ -109,7 +109,7 @@
                 android:layout_gravity="end"
                 android:layout_marginEnd="16dp"
                 android:layout_marginTop="16dp"
-                android:text="Join"
+                android:text="@string/join"
                 />
 
         </LinearLayout>

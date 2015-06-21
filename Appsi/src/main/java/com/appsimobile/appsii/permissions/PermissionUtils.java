@@ -58,15 +58,6 @@ public final class PermissionUtils {
     }
 
     /**
-     * Returns true when runtime permissions are available. This means, when running on
-     * Android M
-     */
-    public static boolean runtimePermissionsAvailable() {
-        if ("MNC".equals(Build.VERSION.CODENAME)) return true;
-        return Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1;
-    }
-
-    /**
      * Throws an exception if a permission is not available. Does nothing if runtime
      * permissions are not available.
      *
@@ -83,6 +74,15 @@ public final class PermissionUtils {
     }
 
     /**
+     * Returns true when runtime permissions are available. This means, when running on
+     * Android M
+     */
+    public static boolean runtimePermissionsAvailable() {
+        if ("MNC".equals(Build.VERSION.CODENAME)) return true;
+        return Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1;
+    }
+
+    /**
      * Returns true when the app holds the given permission. Always returns true on
      * devices that do not have runtime permissions (pre-M).
      */
@@ -90,6 +90,16 @@ public final class PermissionUtils {
         if (!runtimePermissionsAvailable()) return true;
         int result = context.checkSelfPermission(permissionName);
         return result == PackageManager.PERMISSION_GRANTED;
+    }
+
+    public static boolean holdsAllPermissions(Context context, String... permissionNames) {
+        if (!runtimePermissionsAvailable()) return true;
+        for (String permissionName : permissionNames) {
+            if (context.checkSelfPermission(permissionName) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
