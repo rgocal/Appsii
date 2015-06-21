@@ -22,7 +22,6 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.util.Log;
@@ -77,8 +76,7 @@ public final class PermissionUtils {
      * Android M
      */
     public static boolean runtimePermissionsAvailable() {
-        if ("MNC".equals(Build.VERSION.CODENAME)) return true;
-        return Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1;
+        return false;
     }
 
     /**

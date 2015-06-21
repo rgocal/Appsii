@@ -30,6 +30,7 @@ import android.util.Log;
 import com.appsimobile.appsii.module.weather.loader.CantGetWeatherException;
 import com.appsimobile.appsii.module.weather.loader.YahooWeatherApiClient;
 
+import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.List;
 
@@ -37,15 +38,23 @@ import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 /**
+ * Utility helper to load location info
  * Created by nick on 18/06/15.
  */
-public class LocationLoader implements LocationListener {
+public class LocationLoader {
 
     final LocationReceiver mLocationReceiver;
 
     LocationManager mLocationManager;
 
     AsyncTask<Location, Void, YahooWeatherApiClient.LocationInfo> mTask;
+
+    /**
+     * True when the loader has been destroyed
+     */
+    boolean mDestroyed;
+
+    private LocationListenerImpl mLocationListener;
 
     public LocationLoader(LocationReceiver locationReceiver) {
         mLocationReceiver = locationReceiver;
@@ -59,11 +68,13 @@ public class LocationLoader implements LocationListener {
         if (lastKnown != null) {
             onLocationChanged(lastKnown);
         }
-        mLocationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, this, null);
+        mLocationListener = new LocationListenerImpl(this);
+        mLocationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER,
+                mLocationListener, null);
     }
 
-    @Override
     public void onLocationChanged(final Location location) {
+        if (mDestroyed) return;
         if (mTask != null) {
             mTask.cancel(true);
         }
@@ -107,24 +118,47 @@ public class LocationLoader implements LocationListener {
         }
     }
 
-    @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String s) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String s) {
-
-    }
 
     public void destroy() {
+        mDestroyed = true;
+        if (mLocationListener != null) {
+            mLocationListener.destroy();
+        }
         if (mTask != null) {
             mTask.cancel(true);
+        }
+    }
+
+    private static class LocationListenerImpl implements LocationListener {
+
+        WeakReference<LocationLoader> mLocationLoaderRef;
+
+        public LocationListenerImpl(LocationLoader locationLoader) {
+            mLocationLoaderRef = new WeakReference<>(locationLoader);
+        }
+
+        @Override
+        public void onLocationChanged(Location location) {
+            LocationLoader locationLoader = mLocationLoaderRef.get();
+            if (locationLoader != null) {
+                locationLoader.onLocationChanged(location);
+            }
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+        }
+
+        public void destroy() {
+            mLocationLoaderRef.clear();
         }
     }
 }

@@ -192,9 +192,18 @@ public final class FirstRunSettingsFragment extends AbstractFirstRunSettingsFrag
             // enable both pages
             pageHelper.enablePageAccess(Pages.PAGE_HOME, true);
             pageHelper.enablePageAccess(Pages.PAGE_APPS, true);
-            // we do not change the other pages, these require permissions
-            // to function
+            // we do not change the other pages, when the new permission model is
+            // enabled as these require permissions to function
+            if (!PermissionUtils.runtimePermissionsAvailable()) {
+                pageHelper.enablePageAccess(Pages.PAGE_AGENDA, true);
+                pageHelper.enablePageAccess(Pages.PAGE_PEOPLE, true);
+                pageHelper.enablePageAccess(Pages.PAGE_CALLS, true);
+                mAgendaCheckbox.setChecked(true);
+                mPeopleCheckbox.setChecked(true);
+                mCallsCheckbox.setChecked(true);
+            }
             mInitiallyEnabled = true;
+
         }
 
         mHomeCheckbox.setOnCheckedChangeListener(this);
