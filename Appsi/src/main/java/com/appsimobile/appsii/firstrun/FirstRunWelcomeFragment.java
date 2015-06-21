@@ -50,6 +50,46 @@ public final class FirstRunWelcomeFragment extends Fragment implements View.OnCl
 
     private OnWelcomeCompletedListener mOnFirstRunCompletedListener;
 
+    public void setOnFirstRunCompletedListener(
+            OnWelcomeCompletedListener onFirstRunCompletedListener) {
+        mOnFirstRunCompletedListener = onFirstRunCompletedListener;
+    }
+
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+        switch (id) {
+            case R.id.permissions_button:
+                onPermissionButtonPressed();
+                break;
+            case R.id.next_button:
+                onNextButtonPressed();
+                break;
+        }
+    }
+
+    private void onPermissionButtonPressed() {
+        PermissionUtils.requestPermission(
+                this, 1, Manifest.permission.SYSTEM_ALERT_WINDOW);
+    }
+
+    private void onNextButtonPressed() {
+        PreferenceHelper preferenceHelper = PreferenceHelper.getInstance(getActivity());
+        preferenceHelper.setAutoStart(mAutoStartSwitch.isChecked());
+        mOnFirstRunCompletedListener.onWelcomeCompleted();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
+
+        if (requestCode == 1 && Manifest.permission.SYSTEM_ALERT_WINDOW.equals(permissions[0]) &&
+                grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            mNextButton.setEnabled(true);
+            mPermissionsButton.setEnabled(false);
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -88,46 +128,6 @@ public final class FirstRunWelcomeFragment extends Fragment implements View.OnCl
             mPermissionsCaption.setVisibility(View.GONE);
             mPermissionsText.setVisibility(View.GONE);
             mPermissionsButton.setVisibility(View.GONE);
-        }
-    }
-
-    public void setOnFirstRunCompletedListener(
-            OnWelcomeCompletedListener onFirstRunCompletedListener) {
-        mOnFirstRunCompletedListener = onFirstRunCompletedListener;
-    }
-
-    @Override
-    public void onClick(View v) {
-        int id = v.getId();
-        switch (id) {
-            case R.id.permissions_button:
-                onPermissionButtonPressed();
-                break;
-            case R.id.next_button:
-                onNextButtonPressed();
-                break;
-        }
-    }
-
-    private void onPermissionButtonPressed() {
-        PermissionUtils.requestPermission(
-                this, 1, Manifest.permission.SYSTEM_ALERT_WINDOW);
-    }
-
-    private void onNextButtonPressed() {
-        PreferenceHelper preferenceHelper = PreferenceHelper.getInstance(getActivity());
-        preferenceHelper.setAutoStart(mAutoStartSwitch.isChecked());
-        mOnFirstRunCompletedListener.onWelcomeCompleted();
-    }
-
-    //@Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-            @NonNull int[] grantResults) {
-
-        if (requestCode == 1 && Manifest.permission.SYSTEM_ALERT_WINDOW.equals(permissions[0]) &&
-                grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            mNextButton.setEnabled(true);
-            mPermissionsButton.setEnabled(false);
         }
     }
 

@@ -38,7 +38,7 @@ public class RequestPermissionActivity extends Activity {
         PermissionUtils.requestPermission(this, requestCode, permissions);
     }
 
-    //@Override
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
             @NonNull int[] grantResults) {
         //super.onRequestPermissionsResult(requestCode, permissions, grantResults);
