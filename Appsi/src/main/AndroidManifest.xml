@@ -110,7 +110,8 @@
         </service>
         <service
             android:name=".module.weather.SyncService"
-            android:exported="true">
+            android:exported="true"
+            android:process=":sync">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter"/>
             </intent-filter>
@@ -136,18 +137,22 @@
         <activity
             android:name=".AboutActivity"
             android:label="@string/pref_about_title"
-            android:theme="@style/Appsi.Sidebar.Material.Teal.NoActionBar"
             android:launchMode="singleTop"
             android:parentActivityName=".MainActivity"
+            android:theme="@style/Appsi.Sidebar.Material.Teal.NoActionBar"
             >
         </activity>
         <activity
             android:name=".module.weather.WeatherPreferencesActivity"
             android:label="@string/weather"
             android:launchMode="singleTop"
-            android:theme="@style/Appsi.Sidebar.Material.Teal.NoActionBar"
             android:parentActivityName=".MainActivity"
+            android:theme="@style/Appsi.Sidebar.Material.Teal.NoActionBar"
             >
+            <intent-filter>
+                <action android:name="android.intent.action.MANAGE_NETWORK_USAGE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
         </activity>
         <activity
             android:name=".ComingSoonActivity"
@@ -182,9 +187,9 @@
             android:name=".LookAndFeelActivity"
             android:exported="true"
             android:label="@string/pref_category_general"
-            android:theme="@style/Appsi.Sidebar.Material.Teal.NoActionBar"
             android:parentActivityName=".MainActivity"
-            android:screenOrientation="unspecified">
+            android:screenOrientation="unspecified"
+            android:theme="@style/Appsi.Sidebar.Material.Teal.NoActionBar">
         </activity>
         <!-- main screen | look & feel | background -->
 
@@ -302,7 +307,6 @@
         <activity
             android:name=".module.home.CellIntentEditorActivity"
             android:exported="false"
-            android:launchMode="singleTask"
             android:theme="@style/Appsi.Sidebar.Material.Teal.NoActionBar"/>
 
         <activity

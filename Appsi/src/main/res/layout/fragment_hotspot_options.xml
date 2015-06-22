@@ -17,6 +17,7 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
@@ -42,16 +43,52 @@
         android:inputType="textCapWords"
         />
 
-    <android.support.v7.widget.SwitchCompat
-        android:id="@+id/remember_last_switch"
+    <RelativeLayout
+        android:id="@+id/default_page"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/hotspot_title"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="@string/reopen_last_plugin"
-        />
+        android:background="?attr/selectableItemBackground"
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp"
+        >
+
+        <ImageView
+            android:id="@+id/default_page_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="16dp"
+            android:src="@drawable/ic_action_panels"
+            />
+
+        <TextView
+            android:id="@+id/default_page_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="72dp"
+            android:text="@string/default_page"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            />
+
+
+        <TextView
+            android:id="@+id/default_page_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/default_page_header"
+            android:layout_gravity="top"
+            android:layout_marginStart="72dp"
+            android:hint="@string/empty"
+            android:minWidth="84dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="?android:attr/textColorSecondary"
+            tools:text="Home"
+            />
+
+
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/buttons"
@@ -79,7 +116,7 @@
         android:id="@+id/sort_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/remember_last_switch"
+        android:layout_below="@id/default_page"
         android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"

@@ -122,19 +122,6 @@ public class SidebarHotspot extends View {
         super(context, attrs, defStyle);
     }
 
-    public static Gesture detectAction(float deltaX, float deltaY, float minDistance) {
-        Gesture swipeAction = null;
-        if (deltaX >= minDistance) {
-            swipeAction = Gesture.TO_CENTER;
-        } else if (deltaY > minDistance) {
-            swipeAction = Gesture.DOWN;
-        } else if (deltaY < -minDistance) {
-            swipeAction = Gesture.UP;
-        }
-        return swipeAction;
-
-    }
-
     @Override
     public boolean onTouchEvent(MotionEvent e) {
         switch (e.getAction()) {
@@ -234,6 +221,19 @@ public class SidebarHotspot extends View {
         mVelocityTracker = null;
     }
 
+    public static Gesture detectAction(float deltaX, float deltaY, float minDistance) {
+        Gesture swipeAction = null;
+        if (deltaX >= minDistance) {
+            swipeAction = Gesture.TO_CENTER;
+        } else if (deltaY > minDistance) {
+            swipeAction = Gesture.DOWN;
+        } else if (deltaY < -minDistance) {
+            swipeAction = Gesture.UP;
+        }
+        return swipeAction;
+
+    }
+
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -279,7 +279,7 @@ public class SidebarHotspot extends View {
 
                         Cursor c = context.getContentResolver().
                                 query(HotspotPagesQuery.createUri(hotspotId),
-                                        HotspotPagesQuery.ARGS,
+                                        HotspotPagesQuery.PROJECTION,
                                         null,
                                         null,
                                         HomeContract.HotspotDetails.POSITION + " ASC"
@@ -467,10 +467,13 @@ public class SidebarHotspot extends View {
 
         static final int WHAT_TAP_EVENT = 1;
 
-        boolean mCouldBeTap;
-
-
         final int mMinMoveDip;
+
+        final GestureDetector.OnDoubleTapListener mOnDoubleTapListener;
+
+        final Handler mHandler;
+
+        boolean mCouldBeTap;
 
         int mStartX;
 
@@ -481,10 +484,6 @@ public class SidebarHotspot extends View {
         int mLastTapX = -1;
 
         int mLastTapY = -1;
-
-        final GestureDetector.OnDoubleTapListener mOnDoubleTapListener;
-
-        final Handler mHandler;
 
         TapGestureDetector(Context context, GestureDetector.OnDoubleTapListener doubleTapListener) {
             mMinMoveDip = (int) (mMinMovePx * context.getResources().getDisplayMetrics().density);

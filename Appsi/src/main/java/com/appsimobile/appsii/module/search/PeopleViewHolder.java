@@ -39,6 +39,7 @@ class PeopleViewHolder extends RecyclerView.ViewHolder implements View.OnClickLi
         mOnPersonClickedListener = onPersonClickedListener;
         mPeopleActionListener = peopleActionListener;
         ((ContactView) itemView).setPeopleActionListener(peopleActionListener);
+        ((ContactView) itemView).setShowAsTiles(true);
         itemView.setOnClickListener(this);
     }
 

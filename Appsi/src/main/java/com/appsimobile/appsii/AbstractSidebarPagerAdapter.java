@@ -114,7 +114,6 @@ public abstract class AbstractSidebarPagerAdapter extends PagerAdapter {
             if (!page.mEnabled) continue;
             if (page.mPageType == HomeContract.Pages.PAGE_SETTINGS) continue;
             if (page.mPageType == HomeContract.Pages.PAGE_SMS) continue;
-            if (page.mPageType == HomeContract.Pages.PAGE_SEARCH) continue;
 
             PageController controller = mCachedControllers.get(page);
 

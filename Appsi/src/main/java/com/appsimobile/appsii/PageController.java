@@ -97,6 +97,10 @@ public abstract class PageController implements ViewTreeObserver.OnGlobalLayoutL
         return mContext.getLoaderManager();
     }
 
+    public int getContentWidth() {
+        return mContext.getContentWidth();
+    }
+
     public Context getContext() {
         return mContext;
     }

@@ -404,8 +404,8 @@
     </string-array>
 
     <string-array name="weather_units">
-        <item>Metric</item>
-        <item>Imperial</item>
+        <item>@string/metric_description</item>
+        <item>@string/imperial_description</item>
     </string-array>
 
     <string-array name="intent_types">
@@ -536,4 +536,5 @@
     <string name="first_usage_wizard_description">In the next few pages, you will be able to configure Appsii. You can always change these settings later in the settings menu.</string>
     <string name="first_usage_autostart_description">It is recommended to automatically start Appsii when your device is started. You can disable this if you prefer to start Appsii manually.</string>
     <string name="first_usage_draw_over_permission_description">Appsii needs to draw over other applications in order to function properly. To start using Appsii press the button below to grant Appsii the permissions to do so.</string>
+    <string name="default_page">Default page</string>
 </resources>

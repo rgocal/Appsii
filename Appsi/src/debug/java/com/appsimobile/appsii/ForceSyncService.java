@@ -30,7 +30,9 @@ public class ForceSyncService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        AccountHelper.getInstance(this).requestSync();
+        AccountHelper accountHelper = AccountHelper.getInstance(this);
+        accountHelper.configureAutoSyncAndSync();
+//        accountHelper.requestSync();
         return START_NOT_STICKY;
     }
 

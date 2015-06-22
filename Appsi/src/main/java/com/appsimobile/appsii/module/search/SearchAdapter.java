@@ -46,7 +46,7 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implem
 
     static final int TYPE_PERSON = 3;
 
-    final List<Object> mItems = new ArrayList<>();
+    final List<Object> mItems = new ArrayList<>(12);
 
     final OnAppClickedListener mOnAppClickedListener;
 
@@ -54,13 +54,15 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implem
 
     final ContactView.PeopleActionListener mPeopleActionListener;
 
-    final List<BaseContactInfo> mContactInfos = new ArrayList<>();
+    final List<BaseContactInfo> mContactInfos = new ArrayList<>(12);
 
-    final List<AppEntry> mApps = new ArrayList<>();
+    final List<AppEntry> mApps = new ArrayList<>(12);
 
     boolean mShowPlainApps;
 
     boolean mShowPlainContacts;
+
+    int mSpanCount;
 
     final GridLayoutManager.SpanSizeLookup mSpanSizeLookup =
             new GridLayoutManager.SpanSizeLookup() {
@@ -82,12 +84,17 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implem
     int getSpanSize(int position) {
         Object item = mItems.get(position);
         if (item == mApps) {
-            return 3;
+            return mSpanCount;
         } else if (item == mContactInfos) {
-            return 3;
+            return mSpanCount;
         } else {
             return 1;
         }
+    }
+
+    public void setSpanCount(int spanCount) {
+        mSpanCount = spanCount;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -130,7 +137,7 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implem
 
 
         View view = layoutInflater.inflate(
-                R.layout.grid_item_people_tile, parent, false);
+                R.layout.grid_item_people_tile_search, parent, false);
 
         return new PeopleViewHolder(view, mOnPersonClickedListener, mPeopleActionListener);
     }
@@ -250,8 +257,8 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implem
     }
 
     @Override
-    public void onShowAllAppsClicked(int id, AppItemTileViewHolder holder) {
-        mShowPlainApps = true;
+    public void onShowAllPeopleClicked(int id, ContactItemTileViewHolder holder) {
+        mShowPlainContacts = true;
         int position = holder.getPosition();
         List<?> items = (List<?>) mItems.remove(position);
         mItems.addAll(position, items);
@@ -259,8 +266,8 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implem
     }
 
     @Override
-    public void onShowAllPeopleClicked(int id, ContactItemTileViewHolder holder) {
-        mShowPlainContacts = true;
+    public void onShowAllAppsClicked(int id, AppItemTileViewHolder holder) {
+        mShowPlainApps = true;
         int position = holder.getPosition();
         List<?> items = (List<?>) mItems.remove(position);
         mItems.addAll(position, items);

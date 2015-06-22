@@ -67,8 +67,7 @@ public class PageHotspotViewHolder extends ViewHolder
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (isChecked && (mHotspotPageEntry.mPageType == HomeContract.Pages.PAGE_SMS ||
-                mHotspotPageEntry.mPageType == HomeContract.Pages.PAGE_SETTINGS ||
-                mHotspotPageEntry.mPageType == HomeContract.Pages.PAGE_SEARCH
+                mHotspotPageEntry.mPageType == HomeContract.Pages.PAGE_SETTINGS
         )) {
             Context context = itemView.getContext();
             Toast.makeText(context, R.string.page_not_yet_available, Toast.LENGTH_SHORT).show();
