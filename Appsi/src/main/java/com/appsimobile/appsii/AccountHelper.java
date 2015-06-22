@@ -18,13 +18,22 @@ package com.appsimobile.appsii;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.appsimobile.appsii.module.home.WeatherFragment;
 import com.appsimobile.appsii.module.weather.WeatherContract;
 import com.appsimobile.appsii.module.weather.WeatherLoadingService;
+import com.appsimobile.appsii.preference.PreferenceHelper;
+import com.appsimobile.appsii.preference.PreferencesFactory;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -55,12 +64,31 @@ public class AccountHelper {
 
     private static volatile AccountHelper sInstance;
 
-    Account mAccount;
-
     private final Context mContext;
+
+    Account mAccount;
 
     public AccountHelper(Context context) {
         mContext = context;
+
+        BroadcastReceiver receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                onWeatherUpdated();
+            }
+        };
+        IntentFilter intentFilter =
+                new IntentFilter(WeatherLoadingService.ACTION_WEATHER_UPDATED);
+        mContext.registerReceiver(receiver, intentFilter);
+
+    }
+
+    void onWeatherUpdated() {
+        SharedPreferences prefs = PreferencesFactory.getPreferences(mContext);
+        prefs.edit().putLong(
+                WeatherLoadingService.PREFERENCE_LAST_UPDATED_MILLIS, System.currentTimeMillis()).
+                apply();
+
     }
 
     public static AccountHelper getInstance(Context context) {
@@ -75,6 +103,86 @@ public class AccountHelper {
         return sInstance;
     }
 
+    public void requestSync(String woeid) {
+        Log.w("AccountHelper",
+                "request sync " + ContentResolver.getIsSyncable(mAccount, AUTHORITY));
+        Bundle bundle = createManualSyncBundle(woeid);
+        ContentResolver.requestSync(mAccount, AUTHORITY, bundle);
+    }
+
+    @NonNull
+    private Bundle createManualSyncBundle(@Nullable String woeid) {
+        PreferenceHelper preferenceHelper = PreferenceHelper.getInstance(mContext);
+        String defaultUnit = preferenceHelper.getDefaultWeatherTemperatureUnit();
+
+        SharedPreferences prefs = PreferencesFactory.getPreferences(mContext);
+        String unit = prefs.getString(WeatherFragment.PREFERENCE_WEATHER_UNIT, defaultUnit);
+
+        Bundle bundle = new Bundle();
+        if (woeid != null) {
+            bundle.putString(WeatherLoadingService.EXTRA_INCLUDE_WOEID, woeid);
+        }
+        bundle.putString(WeatherLoadingService.EXTRA_UNIT, unit);
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        return bundle;
+    }
+
+    public void configureAutoSyncAndSync() {
+        createAccountIfNeeded();
+
+        if (ContentResolver.getIsSyncable(mAccount, AUTHORITY) < 1) {
+            Log.d("AccountHelper", "making account syncable...");
+            ContentResolver.setIsSyncable(mAccount, AUTHORITY, 1);
+            ContentResolver.setSyncAutomatically(mAccount, AUTHORITY, true);
+        }
+        requestSync();
+//        ContentResolver.requestSync(mAccount, AUTHORITY, Bundle.EMPTY);
+    }
+
+    public boolean createAccountIfNeeded() {
+        // Get an instance of the Android account manager
+        mAccount = getExistingAccount(mContext);
+        if (mAccount != null) {
+            return false;
+        }
+
+        mAccount = createSyncAccount(mContext);
+        /*
+         * Turn on periodic syncing
+         */
+        ContentResolver.addPeriodicSync(
+                mAccount,
+                AUTHORITY,
+                Bundle.EMPTY,
+                SYNC_INTERVAL);
+        // start of as not syncable
+        ContentResolver.setIsSyncable(mAccount, AUTHORITY, -1);
+
+        return true;
+    }
+
+    public void requestSync() {
+        Log.w("AccountHelper",
+                "request sync " + ContentResolver.getIsSyncable(mAccount, AUTHORITY));
+        Bundle extras = createManualSyncBundle(null /* no woeid */);
+        ContentResolver.requestSync(mAccount, AUTHORITY, extras);
+    }
+
+    @Nullable
+    public static Account getExistingAccount(Context context) {
+
+        // Get an instance of the Android account manager
+        AccountManager accountManager =
+                (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
+
+
+        Account[] accounts = accountManager.getAccountsByType(ACCOUNT_TYPE);
+        if (accounts.length > 0) {
+            return accounts[0];
+        }
+        return null;
+    }
+
     /**
      * Create a new dummy account for the sync adapter
      *
@@ -85,12 +193,6 @@ public class AccountHelper {
         // Get an instance of the Android account manager
         AccountManager accountManager =
                 (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
-
-
-        Account[] accounts = accountManager.getAccountsByType("com.appsimobile.appsii");
-        if (accounts.length > 0) {
-            return accounts[0];
-        }
 
         // Create the account type and default account
         Account newAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
@@ -111,46 +213,4 @@ public class AccountHelper {
         return newAccount;
     }
 
-    public void createAccountIfNeeded() {
-        mAccount = createSyncAccount(mContext);
-        /*
-         * Turn on periodic syncing
-         */
-        ContentResolver.addPeriodicSync(
-                mAccount,
-                AUTHORITY,
-                Bundle.EMPTY,
-                SYNC_INTERVAL);
-        // start of as not syncable
-        ContentResolver.setIsSyncable(mAccount, AUTHORITY, -1);
-
-    }
-
-    public void requestSync() {
-        Log.w("AccountHelper",
-                "request sync " + ContentResolver.getIsSyncable(mAccount, AUTHORITY));
-        Bundle extras = new Bundle();
-        extras.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        ContentResolver.requestSync(mAccount, AUTHORITY, extras);
-    }
-
-    public void requestSync(String woeid) {
-        Log.w("AccountHelper",
-                "request sync " + ContentResolver.getIsSyncable(mAccount, AUTHORITY));
-        Bundle bundle = new Bundle();
-        bundle.putString(WeatherLoadingService.EXTRA_INCLUDE_WOEID, woeid);
-        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        ContentResolver.requestSync(mAccount, AUTHORITY, bundle);
-    }
-
-    public void configureAutoSyncAndSync() {
-        createAccountIfNeeded();
-
-        ContentResolver.setIsSyncable(mAccount, AUTHORITY, 1);
-        ContentResolver.setSyncAutomatically(mAccount, AUTHORITY, true);
-        if (WeatherLoadingService.hasTimeoutExpired(mContext)) {
-            ContentResolver.requestSync(mAccount, AUTHORITY, Bundle.EMPTY);
-        }
-
-    }
 }

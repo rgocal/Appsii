@@ -70,6 +70,9 @@ public class WeatherSyncAdapter extends AbstractThreadedSyncAdapter {
         WeatherLoadingService service = new WeatherLoadingService(getContext());
         String extraWoeid =
                 extras == null ? null : extras.getString(WeatherLoadingService.EXTRA_INCLUDE_WOEID);
-        service.doSync(extraWoeid, syncResult);
+        String defaultUnit =
+                extras == null ? null : extras.getString(WeatherLoadingService.EXTRA_UNIT);
+
+        service.doSync(defaultUnit, extraWoeid, syncResult);
     }
 }

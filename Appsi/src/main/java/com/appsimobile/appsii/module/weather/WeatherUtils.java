@@ -26,6 +26,7 @@ import android.text.format.Time;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.appsimobile.appsii.BitmapUtils;
 import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.module.weather.loader.WeatherData;
 
@@ -458,7 +459,7 @@ public class WeatherUtils {
     }
 
     public static File[] getCityPhotos(Context context, String woeid) {
-        File cacheDir = context.getCacheDir();
+        File cacheDir = getWeatherPhotoCacheDir(context);
         int validCount = 0;
         for (int i = 0; i < 5; i++) {
             String name = createPhotoFileName(woeid, i);
@@ -481,12 +482,21 @@ public class WeatherUtils {
         return result;
     }
 
+    public static File getWeatherPhotoCacheDir(Context context) {
+        File path = BitmapUtils.externalFilesFolder();
+        File result = new File(path, "weather");
+        if (!result.exists()) {
+            result.mkdirs();
+        }
+        return result;
+    }
+
     public static String createPhotoFileName(String woeid, int idx) {
         return woeid + "-" + idx + ".jpg";
     }
 
     public static void clearCityPhotos(Context context, String woeid, int startIdx) {
-        File cacheDir = context.getCacheDir();
+        File cacheDir = getWeatherPhotoCacheDir(context);
         for (int i = startIdx; i < 5; i++) {
             String name = createPhotoFileName(woeid, i);
             File photoImage = new File(cacheDir, name);
@@ -495,9 +505,7 @@ public class WeatherUtils {
     }
 
     static boolean saveBitmap(Context context, Bitmap bitmap, String woeid, int idx) {
-        File cacheDir = context.getCacheDir();
-        String name = createPhotoFileName(woeid, idx);
-        File photoImage = new File(cacheDir, name);
+        File photoImage = getWeatherImageFile(context, woeid, idx);
 
         boolean result;
 
@@ -512,6 +520,13 @@ public class WeatherUtils {
         }
 
         return result;
+    }
+
+    @NonNull
+    public static File getWeatherImageFile(Context context, String woeid, int idx) {
+        File cacheDir = getWeatherPhotoCacheDir(context);
+        String name = createPhotoFileName(woeid, idx);
+        return new File(cacheDir, name);
     }
 
     public static class ForecastInfo implements Comparable<ForecastInfo> {

@@ -72,7 +72,7 @@ public class TimeZoneInfo implements Comparable<TimeZoneInfo> {
 
     private final Time recycledTime = new Time();
 
-    public int[] mTransitions; // may have trailing 0's.
+    public long[] mTransitions; // may have trailing 0's.
 
     public int groupId;
 
@@ -94,15 +94,16 @@ public class TimeZoneInfo implements Comparable<TimeZoneInfo> {
         }
     }
 
-    private static int[] getTransitions(TimeZone tz, long time)
+    private static long[] getTransitions(TimeZone tz, long time)
             throws IllegalAccessException, NoSuchFieldException {
         Class<?> zoneInfoClass = tz.getClass();
         Field mTransitionsField = zoneInfoClass.getDeclaredField("mTransitions");
         mTransitionsField.setAccessible(true);
-        int[] objTransitions = (int[]) mTransitionsField.get(tz);
-        int[] transitions = null;
+
+        long[] objTransitions = getTransitionsFromField(tz, mTransitionsField);
+        long[] transitions = null;
         if (objTransitions.length != 0) {
-            transitions = new int[NUM_OF_TRANSITIONS];
+            transitions = new long[NUM_OF_TRANSITIONS];
             int numOfTransitions = 0;
             for (int i = 0; i < objTransitions.length; ++i) {
                 if (objTransitions[i] < time) {
@@ -115,6 +116,27 @@ public class TimeZoneInfo implements Comparable<TimeZoneInfo> {
             }
         }
         return transitions;
+    }
+
+    private static long[] getTransitionsFromField(TimeZone tz, Field mTransitionsField)
+            throws IllegalAccessException {
+        Class<?> type = mTransitionsField.getType();
+        if (long[].class.equals(type)) {
+            return (long[]) mTransitionsField.get(tz);
+
+        } else if (int[].class.equals(type)) {
+            int[] transitions = (int[]) mTransitionsField.get(tz);
+
+            int N = transitions.length;
+            long[] result = new long[N];
+            for (int i = 0; i < N; i++) {
+                int t = transitions[i];
+                result[i] = t;
+            }
+
+            return result;
+        }
+        throw new RuntimeException("Unexpected field type: " + type);
     }
 
     private static String formatTime(DateFormat df, int s) {

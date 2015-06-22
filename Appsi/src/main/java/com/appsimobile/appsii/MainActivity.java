@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity
 
         mPreferences = PreferencesFactory.getPreferences(this);
         // For now always show in debug builds.
-        boolean firstRun = BuildConfig.DEBUG || mPreferences.getBoolean(PREF_FIRST_RUN, true);
+        boolean firstRun = mPreferences.getBoolean(PREF_FIRST_RUN, true);
         mFirstRun = firstRun;
 
         if (firstRun) {

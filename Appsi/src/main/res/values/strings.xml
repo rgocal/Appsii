@@ -404,8 +404,8 @@
     </string-array>
 
     <string-array name="weather_units">
-        <item>Metric</item>
-        <item>Imperial</item>
+        <item>@string/metric_description</item>
+        <item>@string/imperial_description</item>
     </string-array>
 
     <string-array name="intent_types">
