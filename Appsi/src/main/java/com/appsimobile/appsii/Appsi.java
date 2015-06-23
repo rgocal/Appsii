@@ -395,10 +395,7 @@ public class Appsi extends Service
 
             boolean left = mSidebar.getIsLeft();
 
-            int w = mWindowManager.getDefaultDisplay().getWidth();
-            int h = mWindowManager.getDefaultDisplay().getHeight();
-            int sw = Math.min(w, h);
-            int sidebarWidth = (sw * mSidebarPercentage) / 100;
+            int sidebarWidth = getSidebarWidth();
 
             mSidebar.animate().
                     translationX(left ? -sidebarWidth : sidebarWidth).
@@ -420,6 +417,13 @@ public class Appsi extends Service
     void reloadHotspots() {
         HotspotLoader loader = new HotspotLoader(this);
         loader.execute();
+    }
+
+    private int getSidebarWidth() {
+        int w = mWindowManager.getDefaultDisplay().getWidth();
+        int h = mWindowManager.getDefaultDisplay().getHeight();
+        int sw = Math.min(w, h);
+        return (sw * mSidebarPercentage) / 100;
     }
 
     @Override
@@ -551,10 +555,7 @@ public class Appsi extends Service
             mSidebarVisible = false;
         }
 
-        int w = mWindowManager.getDefaultDisplay().getWidth();
-        int h = mWindowManager.getDefaultDisplay().getHeight();
-        int sw = Math.min(w, h);
-        int sidebarWidth = (sw * mSidebarPercentage) / 100;
+        int sidebarWidth = getSidebarWidth();
 
         mSidebarVisible = true;
 
@@ -634,6 +635,11 @@ public class Appsi extends Service
                 mSidebar.findViewById(R.id.sidebar_right_shadow).setVisibility(View.GONE);
                 mSidebar.findViewById(R.id.sidebar_left_shadow).setVisibility(View.VISIBLE);
             }
+
+            int w = mWindowManager.getDefaultDisplay().getWidth();
+            int h = mWindowManager.getDefaultDisplay().getHeight();
+            int sw = Math.min(w, h);
+
 
             mNotificationLikeOpener.setTargetView(mSidebar, sidebarWidth, sw, left);
             mSidebar.updateAdapterData(entries);

@@ -26,7 +26,7 @@ import com.appsimobile.appsii.module.home.provider.HomeContract;
  */
 public class HotspotPagesQuery {
 
-    public static final String[] ARGS = {
+    public static final String[] PROJECTION = {
             HomeContract.HotspotDetails._HOTSPOT_ID,
             HomeContract.HotspotDetails._PAGE_ID,
             HomeContract.HotspotDetails.POSITION,

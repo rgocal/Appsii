@@ -22,15 +22,11 @@ import android.app.Activity;
 import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.appsimobile.appsii.HotspotPageEntry;
-import com.appsimobile.appsii.HotspotPagesQuery;
 import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.module.BaseListAdapter;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
@@ -38,7 +34,6 @@ import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.mobeta.android.dslv.ConditionalRemovableAdapter;
 import com.mobeta.android.dslv.DragSortListView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -66,58 +61,9 @@ public class ReorderController implements DragSortListView.DropListener,
     }
 
     /**
-     * Loads the pages enabled in the hotspot
-     */
-    void loadHotspotPages() {
-
-        AsyncTask<Void, Void, List<HotspotPageEntry>> task =
-                new AsyncTask<Void, Void, List<HotspotPageEntry>>() {
-
-
-                    @Override
-                    protected List<HotspotPageEntry> doInBackground(Void... params) {
-                        Context context = mContext;
-                        if (context == null) return null;
-
-                        Cursor c = context.getContentResolver().
-                                query(HotspotPagesQuery.createUri(mHotspotId),
-                                        HotspotPagesQuery.ARGS,
-                                        null,
-                                        null,
-                                        HomeContract.HotspotDetails.POSITION + " ASC"
-                                );
-                        List<HotspotPageEntry> result = new ArrayList<>(c.getCount());
-                        while (c.moveToNext()) {
-                            HotspotPageEntry entry = new HotspotPageEntry();
-                            entry.mEnabled = c.getInt(HotspotPagesQuery.ENABLED) == 1;
-                            entry.mPageId = c.getLong(HotspotPagesQuery.PAGE_ID);
-                            entry.mHotspotId = c.getLong(HotspotPagesQuery.HOTSPOT_ID);
-                            entry.mPageName = c.getString(HotspotPagesQuery.PAGE_NAME);
-                            entry.mHotspotName = c.getString(HotspotPagesQuery.HOTSPOT_NAME);
-                            entry.mPosition = c.getInt(HotspotPagesQuery.POSITION);
-                            entry.mPageType = c.getInt(HotspotPagesQuery.PAGE_TYPE);
-                            result.add(entry);
-                        }
-                        c.close();
-                        return result;
-                    }
-
-                    @Override
-                    protected void onPostExecute(List<HotspotPageEntry> hotspotPageEntries) {
-
-                        Context context = mContext;
-                        if (context == null) return;
-
-                        onHotspotPagesLoaded(hotspotPageEntries);
-                    }
-                };
-        task.execute();
-    }
-
-    /**
      * Called when the hotspot-pages are loaded. Sets them in the adapter
      */
-    void onHotspotPagesLoaded(List<HotspotPageEntry> hotspotPageEntries) {
+    void setHotspotPages(List<HotspotPageEntry> hotspotPageEntries) {
         mHotspotAdapter.setItems(hotspotPageEntries);
     }
 

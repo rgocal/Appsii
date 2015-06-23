@@ -41,7 +41,7 @@ public class HotspotItem implements Parcelable {
 
     public long mId = NO_ID;
 
-    public boolean mRememberLast;
+    public long mDefaultPageId;
 
     public float mHeightRelativeToViewHeight;
 
@@ -60,7 +60,7 @@ public class HotspotItem implements Parcelable {
 
     private HotspotItem(Parcel in) {
         mId = in.readLong();
-        mRememberLast = in.readInt() == 1;
+        mDefaultPageId = in.readLong();
         mHeightRelativeToViewHeight = in.readFloat();
         mYPosRelativeToView = in.readFloat();
         mLeft = in.readInt() == 1;
@@ -83,14 +83,14 @@ public class HotspotItem implements Parcelable {
     }
 
     public void init(long id, String name, float height, float ypos, boolean left,
-            boolean needsConfiguration, boolean alwaysReopen) {
+            boolean needsConfiguration, long defaultPageId) {
         mId = id;
         mName = name;
         mLeft = left;
         mHeightRelativeToViewHeight = height;
         mYPosRelativeToView = ypos;
         mNeedsConfiguration = needsConfiguration;
-        mRememberLast = alwaysReopen;
+        mDefaultPageId = defaultPageId;
     }
 
     @Override
@@ -101,7 +101,7 @@ public class HotspotItem implements Parcelable {
     @Override
     public void writeToParcel(Parcel out, int flags) {
         out.writeLong(mId);
-        out.writeInt(mRememberLast ? 1 : 0);
+        out.writeLong(mDefaultPageId);
         out.writeFloat(mHeightRelativeToViewHeight);
         out.writeFloat(mYPosRelativeToView);
         out.writeInt(mLeft ? 1 : 0);

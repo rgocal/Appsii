@@ -17,16 +17,22 @@
 package com.appsimobile.appsii.hotspotmanager;
 
 import android.app.DialogFragment;
+import android.app.LoaderManager;
 import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.DialogInterface;
+import android.content.Loader;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.SwitchCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -34,18 +40,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.appsimobile.appsii.HotspotPageEntry;
 import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
 import com.mobeta.android.dslv.DragSortListView;
+
+import java.util.List;
 
 /**
  * A dialog that shows the general options for a hotspot. The user
  * can select and re-order the pages for the hotspot, change the
  * title and set the remember last page switch.
  * Any changes are saved instantly
- * <p/>
- * TODO: this needs support for setting the default page.
  * <p/>
  * Created by nick on 31/01/15.
  */
@@ -69,11 +78,6 @@ public class HotspotSettingsFragment extends DialogFragment
     EditText mHotspotTitleView;
 
     /**
-     * The remember last switch
-     */
-    SwitchCompat mRememberLastSwitch;
-
-    /**
      * ok button to close the dialog.
      */
     View mOkButton;
@@ -89,11 +93,6 @@ public class HotspotSettingsFragment extends DialogFragment
     String mHotspotName;
 
     /**
-     * True when remember last is enabled
-     */
-    boolean mRememberLastEnabled;
-
-    /**
      * True when the fragment state was restored from the instance state.
      * This allows us not to initialize the values of some fields
      */
@@ -106,6 +105,16 @@ public class HotspotSettingsFragment extends DialogFragment
 
     ReorderController mReorderController;
 
+    View mDefaultPage;
+
+    ImageView mDefaultPageIconView;
+
+    TextView mDefaultPageValueView;
+
+    long mDefaultPageId;
+
+    List<HotspotPageEntry> mHotspotPages;
+
     public HotspotSettingsFragment() {
         setStyle(DialogFragment.STYLE_NO_TITLE, 0);
         mHandler = new Handler(new Handler.Callback() {
@@ -117,28 +126,28 @@ public class HotspotSettingsFragment extends DialogFragment
         });
     }
 
+    void onHandleMessage(Message msg) {
+        String title = (String) msg.obj;
+        mQueryHandler.saveHotspotTitle(mHotspotId, title);
+    }
+
     /**
      * Creates an instance of the fragment with the arguments properly initialized
      *
      * @param hotspotId The hotspot id to edit
      * @param hotspotName The original name of the hotspot
-     * @param rememberLastEnabled The state of the remember last option
+     * @param defaultPageId The id of the default page
      */
     static HotspotSettingsFragment createEditInstance(long hotspotId, String hotspotName,
-            boolean rememberLastEnabled) {
+            long defaultPageId) {
 
         HotspotSettingsFragment result = new HotspotSettingsFragment();
         Bundle args = new Bundle();
         args.putLong("hotspot_id", hotspotId);
         args.putString("hotspot_name", hotspotName);
-        args.putBoolean("remember_last", rememberLastEnabled);
+        args.putLong("default_page_id", defaultPageId);
         result.setArguments(args);
         return result;
-    }
-
-    void onHandleMessage(Message msg) {
-        String title = (String) msg.obj;
-        mQueryHandler.saveHotspotTitle(mHotspotId, title);
     }
 
     @Override
@@ -152,16 +161,26 @@ public class HotspotSettingsFragment extends DialogFragment
             // get the default values from the arguments
             mHotspotId = args.getLong("hotspot_id", -1L);
             mHotspotName = args.getString("hotspot_name");
-            mRememberLastEnabled = args.getBoolean("remember_last", false);
+            mDefaultPageId = args.getLong("default_page_id");
         }
         // track if the state was restored
-        mRestoredInstanceState = savedInstanceState != null;
+        if (savedInstanceState != null) {
+            mRestoredInstanceState = true;
+            mDefaultPageId = savedInstanceState.getLong("default_page_id");
+        }
 
         mQueryHandler = new QueryHandlerImpl(getActivity().getContentResolver());
         mReorderController = new ReorderController(getActivity(), mHotspotId);
-        mReorderController.loadHotspotPages();
+
+        getLoaderManager().initLoader(1, null, new HotspotPagesLoaderCallbacks());
     }
 
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong("default_page_id", mDefaultPageId);
+    }
 
     @Nullable
     @Override
@@ -176,12 +195,20 @@ public class HotspotSettingsFragment extends DialogFragment
 
         mOkButton = view.findViewById(R.id.ok_button);
         mHotspotTitleView = (EditText) view.findViewById(R.id.hotspot_title);
-        mRememberLastSwitch = (SwitchCompat) view.findViewById(R.id.remember_last_switch);
 
         mDragSortListView = (DragSortListView) view.findViewById(R.id.sort_list_view);
         mReorderController.configure(mDragSortListView);
 
+        mDefaultPage = view.findViewById(R.id.default_page);
+        mDefaultPageIconView = (ImageView) view.findViewById(R.id.default_page_icon);
+        mDefaultPageValueView = (TextView) view.findViewById(R.id.default_page_value);
+
+        Drawable drawable = DrawableCompat.wrap(mDefaultPageIconView.getDrawable());
+        DrawableCompat.setTint(drawable, 0xFF666666);
+        mDefaultPageIconView.setImageDrawable(drawable);
+
         mOkButton.setOnClickListener(this);
+        mDefaultPage.setOnClickListener(this);
     }
 
     @Override
@@ -191,11 +218,11 @@ public class HotspotSettingsFragment extends DialogFragment
             // When we were not restored from the instance state, we can initialize
             // the values provided by the callee (from the args).
             mHotspotTitleView.setText(mHotspotName);
-            mRememberLastSwitch.setChecked(mRememberLastEnabled);
         }
         // Next register the listeners. This is done after setting the values
         // to make sure the event is not triggered before it should
-        mRememberLastSwitch.setOnCheckedChangeListener(this);
+        //
+        // make sure to remove the listener before adding it again
         mHotspotTitleView.removeTextChangedListener(this);
         mHotspotTitleView.addTextChangedListener(this);
     }
@@ -203,14 +230,88 @@ public class HotspotSettingsFragment extends DialogFragment
     @Override
     public void onPause() {
         super.onPause();
-        mRememberLastSwitch.setOnCheckedChangeListener(null);
         mHotspotTitleView.removeTextChangedListener(this);
-
     }
 
     @Override
     public void onClick(View v) {
-        dismiss();
+        int id = v.getId();
+        if (id == R.id.default_page) {
+            showDefaultPageSelector();
+        } else if (id == R.id.ok_button) {
+            dismiss();
+        }
+    }
+
+    private void showDefaultPageSelector() {
+        int selection = 0;
+
+        int len = getEnabledCount(mHotspotPages);
+
+        String[] choices = new String[len + 1];
+        final long[] pageIds = new long[len + 1];
+
+        choices[0] = getString(R.string.reopen_last_plugin);
+        pageIds[0] = -1L;
+
+        int N = mHotspotPages.size();
+        int pos = 0;
+        for (int i = 0; i < N; i++) {
+            HotspotPageEntry page = mHotspotPages.get(i);
+            if (!page.mEnabled) continue;
+
+            pos++;
+            choices[pos] = page.mPageName;
+            pageIds[pos] = page.mPageId;
+
+            if (page.mPageId == mDefaultPageId) {
+                selection = pos;
+            }
+        }
+
+        new AlertDialog.Builder(getActivity()).
+                setSingleChoiceItems(choices, selection, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        long id = pageIds[which];
+                        onDefaultPageSelected(id);
+                        dialog.dismiss();
+                    }
+                }).show();
+        // TODO: add boolean that the dialog was showing for orientation changes
+    }
+
+    private static int getEnabledCount(List<HotspotPageEntry> hotspotPages) {
+        int result = 0;
+        for (HotspotPageEntry e : hotspotPages) {
+            if (e.mEnabled) result++;
+        }
+        return result;
+    }
+
+    void onDefaultPageSelected(long id) {
+        if (mDefaultPageId != id) {
+            mDefaultPageId = id;
+            notifyDefaultPageChanged();
+        }
+    }
+
+    private void notifyDefaultPageChanged() {
+        updateSelectedPageText(mDefaultPageId, mHotspotPages);
+        mQueryHandler.updateDefaultPage(mHotspotId, mDefaultPageId);
+    }
+
+    private void updateSelectedPageText(long defaultPageId, List<HotspotPageEntry> pages) {
+        String text = getString(R.string.reopen_last_plugin);
+        for (int i = 0; i < pages.size(); i++) {
+            HotspotPageEntry page = pages.get(i);
+            if (page.mEnabled && page.mPageId == defaultPageId) {
+                text = page.mPageName;
+                break;
+            }
+        }
+
+        mDefaultPageValueView.setText(text);
     }
 
     @Override
@@ -233,6 +334,29 @@ public class HotspotSettingsFragment extends DialogFragment
         mHandler.sendMessageDelayed(message, 500);
     }
 
+    void onHotspotPagesLoaded(List<HotspotPageEntry> pages) {
+        mHotspotPages = pages;
+        mReorderController.setHotspotPages(pages);
+        validateSelectedDefaultPage(mDefaultPageId, pages);
+        updateSelectedPageText(mDefaultPageId, pages);
+    }
+
+    private void validateSelectedDefaultPage(long defaultPageId, List<HotspotPageEntry> pages) {
+        boolean found = false;
+        for (int i = 0; i < pages.size(); i++) {
+            HotspotPageEntry page = pages.get(i);
+            if (page.mPageId == defaultPageId) {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found && mDefaultPageId != -1L) {
+            mDefaultPageId = -1L;
+            notifyDefaultPageChanged();
+        }
+    }
+
     static class QueryHandlerImpl extends AsyncQueryHandler {
 
         public QueryHandlerImpl(ContentResolver cr) {
@@ -251,6 +375,45 @@ public class HotspotSettingsFragment extends DialogFragment
             ContentValues values = new ContentValues(1);
             values.put(HomeContract.Hotspots.ALWAYS_OPEN_LAST, alwaysOpenLast);
             startUpdate(0, null, uri, values, null, null);
+        }
+
+        public void updateDefaultPage(long hotspotId, long defaultPageId) {
+            Uri uri = ContentUris.withAppendedId(HomeContract.Hotspots.CONTENT_URI, hotspotId);
+            if (defaultPageId != -1L) {
+                ContentValues values = new ContentValues(1);
+                values.put(HomeContract.Hotspots._DEFAULT_PAGE, defaultPageId);
+                startUpdate(0, null, uri, values, null, null);
+            } else {
+                ContentValues values = new ContentValues(1);
+                values.putNull(HomeContract.Hotspots._DEFAULT_PAGE);
+                startUpdate(0, null, uri, values, null, null);
+
+            }
+
+        }
+    }
+
+    private class HotspotPagesLoaderCallbacks
+            implements LoaderManager.LoaderCallbacks<List<HotspotPageEntry>> {
+
+        HotspotPagesLoaderCallbacks() {
+
+        }
+
+        @Override
+        public Loader<List<HotspotPageEntry>> onCreateLoader(int id, Bundle args) {
+            return new HotspotsPagesLoader(getActivity(), mHotspotId);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<List<HotspotPageEntry>> loader,
+                List<HotspotPageEntry> data) {
+            onHotspotPagesLoaded(data);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<List<HotspotPageEntry>> loader) {
+
         }
     }
 

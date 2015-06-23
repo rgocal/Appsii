@@ -24,6 +24,7 @@ import com.appsimobile.appsii.HotspotItem;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -36,8 +37,8 @@ public class HotspotLoader {
         Cursor cursor = r.query(HomeContract.Hotspots.CONTENT_URI,
                 HotspotQuery.PROJECTION,
                 null, null, null);
-        List<HotspotItem> result = new ArrayList<>();
         if (cursor != null) {
+            List<HotspotItem> result = new ArrayList<>(cursor.getCount());
 
             try {
                 while (cursor.moveToNext()) {
@@ -47,21 +48,22 @@ public class HotspotLoader {
                     boolean left = cursor.getInt(HotspotQuery.LEFT_BORDER) == 1;
                     boolean needsConfiguration =
                             cursor.getInt(HotspotQuery.NEEDS_CONFIGURATION) == 1;
-                    boolean alwaysReopen = !cursor.isNull(HotspotQuery.ALWAYS_OPEN_LAST) &&
-                            cursor.getInt(HotspotQuery.ALWAYS_OPEN_LAST) == 1;
+                    long defaultPageId = cursor.isNull(HotspotQuery._DEFAULT_PAGE) ? -1L :
+                            cursor.getLong(HotspotQuery._DEFAULT_PAGE);
 
                     String name = cursor.getString(HotspotQuery.NAME);
 
                     HotspotItem conf = new HotspotItem();
                     conf.init(id, name, height, ypos, left, needsConfiguration,
-                            alwaysReopen);
+                            defaultPageId);
 
                     result.add(conf);
                 }
             } finally {
                 cursor.close();
             }
+            return result;
         }
-        return result;
+        return Collections.emptyList();
     }
 }

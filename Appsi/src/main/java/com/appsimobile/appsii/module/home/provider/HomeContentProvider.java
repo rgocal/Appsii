@@ -33,6 +33,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 
@@ -362,7 +363,7 @@ public class HomeContentProvider extends ContentProvider {
     }
 
     @Override
-    public int bulkInsert(Uri uri, ContentValues[] values) {
+    public int bulkInsert(Uri uri, @NonNull ContentValues[] values) {
         SqlArguments args = new SqlArguments(uri);
 
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
@@ -425,7 +426,7 @@ public class HomeContentProvider extends ContentProvider {
      * because the projection is mapped and the id may become ambiguous. This method returns
      * the correct where for the args provided.
      */
-    private String fixWhereProjection(Uri uri, String selection) {
+    private static String fixWhereProjection(Uri uri, String selection) {
         if (selection == null) return null;
         String table = uri.getPathSegments().get(0);
 
@@ -443,7 +444,7 @@ public class HomeContentProvider extends ContentProvider {
     /**
      * Return the actual tables to be queries when the user queries the specified table.
      */
-    private String createTablesFromTableQuery(String queriedTable) {
+    private static String createTablesFromTableQuery(String queriedTable) {
         if (HomeContract.CELLS_TABLE_NAME.equals(queriedTable)) {
             return CELLS_QUERY_TABLES;
         } else if (ROWS_TABLE_NAME.equals(queriedTable)) {
@@ -459,7 +460,7 @@ public class HomeContentProvider extends ContentProvider {
     /**
      * Return the projection map for a query on the given table.
      */
-    private Map<String, String> getProjectionMapForTable(String queriedTable) {
+    private static Map<String, String> getProjectionMapForTable(String queriedTable) {
         if (HomeContract.CELLS_TABLE_NAME.equals(queriedTable)) {
             return CELLS_QUERY_MAP;
         } else if (ROWS_TABLE_NAME.equals(queriedTable)) {
@@ -472,7 +473,7 @@ public class HomeContentProvider extends ContentProvider {
         return null;
     }
 
-    private String fixSortOrder(String sortOrder) {
+    private static String fixSortOrder(String sortOrder) {
         if (sortOrder == null) return null;
 
 
@@ -581,15 +582,6 @@ public class HomeContentProvider extends ContentProvider {
             mContext = context;
         }
 
-        private static void insertKeyValue(SQLiteDatabase db, ContentValues vals, long cellId,
-                String key, String value) {
-            vals.clear();
-            vals.put(HomeContract.ConfigurationColumns._CELL_ID, cellId);
-            vals.put(HomeContract.ConfigurationColumns.KEY, key);
-            vals.put(HomeContract.ConfigurationColumns.VALUE, value);
-            db.insert(HomeContract.CONFIG_TABLE_NAME, null, vals);
-        }
-
         @Override
         @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
         public void onConfigure(SQLiteDatabase db) {
@@ -681,7 +673,7 @@ public class HomeContentProvider extends ContentProvider {
             insertDefaultHomePageValuesV7(db, v, homePageId);
         }
 
-        private long insertDefaultHotspotsV7(ContentValues values, SQLiteDatabase db,
+        private static long insertDefaultHotspotsV7(ContentValues values, SQLiteDatabase db,
                 long defaultPageId) {
 
             values.clear();
@@ -785,6 +777,15 @@ public class HomeContentProvider extends ContentProvider {
             vals.put(HomeContract.CellColumns.POSITION, position);
             vals.put(HomeContract.CellColumns.TYPE, type);
             return db.insert(HomeContract.CELLS_TABLE_NAME, null, vals);
+        }
+
+        private static void insertKeyValue(SQLiteDatabase db, ContentValues vals, long cellId,
+                String key, String value) {
+            vals.clear();
+            vals.put(HomeContract.ConfigurationColumns._CELL_ID, cellId);
+            vals.put(HomeContract.ConfigurationColumns.KEY, key);
+            vals.put(HomeContract.ConfigurationColumns.VALUE, value);
+            db.insert(HomeContract.CONFIG_TABLE_NAME, null, vals);
         }
 
         @Override

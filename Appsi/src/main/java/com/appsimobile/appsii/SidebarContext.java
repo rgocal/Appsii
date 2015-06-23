@@ -24,11 +24,13 @@ import android.content.ContextWrapper;
  */
 public class SidebarContext extends ContextWrapper {
 
-    public boolean mIsFullScreen;
-
     final AnalyticsManager mAnalyticsManager = AnalyticsManager.getInstance();
 
+    public boolean mIsFullScreen;
+
     private LoaderManager mLoaderManager;
+
+    private int mContentWidth;
 
     public SidebarContext(Context base) {
         super(base);
@@ -38,12 +40,12 @@ public class SidebarContext extends ContextWrapper {
         ((SidebarContext) context).track(action, category, label);
     }
 
-    public static void track(Context context, String action, String category) {
-        ((SidebarContext) context).track(action, category);
-    }
-
     public void track(String action, String category, String label) {
         mAnalyticsManager.trackAppsiEvent(action, category, label);
+    }
+
+    public static void track(Context context, String action, String category) {
+        ((SidebarContext) context).track(action, category);
     }
 
     public void track(String action, String category) {
@@ -60,6 +62,14 @@ public class SidebarContext extends ContextWrapper {
 
     public void setLoaderManager(LoaderManager loaderManager) {
         mLoaderManager = loaderManager;
+    }
+
+    public int getContentWidth() {
+        return mContentWidth;
+    }
+
+    public void setContentWidth(int contentWidth) {
+        mContentWidth = contentWidth;
     }
 
 //        @Override

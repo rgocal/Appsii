@@ -119,7 +119,6 @@ public class AppsiApplication extends Application {
 
             }
         });
-        updatePageEnabledState(HomeContract.Pages.PAGE_SEARCH, false);
         featureManager.load(true);
 
     }

@@ -16,14 +16,15 @@
 
 package com.appsimobile.appsii.hotspotmanager;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
-import com.appsimobile.appsii.HotspotItem;
+import com.appsimobile.appsii.HotspotPageEntry;
+import com.appsimobile.appsii.HotspotPagesQuery;
 import com.appsimobile.appsii.PermissionDeniedException;
-import com.appsimobile.appsii.module.HotspotQuery;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
 import com.appsimobile.util.ConvertedCursorLoader;
 
@@ -34,7 +35,7 @@ import java.util.List;
  * A loader that can load the hotspots present in the system
  * Created by nick on 22/09/14.
  */
-public class HotspotsLoader extends ConvertedCursorLoader<List<HotspotItem>> {
+public class HotspotsPagesLoader extends ConvertedCursorLoader<List<HotspotPageEntry>> {
 
 
     /**
@@ -43,17 +44,17 @@ public class HotspotsLoader extends ConvertedCursorLoader<List<HotspotItem>> {
      */
     ForceLoadContentObserver mForceLoadObserver;
 
-    public HotspotsLoader(Context context) {
+    public HotspotsPagesLoader(Context context, long hotspotId) {
 
         super(context);
 
-        Uri uri = HomeContract.Hotspots.CONTENT_URI;
+        Uri uri = HotspotPagesQuery.createUri(hotspotId);
 
         setUri(uri);
-        setProjection(HotspotQuery.PROJECTION);
+        setProjection(HotspotPagesQuery.PROJECTION);
         setSelection(null);
         setSelectionArgs(null);
-        setSortOrder(null);
+        setSortOrder(HomeContract.HotspotDetails.POSITION + " ASC");
     }
 
     @Override
@@ -61,46 +62,41 @@ public class HotspotsLoader extends ConvertedCursorLoader<List<HotspotItem>> {
     }
 
     @Override
-    protected List<HotspotItem> convertPermissionDeniedException(PermissionDeniedException e) {
+    protected List<HotspotPageEntry> convertPermissionDeniedException(PermissionDeniedException e) {
         return null;
     }
 
     @Override
-    protected List<HotspotItem> convertCursor(@NonNull Cursor cursor) {
+    protected List<HotspotPageEntry> convertCursor(@NonNull Cursor c) {
+        c.moveToPosition(-1);
 
+        List<HotspotPageEntry> result = new ArrayList<>(c.getCount());
+        while (c.moveToNext()) {
 
-        cursor.moveToPosition(-1);
-
-        List<HotspotItem> result = new ArrayList<>();
-
-        try {
-            while (cursor.moveToNext()) {
-                long id = cursor.getLong(HotspotQuery.ID);
-                float height = cursor.getFloat(HotspotQuery.HEIGHT);
-                float ypos = cursor.getFloat(HotspotQuery.Y_POSITION);
-                boolean left = cursor.getInt(HotspotQuery.LEFT_BORDER) == 1;
-                boolean needsConfiguration =
-                        cursor.getInt(HotspotQuery.NEEDS_CONFIGURATION) == 1;
-                long defaultPageId = cursor.isNull(HotspotQuery._DEFAULT_PAGE) ? -1L :
-                        cursor.getLong(HotspotQuery._DEFAULT_PAGE);
-
-                String name = cursor.getString(HotspotQuery.NAME);
-
-                HotspotItem conf = new HotspotItem();
-                conf.init(id, name, height, ypos, left, needsConfiguration,
-                        defaultPageId);
-
-                result.add(conf);
+            int pageType = c.getInt(HotspotPagesQuery.PAGE_TYPE);
+            // The page types SMS and SETTINGS are not yet ready.
+            // They will be added once implemented
+            if (pageType == HomeContract.Pages.PAGE_SMS || pageType ==
+                    HomeContract.Pages.PAGE_SETTINGS) {
+                continue;
             }
-        } finally {
-            cursor.close();
-        }
 
+            HotspotPageEntry entry = new HotspotPageEntry();
+            entry.mEnabled = c.getInt(HotspotPagesQuery.ENABLED) == 1;
+            entry.mPageId = c.getLong(HotspotPagesQuery.PAGE_ID);
+            entry.mHotspotId = c.getLong(HotspotPagesQuery.HOTSPOT_ID);
+            entry.mPageName = c.getString(HotspotPagesQuery.PAGE_NAME);
+            entry.mHotspotName = c.getString(HotspotPagesQuery.HOTSPOT_NAME);
+            entry.mPosition = c.getInt(HotspotPagesQuery.POSITION);
+            entry.mPageType = pageType;
+            result.add(entry);
+        }
+        c.close();
         return result;
     }
 
     @Override
-    protected void cleanup(List<HotspotItem> old) {
+    protected void cleanup(List<HotspotPageEntry> old) {
 
     }
 
@@ -109,9 +105,9 @@ public class HotspotsLoader extends ConvertedCursorLoader<List<HotspotItem>> {
         super.onStartLoading();
 
         mForceLoadObserver = new ForceLoadContentObserver();
-        getContext().getContentResolver().
-                registerContentObserver(HomeContract.Hotspots.CONTENT_URI, true,
-                        mForceLoadObserver);
+        ContentResolver contentResolver = getContext().getContentResolver();
+        contentResolver.registerContentObserver(
+                HomeContract.HotspotPages.CONTENT_URI, true, mForceLoadObserver);
 
         // start monitoring for day changes to make sure the list is reloaded
         // whenever the date changes.

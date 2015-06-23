@@ -97,11 +97,17 @@ public class ManageHotspotsActivity extends AppCompatActivity
         getLoaderManager().initLoader(0, null, this);
     }
 
+    /**
+     * Called when the add action is performed
+     */
+    void onAddClicked() {
+        mAsyncQueryHandler.addNewHotspot();
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
     }
-
 
     @Override
     public void performMainAction(HotspotItem configuration) {
@@ -111,9 +117,9 @@ public class ManageHotspotsActivity extends AppCompatActivity
     void onItemClicked(HotspotItem configuration) {
         String hotspotName = configuration.mName;
         long id = configuration.mId;
-        boolean rememberLast = configuration.mRememberLast;
+        long defaultPageId = configuration.mDefaultPageId;
         HotspotSettingsFragment fragment = HotspotSettingsFragment.
-                createEditInstance(id, hotspotName, rememberLast);
+                createEditInstance(id, hotspotName, configuration.mDefaultPageId);
 
         fragment.show(getFragmentManager(), "edit_hotspot");
 
@@ -146,13 +152,6 @@ public class ManageHotspotsActivity extends AppCompatActivity
                 createInstance(configuration.mId, configuration.mHeightRelativeToViewHeight);
 
         fragment.show(getFragmentManager(), "height_editor");
-    }
-
-    /**
-     * Called when the add action is performed
-     */
-    void onAddClicked() {
-        mAsyncQueryHandler.addNewHotspot();
     }
 
     @Override
@@ -189,9 +188,9 @@ public class ManageHotspotsActivity extends AppCompatActivity
 
         final List<HotspotItem> mHotspotItems = new ArrayList<>();
 
-        boolean mGotItDismissed;
-
         final SharedPreferences mPreferences;
+
+        boolean mGotItDismissed;
 
         HotspotAdapter(Context context, HotspotActionListener actionListener) {
             mActionListener = actionListener;

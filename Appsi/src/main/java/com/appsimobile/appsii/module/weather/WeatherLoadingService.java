@@ -135,6 +135,8 @@ public class WeatherLoadingService {
     // if e.g. the location was changed, this is a forced update.
     void doSync(String defaultUnit, String extraWoeid, SyncResult result) {
 
+        if (defaultUnit == null) throw new IllegalArgumentException("defaultUnit == null");
+
         ConnectivityManager cm =
                 (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();

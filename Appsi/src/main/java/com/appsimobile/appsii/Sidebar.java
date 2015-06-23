@@ -57,6 +57,8 @@ public class Sidebar extends RelativeLayout
      */
     final Bundle mCloseStateBundle = new Bundle();
 
+    private final OnPageChangeListenerImpl mOnPageChangeListener = new OnPageChangeListenerImpl();
+
     /**
      * A listener that can be called when the sidebar needs to be closed
      */
@@ -92,14 +94,15 @@ public class Sidebar extends RelativeLayout
 
     private SidebarPagerAdapter mAdapter;
 
-
     private SidebarContext mAppsiContext;
-
-    private final OnPageChangeListenerImpl mOnPageChangeListener = new OnPageChangeListenerImpl();
 
     public Sidebar(Context context) {
         super(context);
         init();
+    }
+
+    private void init() {
+        mAppsiContext = new SidebarContext(getContext());
     }
 
     public Sidebar(Context context, AttributeSet attrs) {
@@ -110,10 +113,6 @@ public class Sidebar extends RelativeLayout
     public Sidebar(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init();
-    }
-
-    private void init() {
-        mAppsiContext = new SidebarContext(getContext());
     }
 
     public void onTrimMemory(int level) {
@@ -181,6 +180,12 @@ public class Sidebar extends RelativeLayout
             return true;
         }
         return super.onKeyUp(keyCode, event);
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        mAppsiContext.setContentWidth(w);
     }
 
     @Override

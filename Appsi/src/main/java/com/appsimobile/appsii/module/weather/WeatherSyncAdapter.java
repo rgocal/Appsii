@@ -21,8 +21,13 @@ import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.SyncResult;
 import android.os.Bundle;
+
+import com.appsimobile.appsii.module.home.WeatherFragment;
+import com.appsimobile.appsii.preference.PreferenceHelper;
+import com.appsimobile.appsii.preference.PreferencesFactory;
 
 /**
  * Handle the transfer of data between a server and an
@@ -72,6 +77,14 @@ public class WeatherSyncAdapter extends AbstractThreadedSyncAdapter {
                 extras == null ? null : extras.getString(WeatherLoadingService.EXTRA_INCLUDE_WOEID);
         String defaultUnit =
                 extras == null ? null : extras.getString(WeatherLoadingService.EXTRA_UNIT);
+
+        if (defaultUnit == null) {
+            PreferenceHelper preferenceHelper = PreferenceHelper.getInstance(getContext());
+            String systemDefault = preferenceHelper.getDefaultWeatherTemperatureUnit();
+
+            SharedPreferences prefs = PreferencesFactory.getPreferences(getContext());
+            defaultUnit = prefs.getString(WeatherFragment.PREFERENCE_WEATHER_UNIT, systemDefault);
+        }
 
         service.doSync(defaultUnit, extraWoeid, syncResult);
     }
