@@ -173,7 +173,6 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:screenOrientation="unspecified"
             android:theme="@style/Appsi.Sidebar.Material.Teal.NoActionBar"
             >
             <intent-filter>
@@ -191,6 +190,10 @@
             android:screenOrientation="unspecified"
             android:theme="@style/Appsi.Sidebar.Material.Teal.NoActionBar">
         </activity>
+        <activity
+            android:name=".processmon.ProcessMonitorActivity"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/Appsi.Sidebar.Material.Teal.NoActionBar"/>
         <!-- main screen | look & feel | background -->
 
 

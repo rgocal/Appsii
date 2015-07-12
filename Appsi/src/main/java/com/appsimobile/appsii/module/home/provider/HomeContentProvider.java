@@ -667,14 +667,13 @@ public class HomeContentProvider extends ContentProvider {
             long searchPageId = db.insert(PAGES_TABLE_NAME, null, v);
 
 
-            long defaultHotspotId = insertDefaultHotspotsV7(v, db, homePageId);
+            long defaultHotspotId = insertDefaultHotspotsV7(v, db);
 
 
             insertDefaultHomePageValuesV7(db, v, homePageId);
         }
 
-        private static long insertDefaultHotspotsV7(ContentValues values, SQLiteDatabase db,
-                long defaultPageId) {
+        private static long insertDefaultHotspotsV7(ContentValues values, SQLiteDatabase db) {
 
             values.clear();
             values.put(HotspotColumns.HEIGHT, .1f);
@@ -683,7 +682,7 @@ public class HomeContentProvider extends ContentProvider {
             values.put(HotspotColumns.NAME, "Appsii");
             values.put(HotspotColumns.LEFT_BORDER, 1);
             values.put(HotspotColumns.ALWAYS_OPEN_LAST, 1);
-            values.put(HotspotColumns._DEFAULT_PAGE, defaultPageId);
+            values.putNull(HotspotColumns._DEFAULT_PAGE);
             return db.insert(HOTSPOTS_TABLE_NAME, null, values);
 
         }

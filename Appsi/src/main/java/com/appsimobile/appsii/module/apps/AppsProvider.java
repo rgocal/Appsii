@@ -78,7 +78,7 @@ public class AppsProvider extends ContentProvider {
         sURLMatcher.addURI(AUTHORITY, "launchHistory/#", TABLE_HISTORY_ITEM);
 
 
-        sAppsProjectionMap = new HashMap<>();
+        sAppsProjectionMap = new HashMap<>(8);
         // Events columns
         sAppsProjectionMap.put(TaggedAppColumns._ID,
                 TaggedAppColumns.TABLE_NAME + "." + TaggedAppColumns._ID);
@@ -99,7 +99,7 @@ public class AppsProvider extends ContentProvider {
                 TagColumns.TABLE_NAME + "." + TagColumns._ID);
 
 
-        sTagsProjectionMap = new HashMap<>();
+        sTagsProjectionMap = new HashMap<>(8);
         // Events columns
         sTagsProjectionMap.put(TagColumns._ID, TagColumns._ID);
         sTagsProjectionMap.put(TagColumns.POSITION, TagColumns.POSITION);
@@ -109,7 +109,7 @@ public class AppsProvider extends ContentProvider {
         sTagsProjectionMap.put(TagColumns.COLUMN_COUNT, TagColumns.COLUMN_COUNT);
         sTagsProjectionMap.put(TagColumns.TAG_TYPE, TagColumns.TAG_TYPE);
 
-        sHistoryProjectionMap = new HashMap<>();
+        sHistoryProjectionMap = new HashMap<>(5);
         // Events columns
         sHistoryProjectionMap.put(LaunchHistoryColumns._ID, LaunchHistoryColumns._ID);
         sHistoryProjectionMap.put(LaunchHistoryColumns.COMPONENT_NAME,
@@ -334,11 +334,13 @@ public class AppsProvider extends ContentProvider {
                                 TagColumns.NAME + " TEXT NOT NULL " +
                                 ");"
                 );
+
                 // insert recent apps folder
                 ContentValues values = new ContentValues();
-                values.put(TagColumns.DEFAULT_EXPANDED, 0);
+                values.put(TagColumns.DEFAULT_EXPANDED, 1);
                 values.put(TagColumns.POSITION, 0);
-                values.put(TagColumns.COLUMN_COUNT, 3);
+                // get the default, this depends on the device's size
+                values.put(TagColumns.COLUMN_COUNT, 6);
                 values.put(TagColumns.TAG_TYPE, TagColumns.TAG_TYPE_RECENT);
                 values.put(TagColumns.VISIBLE, 1);
                 values.put(TagColumns.NAME, context.getString(R.string.folder_recent_apps));
@@ -347,7 +349,7 @@ public class AppsProvider extends ContentProvider {
 
                 // insert all apps folder
                 values.clear();
-                values.put(TagColumns.DEFAULT_EXPANDED, 0);
+                values.put(TagColumns.DEFAULT_EXPANDED, 1);
                 values.put(TagColumns.POSITION, 1);
                 values.put(TagColumns.COLUMN_COUNT, 3);
                 values.put(TagColumns.TAG_TYPE, TagColumns.TAG_TYPE_ALL);

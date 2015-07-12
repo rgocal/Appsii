@@ -17,5 +17,6 @@
 <resources>
 
     <dimen name="large_icon">80dp</dimen>
+    <integer name="default_app_columns">5</integer>
 
 </resources>

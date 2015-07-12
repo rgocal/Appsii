@@ -44,27 +44,6 @@ public class SidebarPagerAdapterTest extends InstrumentationTestCase {
         mContext = new MockSidebarContext(getInstrumentation().getTargetContext());
     }
 
-    HotspotPageEntry entry() {
-        HotspotPageEntry entry = new HotspotPageEntry();
-        entry.mEnabled = true;
-        return entry;
-    }
-
-    Pair<List<HotspotPageEntry>, MockSidebarPagerAdapter> createAdapter() {
-        MockSidebarPagerAdapter adapter = new MockSidebarPagerAdapter();
-
-        List<HotspotPageEntry> entries = Arrays.asList(
-                entry(),
-                entry(),
-                entry(),
-                entry(),
-                entry());
-
-        adapter.setPages(entries);
-
-        return Pair.create(entries, adapter);
-    }
-
     public void testSetPrimaryItem() {
 
         Pair<List<HotspotPageEntry>, MockSidebarPagerAdapter> pair = createAdapter();
@@ -138,6 +117,26 @@ public class SidebarPagerAdapterTest extends InstrumentationTestCase {
 
     }
 
+    Pair<List<HotspotPageEntry>, MockSidebarPagerAdapter> createAdapter() {
+        MockSidebarPagerAdapter adapter = new MockSidebarPagerAdapter();
+
+        List<HotspotPageEntry> entries = Arrays.asList(
+                entry(),
+                entry(),
+                entry(),
+                entry(),
+                entry());
+
+        adapter.setPages(entries);
+
+        return Pair.create(entries, adapter);
+    }
+
+    HotspotPageEntry entry() {
+        HotspotPageEntry entry = new HotspotPageEntry();
+        entry.mEnabled = true;
+        return entry;
+    }
 
     static class MockPageController extends PageController {
 
@@ -148,11 +147,6 @@ public class SidebarPagerAdapterTest extends InstrumentationTestCase {
         public MockPageController(Context context, HotspotPageEntry entry, String title) {
             super(context, title);
             mEntry = entry;
-        }
-
-        @Override
-        public void setDeferLoads(boolean deferLoads) {
-            mDeferLoads = deferLoads;
         }
 
         @Override
@@ -169,6 +163,12 @@ public class SidebarPagerAdapterTest extends InstrumentationTestCase {
         @Override
         protected void applyToolbarColor(int color) {
 
+        }
+
+        @Override
+        public void setDeferLoads(boolean deferLoads) {
+            super.setDeferLoads(deferLoads);
+            mDeferLoads = deferLoads;
         }
 
     }

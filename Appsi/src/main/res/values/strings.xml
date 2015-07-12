@@ -537,4 +537,8 @@
     <string name="first_usage_autostart_description">It is recommended to automatically start Appsii when your device is started. You can disable this if you prefer to start Appsii manually.</string>
     <string name="first_usage_draw_over_permission_description">Appsii needs to draw over other applications in order to function properly. To start using Appsii press the button below to grant Appsii the permissions to do so.</string>
     <string name="default_page">Default page</string>
+    <plurals name="interval_seconds">
+        <item quantity="one"><xliff:g example="1" id="item">%1$s</xliff:g> second</item>
+        <item quantity="other"><xliff:g example="6" id="item">%1$s</xliff:g> seconds</item>
+    </plurals>
 </resources>

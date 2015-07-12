@@ -268,7 +268,7 @@ public class SearchController extends PageController
     protected void onUserVisible() {
         super.onUserVisible();
         trackPageView(AnalyticsManager.CATEGORY_SEARCH);
-        focusSearchView();
+//        focusSearchView();
     }
 
     @Override
@@ -277,6 +277,7 @@ public class SearchController extends PageController
         InputMethodManager imm = (InputMethodManager) getContext().getSystemService(
                 Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(mSearchView.getWindowToken(), 0);
+
     }
 
     @Override
@@ -305,7 +306,7 @@ public class SearchController extends PageController
     public void setDeferLoads(boolean deferLoads) {
         super.setDeferLoads(deferLoads);
         if (!deferLoads) {
-            focusSearchView();
+//            focusSearchView();
         }
     }
 

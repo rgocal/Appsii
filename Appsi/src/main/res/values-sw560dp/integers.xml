@@ -16,4 +16,5 @@
 
 <resources>
     <item name="max_grid_size" type="integer">10</item>
+    <integer name="default_app_columns">4</integer>
 </resources>

@@ -17,12 +17,16 @@
 package com.appsimobile.appsii;
 
 import android.content.Context;
+import android.content.Loader;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
+import android.util.Log;
+import android.util.Pair;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +35,11 @@ import android.view.ViewTreeObserver;
 
 import com.appsimobile.annotation.KeepName;
 import com.appsimobile.appsii.annotation.VisibleForTesting;
+
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple wrapper for a page, used to save instance state of the
@@ -55,12 +64,20 @@ public abstract class PageController implements ViewTreeObserver.OnGlobalLayoutL
 
     protected final String mTitle;
 
+    final List<Runnable> mDeferredRunnables = new ArrayList<>(8);
+
     private final SidebarContext mContext;
 
     protected boolean mSidebarAttached;
 
     @VisibleForTesting
     boolean mUserVisible;
+
+    LoaderManager mLoaderManager;
+
+    boolean mLoadsDeferred;
+
+    SearchRequestListener mSearchRequestListener;
 
     private HotspotPageEntry mPage;
 
@@ -94,7 +111,10 @@ public abstract class PageController implements ViewTreeObserver.OnGlobalLayoutL
     }
 
     public LoaderManager getLoaderManager() {
-        return mContext.getLoaderManager();
+        if (mLoaderManager == null) {
+            mLoaderManager = new LoaderManagerWrapper(mContext.getLoaderManager());
+        }
+        return mLoaderManager;
     }
 
     public int getContentWidth() {
@@ -352,7 +372,18 @@ public abstract class PageController implements ViewTreeObserver.OnGlobalLayoutL
         return 0;
     }
 
+    @CallSuper
     public void setDeferLoads(boolean deferLoads) {
+        Log.d("PageController", "setting deferloads: " + deferLoads);
+        mLoadsDeferred = deferLoads;
+
+        if (!deferLoads) {
+            for (int i = 0; i < mDeferredRunnables.size(); i++) {
+                Runnable r = mDeferredRunnables.get(i);
+                r.run();
+            }
+            mDeferredRunnables.clear();
+        }
     }
 
     public void onSidebarAttached() {
@@ -377,4 +408,123 @@ public abstract class PageController implements ViewTreeObserver.OnGlobalLayoutL
     public void rememberCloseAction(Bundle state, int action) {
 
     }
+
+    protected <T> LoaderManager.LoaderCallbacks<T> wrapCallback(
+            LoaderManager.LoaderCallbacks<T> cb) {
+        return new CallbackWrapper<>(cb);
+    }
+
+    public void requestSearch() {
+        if (mSearchRequestListener != null) {
+            mSearchRequestListener.onSearchRequested();
+        }
+    }
+
+    public void setSearchRequestListener(
+            SearchRequestListener searchRequestListener) {
+        mSearchRequestListener = searchRequestListener;
+    }
+
+    public interface SearchRequestListener {
+
+        void onSearchRequested();
+    }
+
+    class LoaderManagerWrapper extends LoaderManager {
+
+        LoaderManager mWrapped;
+
+        public LoaderManagerWrapper(LoaderManager wrap) {
+            mWrapped = wrap;
+        }
+
+        @Override
+        public <D> Loader<D> initLoader(int id, Bundle args,
+                LoaderCallbacks<D> callback) {
+            return mWrapped.initLoader(id, args, wrapCallback(callback));
+        }
+
+        private <D> LoaderCallbacks<D> wrapCallback(LoaderCallbacks<D> callback) {
+            return PageController.this.wrapCallback(callback);
+        }
+
+        @Override
+        public <D> Loader<D> restartLoader(int id, Bundle args,
+                LoaderCallbacks<D> callback) {
+            return mWrapped.restartLoader(id, args, wrapCallback(callback));
+        }
+
+        @Override
+        public void destroyLoader(int id) {
+            mWrapped.destroyLoader(id);
+        }
+
+        @Override
+        public <D> Loader<D> getLoader(int id) {
+            return mWrapped.getLoader(id);
+        }
+
+        @Override
+        public void dump(String prefix, FileDescriptor fd, PrintWriter writer,
+                String[] args) {
+            mWrapped.dump(prefix, fd, writer, args);
+        }
+
+        @Override
+        public boolean hasRunningLoaders() {
+            return mWrapped.hasRunningLoaders();
+        }
+    }
+
+    class CallbackWrapper<T> implements LoaderManager.LoaderCallbacks<T>, Runnable {
+
+        final LoaderManager.LoaderCallbacks<T> mLoaderCallbacks;
+
+        final SparseArray<Bundle> mLoadersToCreate = new SparseArray<>();
+
+        Pair<Loader<T>, T> mResult;
+
+        public CallbackWrapper(LoaderManager.LoaderCallbacks<T> cb) {
+            mLoaderCallbacks = cb;
+        }
+
+        @Override
+        public Loader<T> onCreateLoader(int id, Bundle args) {
+            return mLoaderCallbacks.onCreateLoader(id, args);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<T> loader, T data) {
+            Log.d("PageController", "Load finished; v=" + isUserVisible() + " o=" + isOpening());
+            if (isUserVisible() || !isOpening()) {
+                Log.d("PageController", "Delivering result");
+                mResult = null;
+                mLoaderCallbacks.onLoadFinished(loader, data);
+            } else {
+                Log.d("PageController", "Deferring result delivery");
+                mResult = new Pair<>(loader, data);
+                mDeferredRunnables.add(this);
+            }
+        }
+
+        protected boolean isOpening() {
+            return PageController.this.mLoadsDeferred;
+        }
+
+        @Override
+        public void onLoaderReset(Loader<T> loader) {
+            mLoaderCallbacks.onLoaderReset(loader);
+            mResult = null;
+        }
+
+        @Override
+        public void run() {
+            if (mResult != null) {
+                Log.d("PageController", "Delivering deferred result");
+                mLoaderCallbacks.onLoadFinished(mResult.first, mResult.second);
+                mResult = null;
+            }
+        }
+    }
+
 }

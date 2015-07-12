@@ -21,7 +21,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'io.fabric.tools:gradle:1.14.4'
+        classpath 'io.fabric.tools:gradle:1.19.2'
     }
 }
 
@@ -34,7 +34,7 @@ repositories {
 
 android {
     compileSdkVersion 22
-    buildToolsVersion '23.0.0 rc2'
+    buildToolsVersion '23.0.0 rc3'
 
     defaultConfig {
         applicationId "com.appsimobile.appsii"

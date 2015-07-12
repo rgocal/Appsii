@@ -59,7 +59,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:text="Below is a list of all panels. Tap on a panel to change it\'s title, select the pages it displays and change their order."
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 />
 
             <FrameLayout

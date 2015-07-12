@@ -353,8 +353,21 @@ public class Sidebar extends RelativeLayout
         mAdapter.onDetachedFromWindow();
     }
 
-    public void updateAdapterData(List<HotspotPageEntry> entries) {
+    public void updateAdapterData(long defaultPage, List<HotspotPageEntry> entries) {
         mAdapter.setPages(entries);
+        int idx = indexOfId(entries, defaultPage);
+        if (idx != -1L) {
+            mAppsiViewPager.setCurrentItem(idx, false);
+        }
+    }
+
+    private static int indexOfId(List<HotspotPageEntry> entries, long defaultPage) {
+        if (defaultPage == -1L) return -1;
+        for (int i = 0; i < entries.size(); i++) {
+            HotspotPageEntry e = entries.get(i);
+            if (e.mPageId == defaultPage) return i;
+        }
+        return -1;
     }
 
     @Override

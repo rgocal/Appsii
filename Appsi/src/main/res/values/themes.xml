@@ -629,4 +629,9 @@
         <item name="colorAccent">#FF6E40</item>
     </style>
 
+    <style name="AppsiiAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">#FF3D00</item>
+        <item name="android:textColorPrimary">#CCCCCC</item>
+    </style>
+
 </resources>

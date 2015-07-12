@@ -57,6 +57,16 @@
             android:targetPackage="com.appsimobile.appsii"/>
     </Preference>
 
+    <!--<Preference-->
+    <!--android:title="Process monitor"-->
+    <!-->-->
+
+    <!--<intent-->
+    <!--android:action="android.intent.action.VIEW"-->
+    <!--android:targetClass="com.appsimobile.appsii.processmon.ProcessMonitorActivity"-->
+    <!--android:targetPackage="com.appsimobile.appsii"/>-->
+    <!--</Preference>-->
+
     <!-- 7. About -->
     <Preference
         android:title="@string/pref_about_title"

@@ -534,12 +534,9 @@ public class Appsi extends Service
         LockableAsyncQueryHandler.lock();
         mSidebar.setSidebarOpening(true);
 
-//        if (mFirstOpen) {
-//            if (!mLoaderManager.isStarted()) {
-//                mLoaderManager.doStart();
-//            }
-//            mFirstOpen = false;
-//        }
+        if (!mLoaderManager.isStarted()) {
+            mLoaderManager.doStart();
+        }
 
         boolean fullscreen = mHotspotHelper.getTopOffset() == 0;
 
@@ -622,7 +619,7 @@ public class Appsi extends Service
             }
             updateDimColor(mSidebar, left);
             mPopupLayer.addPopupChild(mSidebar);
-            mSidebar.updateAdapterData(entries);
+            mSidebar.updateAdapterData(conf.mDefaultPageId, entries);
 
             mScrollAnimationListener = null;
         } else if (openLikeNotificationBar) {
@@ -642,7 +639,7 @@ public class Appsi extends Service
 
 
             mNotificationLikeOpener.setTargetView(mSidebar, sidebarWidth, sw, left);
-            mSidebar.updateAdapterData(entries);
+            mSidebar.updateAdapterData(conf.mDefaultPageId, entries);
             mPopupLayer.addPopupChild(mSidebar);
         } else {
             mSidebar.setTranslationX(0);
@@ -658,9 +655,6 @@ public class Appsi extends Service
         } else {
             stopForeground(false);
             startForeground(ONGOING_NOTIFICATION_ID, createOperatingNormallyNotification());
-            if (!mLoaderManager.isStarted()) {
-                mLoaderManager.doStart();
-            }
         }
     }
 
@@ -888,9 +882,6 @@ public class Appsi extends Service
     }
 
     void onOpenCompleted() {
-        if (!mLoaderManager.isStarted()) {
-            mLoaderManager.doStart();
-        }
         LockableAsyncQueryHandler.unlock();
         mSidebar.setSidebarOpening(false);
     }

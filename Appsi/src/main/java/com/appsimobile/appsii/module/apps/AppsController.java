@@ -135,7 +135,8 @@ public class AppsController extends PageController
         mBottomSheetHelper.onViewCreated(view);
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        mColumnCount = preferences.getInt("page_apps_column_count", 3);
+        int defaultColumnCount = getResources().getInteger(R.integer.default_app_columns);
+        mColumnCount = preferences.getInt("page_apps_column_count", defaultColumnCount);
 
         mLayoutManager = new GridLayoutManager(getContext(), mColumnCount);
         mLayoutManager.setSpanSizeLookup(new AppsSpanSizeLookup());

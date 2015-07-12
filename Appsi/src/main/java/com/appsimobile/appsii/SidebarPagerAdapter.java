@@ -29,7 +29,8 @@ import com.appsimobile.appsii.module.search.SearchController;
 /**
  * Created by nick on 10/08/14.
  */
-public class SidebarPagerAdapter extends AbstractSidebarPagerAdapter {
+public class SidebarPagerAdapter extends AbstractSidebarPagerAdapter
+        implements PageController.SearchRequestListener {
 
     public SidebarPagerAdapter(Context context) {
         super(context);
@@ -50,9 +51,13 @@ public class SidebarPagerAdapter extends AbstractSidebarPagerAdapter {
             case HomeContract.Pages.PAGE_CALLS:
                 return new CallLogController(context, page.mPageName);
             case HomeContract.Pages.PAGE_PEOPLE:
-                return new PeopleController(context, page.mPageName);
+                PeopleController peopleController = new PeopleController(context, page.mPageName);
+                peopleController.setSearchRequestListener(this);
+                return peopleController;
             case HomeContract.Pages.PAGE_APPS:
-                return new AppsController(context, page.mPageName);
+                AppsController appsController = new AppsController(context, page.mPageName);
+                appsController.setSearchRequestListener(this);
+                return appsController;
             case HomeContract.Pages.PAGE_AGENDA:
                 return new AgendaController(context, page.mPageName);
             case HomeContract.Pages.PAGE_SEARCH:
@@ -62,4 +67,8 @@ public class SidebarPagerAdapter extends AbstractSidebarPagerAdapter {
         }
     }
 
+    @Override
+    public void onSearchRequested() {
+        // TODO: implement this!
+    }
 }

@@ -24,6 +24,8 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.support.annotation.UiThread;
+import android.support.annotation.WorkerThread;
 
 import com.appsimobile.appsii.annotation.VisibleForTesting;
 
@@ -38,8 +40,6 @@ import java.util.Set;
  * Created by nick on 01/04/15.
  */
 public class ProcessMonitorFactory {
-
-    static final int UPDATE_INTERVAL = 3000;
 
     /**
      * The instance of the factory
@@ -68,7 +68,7 @@ public class ProcessMonitorFactory {
          * <p/>
          * Process started before this monitoring starts, will not be reported
          */
-        void startMonitoringProcesses(List<String> processesToReport);
+        void startMonitoringProcesses(List<String> processesToReport, long updateIntervalMs);
 
         /**
          * Stops monitoring the registered processes
@@ -141,6 +141,8 @@ public class ProcessMonitorFactory {
          */
         boolean mStarted;
 
+        long mIntervalMs;
+
         /**
          * The listener that is registered to receive updates.
          */
@@ -157,6 +159,7 @@ public class ProcessMonitorFactory {
         HandlerThread mHandlerThread;
 
 
+        @UiThread
         public ProcessMonitorImpl(Context context) {
             checkThread("ProcessMonitorImpl");
             mContext = context.getApplicationContext();
@@ -164,18 +167,17 @@ public class ProcessMonitorFactory {
             mActivityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         }
 
-        void setLastSeenPackages(Set<String> packageNames) {
-            checkThread("setLastSeenPackages");
-            mLastSeenPackageList.clear();
-            mLastSeenPackageList.addAll(packageNames);
+        static void checkThread(String methodName) {
+            if (Looper.myLooper() != Looper.getMainLooper()) {
+                throw new IllegalStateException(
+                        methodName + "() can only be called on the main thread");
+            }
         }
 
-        public void setProcessMonitorListener(ProcessMonitorListener processMonitorListener) {
-            checkThread("setProcessMonitorListener");
-            mProcessMonitorListener = processMonitorListener;
-        }
-
-        public void startMonitoringProcesses(List<String> processesToReport) {
+        @Override
+        @UiThread
+        public void startMonitoringProcesses(List<String> processesToReport,
+                long updateIntervalMs) {
             checkThread("startMonitoringProcesses");
             mMts.setProcessesToReport(processesToReport);
             if (!mStarted) {
@@ -185,22 +187,7 @@ public class ProcessMonitorFactory {
             }
         }
 
-        void checkThread(String methodName) {
-            if (Looper.myLooper() != Looper.getMainLooper()) {
-                throw new IllegalStateException(
-                        methodName + "() can only be called on the main thread");
-            }
-        }
-
-        void postUpdateMessage() {
-            checkThread("postUpdateMessage");
-            if (mBackgroundHandler != null) {
-                mBackgroundHandler.
-                        sendEmptyMessageDelayed(MSG_UPDATE_RUNNING_PACKAGES, UPDATE_INTERVAL);
-            }
-
-        }
-
+        @UiThread
         public void stopMonitoringProcesses() {
             checkThread("stopMonitoringProcesses");
             mStarted = false;
@@ -208,6 +195,23 @@ public class ProcessMonitorFactory {
             quitHandler();
         }
 
+        @UiThread
+        public void setProcessMonitorListener(ProcessMonitorListener processMonitorListener) {
+            checkThread("setProcessMonitorListener");
+            mProcessMonitorListener = processMonitorListener;
+        }
+
+        @UiThread
+        void quitHandler() {
+            checkThread("quitHandler");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                mHandlerThread.quitSafely();
+            } else {
+                mHandlerThread.quit();
+            }
+        }
+
+        @UiThread
         private void startHandler() {
             checkThread("startHandler");
             mHandlerThread = new HandlerThread("Process-Watcher");
@@ -222,15 +226,57 @@ public class ProcessMonitorFactory {
 
         }
 
-        void quitHandler() {
-            checkThread("quitHandler");
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                mHandlerThread.quitSafely();
-            } else {
-                mHandlerThread.quit();
+        @UiThread
+        void postUpdateMessage() {
+            checkThread("postUpdateMessage");
+            if (mBackgroundHandler != null) {
+                mBackgroundHandler.
+                        sendEmptyMessageDelayed(MSG_UPDATE_RUNNING_PACKAGES, mIntervalMs);
+            }
+
+        }
+
+        @WorkerThread
+        void updateRunningPackagesInBackground() {
+            List<RunningAppProcessInfo> processes =
+                    mActivityManager.getRunningAppProcesses();
+
+            if (processes == null) return;
+
+            Set<String> running = null;
+
+            for (RunningAppProcessInfo process : processes) {
+                if (process.importance <= RunningAppProcessInfo.IMPORTANCE_VISIBLE) {
+                    int N = process.pkgList.length;
+                    for (int i = 0; i < N; i++) {
+                        String packageName = process.pkgList[i];
+                        if (mMts.isMonitoringPackage(packageName)) {
+                            if (running == null) {
+                                running = new HashSet<>(1);
+                            }
+                            running.add(packageName);
+                        }
+                    }
+                }
+            }
+
+            if (running != null) {
+                mMts.notifyPackageNamesRunningInBackground(running);
             }
         }
 
+        @UiThread
+        void handleMessageOnMainThread(Message msg) {
+            if (msg.what == MSG_PACKAGES_RUNNING) {
+                // We know we get a Set<String>, so ignore the cast warning
+                //noinspection unchecked
+                onPackagesRunning((Set<String>) msg.obj);
+            } else if (msg.what == MSG_UPDATE_RUNNING_PACKAGES) {
+                postUpdateMessage();
+            }
+        }
+
+        @UiThread
         void onPackagesRunning(Set<String> packageNames) {
             checkThread("onPackagesRunning");
             if (mProcessMonitorListener == null) return;
@@ -247,43 +293,11 @@ public class ProcessMonitorFactory {
             }
         }
 
-
-        void updateRunningPackagesInBackground() {
-            List<RunningAppProcessInfo> processes =
-                    mActivityManager.getRunningAppProcesses();
-
-            if (processes == null) return;
-
-            Set<String> running = null;
-
-            for (RunningAppProcessInfo process : processes) {
-                if (process.importance <= RunningAppProcessInfo.IMPORTANCE_VISIBLE) {
-                    int N = process.pkgList.length;
-                    for (int i = 0; i < N; i++) {
-                        String packageName = process.pkgList[i];
-                        if (mMts.isMonitoringPackage(packageName)) {
-                            if (running == null) {
-                                running = new HashSet<>();
-                            }
-                            running.add(packageName);
-                        }
-                    }
-                }
-            }
-
-            if (running != null) {
-                mMts.notifyPackageNamesRunningInBackground(running);
-            }
-        }
-
-        void handleMessageOnMainThread(Message msg) {
-            if (msg.what == MSG_PACKAGES_RUNNING) {
-                // We know we get a Set<String>, so ignore the cast warning
-                //noinspection unchecked
-                onPackagesRunning((Set<String>) msg.obj);
-            } else if (msg.what == MSG_UPDATE_RUNNING_PACKAGES) {
-                postUpdateMessage();
-            }
+        @UiThread
+        void setLastSeenPackages(Set<String> packageNames) {
+            checkThread("setLastSeenPackages");
+            mLastSeenPackageList.clear();
+            mLastSeenPackageList.addAll(packageNames);
         }
 
         class MultiThreadState {
@@ -304,8 +318,7 @@ public class ProcessMonitorFactory {
 
             }
 
-
-            boolean isMonitoringPackage(String packageName) {
+            synchronized boolean isMonitoringPackage(String packageName) {
                 return mPackageNamesToReport.contains(packageName);
             }
 

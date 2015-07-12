@@ -79,6 +79,8 @@ public abstract class AbstractSidebarPagerAdapter extends PagerAdapter {
     @VisibleForTesting
     PageController mActivePageController;
 
+    boolean mSidebarOpening;
+
     public AbstractSidebarPagerAdapter(
             Context context) {
         mContext = context;
@@ -131,6 +133,8 @@ public abstract class AbstractSidebarPagerAdapter extends PagerAdapter {
     private PageController instantiateAndCacheControllerForPage(HotspotPageEntry page) {
         Bundle state = mSavedControllerStates.get(page);
         PageController controller = createPageController(page, state);
+        controller.setDeferLoads(mSidebarOpening);
+        controller.setUserVisible(false);
         mCachedControllers.put(page, controller);
         return controller;
     }
@@ -294,6 +298,7 @@ public abstract class AbstractSidebarPagerAdapter extends PagerAdapter {
     }
 
     public void setSidebarOpening(boolean sidebarOpening) {
+        mSidebarOpening = sidebarOpening;
         int length = mActivePageControllers.size();
         for (int i = 0; i < length; i++) {
             PageController controller = mActivePageControllers.get(i);
