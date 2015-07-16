@@ -40,8 +40,8 @@ android {
         applicationId "com.appsimobile.appsii"
         minSdkVersion 17
         targetSdkVersion 22
-        versionCode 16
-        versionName "beta-0.9.9"
+        versionCode 17
+        versionName "beta-0.9.9.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
