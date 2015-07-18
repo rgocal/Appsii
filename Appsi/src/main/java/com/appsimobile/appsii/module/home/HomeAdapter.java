@@ -2469,6 +2469,8 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
         }
 
         public void removeRowAtItemPosition(int position, List<ContentProviderOperation> ops) {
+            if (position >= mHomeItems.size()) return;
+
             HomeItem item = mHomeItems.get(position);
             int rowPosition = item.mRowPosition;
 
