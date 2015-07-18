@@ -72,6 +72,8 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
         LoaderManager.LoaderCallbacks<List<YahooWeatherApiClient.LocationSearchResult>>,
         View.OnClickListener {
 
+    public static final int MESSAGE_RELOAD = 0;
+
     public static final int LOCATION_REQUEST_RESULT_DISABLED = 0;
 
     public static final int LOCATION_REQUEST_RESULT_READY = 1;
@@ -329,6 +331,9 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
         if (sLocationUpdateHelper != null) {
             sLocationUpdateHelper.onStop();
         }
+        // remove the pending requests. This may crash when the user types
+        // something and immediately closes the dialog
+        mRestartLoaderHandler.removeMessages(MESSAGE_RELOAD);
     }
 
     @Override
@@ -344,12 +349,12 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
     @Override
     public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
         mQuery = charSequence.toString();
-        if (mRestartLoaderHandler.hasMessages(0)) {
+        if (mRestartLoaderHandler.hasMessages(MESSAGE_RELOAD)) {
             return;
         }
 
         mRestartLoaderHandler.sendMessageDelayed(
-                mRestartLoaderHandler.obtainMessage(0),
+                mRestartLoaderHandler.obtainMessage(MESSAGE_RELOAD),
                 QUERY_DELAY_MILLIS);
     }
 

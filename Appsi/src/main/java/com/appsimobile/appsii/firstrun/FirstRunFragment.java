@@ -17,6 +17,7 @@
 
 package com.appsimobile.appsii.firstrun;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
@@ -36,9 +37,19 @@ public final class FirstRunFragment extends Fragment
         FirstRunLocationFragment.OnLocationCompletedListener,
         FirstRunDoneFragment.OnDoneCompletedListener {
 
+    boolean mFragmentAdded;
+
     private OnFirstRunCompletedListener mOnFirstRunCompletedListener;
 
-    boolean mFragmentAdded;
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        // set the listener here to prevent it from not being
+        // set due to backstack-rotation reasons
+        if (mOnFirstRunCompletedListener == null) {
+            mOnFirstRunCompletedListener = (OnFirstRunCompletedListener) getActivity();
+        }
+    }
 
     @Nullable
     @Override
@@ -61,17 +72,6 @@ public final class FirstRunFragment extends Fragment
                     add(R.id.first_run_contents, new FirstRunWelcomeFragment(), "welcome").
                     commit();
         }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean("fragment_added", mFragmentAdded);
-    }
-
-    public void setOnFirstRunCompletedListener(
-            OnFirstRunCompletedListener onFirstRunCompletedListener) {
-        mOnFirstRunCompletedListener = onFirstRunCompletedListener;
     }
 
     @Override
@@ -102,6 +102,12 @@ public final class FirstRunFragment extends Fragment
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("fragment_added", mFragmentAdded);
+    }
+
+    @Override
     public void onWelcomeCompleted() {
         FirstRunSettingsFragment fragment = new FirstRunSettingsFragment();
         fragment.setOnSettingsCompletedListener(this);
@@ -123,6 +129,11 @@ public final class FirstRunFragment extends Fragment
                 commit();
     }
 
+    @Override
+    public void onLocationCompleted() {
+        showDoneFragment();
+    }
+
     private void showDoneFragment() {
         FirstRunDoneFragment fragment = new FirstRunDoneFragment();
         fragment.setDoneCompletedListener(this);
@@ -131,11 +142,6 @@ public final class FirstRunFragment extends Fragment
                 replace(R.id.first_run_contents, fragment, "done").
                 setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN).
                 commit();
-    }
-
-    @Override
-    public void onLocationCompleted() {
-        showDoneFragment();
     }
 
     @Override

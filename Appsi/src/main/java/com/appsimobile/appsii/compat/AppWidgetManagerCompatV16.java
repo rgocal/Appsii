@@ -74,8 +74,13 @@ class AppWidgetManagerCompatV16 extends AppWidgetManagerCompat {
 
     @Override
     public Drawable loadPreview(AppWidgetProviderInfo info) {
-        return mContext.getPackageManager().getDrawable(
-                info.provider.getPackageName(), info.previewImage, null);
+        try {
+            return mContext.getPackageManager().getDrawable(
+                    info.provider.getPackageName(), info.previewImage, null);
+        } catch (OutOfMemoryError e) {
+            Runtime.getRuntime().gc();
+            return null;
+        }
     }
 
     @Override

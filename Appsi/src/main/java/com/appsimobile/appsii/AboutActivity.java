@@ -16,6 +16,7 @@
 
 package com.appsimobile.appsii;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,6 +24,8 @@ import android.preference.Preference;
 import android.support.annotation.XmlRes;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
+
+import com.crashlytics.android.Crashlytics;
 
 /**
  * Created by Nick Martens on 6/21/13.
@@ -71,25 +74,25 @@ public class AboutActivity extends AppCompatActivity {
             Preference pref = findPreference("pref_appsi_version");
             String version = BuildConfig.VERSION_NAME;
             pref.setSummary(version);
-            setPreferenceUri("google_plus_community",
+            setOnPreferenceClickListener("google_plus_community",
                     "https://plus.google.com/communities/111374377186674137148",
                     AnalyticsManager.ACTION_OPEN_GOOGLE_COMMUNITY);
 
-            setPreferenceUri("google_moderator",
+            setOnPreferenceClickListener("google_moderator",
                     "http://www.google.com/moderator/#16/e=215186",
                     AnalyticsManager.ACTION_OPEN_GOOGLE_MODERATOR);
 
-            setPreferenceUri("beta_tester",
+            setOnPreferenceClickListener("beta_tester",
                     "http://appsi.appsimobile.com/become-a-beta-tester",
                     AnalyticsManager.ACTION_OPEN_BETA_TESTER);
 
-            setPreferenceUri("me_google_plus",
+            setOnPreferenceClickListener("me_google_plus",
                     "https://plus.google.com/+NickMartens/about",
                     AnalyticsManager.ACTION_OPEN_FOLLOW_ME);
 
         }
 
-        private void setPreferenceUri(String key, final String url,
+        private void setOnPreferenceClickListener(String key, final String url,
                 final String trackingAction) {
             Preference gpPref = findPreference(key);
             gpPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -97,8 +100,16 @@ public class AboutActivity extends AppCompatActivity {
                 public boolean onPreferenceClick(Preference preference) {
                     Uri uri = Uri.parse(url);
                     Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                    startActivity(intent);
                     track(trackingAction, AnalyticsManager.CATEGORY_ABOUT);
+                    try {
+                        startActivity(intent);
+                    } catch (ActivityNotFoundException e) {
+                        Toast.makeText(getActivity(), "Unable to start web-browser",
+                                Toast.LENGTH_SHORT)
+                                .show();
+
+                        Crashlytics.logException(e);
+                    }
                     return true;
                 }
             });

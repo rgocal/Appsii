@@ -103,12 +103,6 @@ public class MainActivity extends AppCompatActivity
             AppsiiUtils.startAppsi(this);
         }
 
-        FragmentManager fm = getFragmentManager();
-        FirstRunFragment fragment = (FirstRunFragment) fm.findFragmentByTag(FRAGMENT_FIRST_RUN);
-        if (fragment != null) {
-            fragment.setOnFirstRunCompletedListener(this);
-        }
-
     }
 
     private void showSystemAlertWindowPermissionErrorIfNotFirstRun() {
@@ -127,12 +121,6 @@ public class MainActivity extends AppCompatActivity
         mFirstRun = false;
 
         FragmentManager fm = getFragmentManager();
-
-        // clear the listener
-        FirstRunFragment prefs = (FirstRunFragment) fm.findFragmentByTag(FRAGMENT_FIRST_RUN);
-        if (prefs != null) {
-            prefs.setOnFirstRunCompletedListener(null);
-        }
 
         // move forward to the main preferences fragment
         fm.beginTransaction().

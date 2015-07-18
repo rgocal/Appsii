@@ -61,7 +61,11 @@ public class LocationLoader {
     }
 
     @RequiresPermission(anyOf = {ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION})
-    public void requestLocationUpdate(Context context) throws SecurityException {
+    public boolean requestLocationUpdate(Context context) throws SecurityException {
+        if (!mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            return false;
+        }
+
         mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         Location lastKnown =
                 mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
@@ -71,6 +75,7 @@ public class LocationLoader {
         mLocationListener = new LocationListenerImpl(this);
         mLocationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER,
                 mLocationListener, null);
+        return true;
     }
 
     public void onLocationChanged(final Location location) {

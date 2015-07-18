@@ -22,6 +22,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -135,7 +136,10 @@ public final class FirstRunLocationFragment extends Fragment implements View.OnC
 
             try {
                 mLocationLoader = new LocationLoader(this);
-                mLocationLoader.requestLocationUpdate(getActivity());
+                boolean success = mLocationLoader.requestLocationUpdate(getActivity());
+                if (!success) {
+                    Log.w("FirstRun", "Provider NETWORK does not exist");
+                }
             } catch (SecurityException ignore) {
                 // should not happen as we checked the permission before
                 // also does not really matter
@@ -195,7 +199,9 @@ public final class FirstRunLocationFragment extends Fragment implements View.OnC
 
     @Override
     public void onLocationSearchResult(YahooWeatherApiClient.LocationSearchResult result) {
-        saveLocationResult(result);
+        if (result != null) {
+            saveLocationResult(result);
+        }
     }
 
     private void saveLocationResult(YahooWeatherApiClient.LocationSearchResult result) {

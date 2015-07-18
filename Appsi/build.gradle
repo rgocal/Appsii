@@ -40,8 +40,7 @@ android {
         applicationId "com.appsimobile.appsii"
         minSdkVersion 17
         targetSdkVersion 22
-        versionCode 17
-        versionName "beta-0.9.9.1"
+        versionCode 18
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -72,8 +71,10 @@ android {
     }
     productFlavors {
         community {
+            versionName "community-0.9.9.2"
         }
         google {
+            versionName "beta-0.9.9.2"
         }
     }
     packagingOptions {
@@ -96,15 +97,15 @@ if (new File(rootDir, "release.properties").exists()) {
 
 dependencies {
     compile 'com.google.android.gms:play-services:7.5.0'
-    compile 'com.android.support:support-v13:22.2.0'
-    compile 'com.android.support:gridlayout-v7:22.2.0'
-    compile 'com.android.support:recyclerview-v7:22.2.0'
-    compile 'com.android.support:palette-v7:22.2.0'
-    compile 'com.android.support:cardview-v7:22.2.0'
-    compile 'com.android.support:support-annotations:22.2.0'
-    compile 'com.googlecode.libphonenumber:libphonenumber:7.0.6'
-    compile 'com.googlecode.libphonenumber:geocoder:2.22'
-    compile 'com.android.support:appcompat-v7:22.2.0'
+    compile 'com.android.support:support-v13:22.2.1'
+    compile 'com.android.support:gridlayout-v7:22.2.1'
+    compile 'com.android.support:recyclerview-v7:22.2.1'
+    compile 'com.android.support:palette-v7:22.2.1'
+    compile 'com.android.support:cardview-v7:22.2.1'
+    compile 'com.android.support:support-annotations:22.2.1'
+    compile 'com.googlecode.libphonenumber:libphonenumber:7.0.8'
+    compile 'com.googlecode.libphonenumber:geocoder:2.24'
+    compile 'com.android.support:appcompat-v7:22.2.1'
     //    compile 'com.github.japgolly.android:svg-android:2.0.6'
     compile fileTree(include: ['*.jar'], dir: 'libs')
     // TODO: Add this at some point so we can interpret js. The
@@ -122,5 +123,5 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.2.2@aar') {
         transitive = true;
     }
-    compile 'com.android.support:design:22.2.0'
+    compile 'com.android.support:design:22.2.1'
 }
