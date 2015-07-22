@@ -88,7 +88,9 @@ public class EditClassDialog extends DialogFragment implements TextView.OnEditor
         {
             List<ResolveInfo> resolveInfos = packageManager.queryBroadcastReceivers(intent, 0);
             if (resolveInfos != null) {
-                for (ResolveInfo packageInfo : resolveInfos) {
+                int N = resolveInfos.size();
+                for (int i = 0; i < N; i++) {
+                    ResolveInfo packageInfo = resolveInfos.get(i);
                     String className = packageInfo.activityInfo.name;
                     if (className.startsWith(mPackageName)) {
                         className = className.substring(mPackageName.length());
@@ -100,7 +102,9 @@ public class EditClassDialog extends DialogFragment implements TextView.OnEditor
         {
             List<ResolveInfo> activities = packageManager.queryIntentActivities(intent, 0);
             if (activities != null) {
-                for (ResolveInfo packageInfo : activities) {
+                int N = activities.size();
+                for (int i = 0; i < N; i++) {
+                    ResolveInfo packageInfo = activities.get(i);
                     String className = packageInfo.activityInfo.name;
                     if (className.startsWith(mPackageName)) {
                         className = className.substring(mPackageName.length());
@@ -112,7 +116,9 @@ public class EditClassDialog extends DialogFragment implements TextView.OnEditor
         {
             List<ResolveInfo> activities = packageManager.queryIntentServices(intent, 0);
             if (activities != null) {
-                for (ResolveInfo packageInfo : activities) {
+                int N = activities.size();
+                for (int i = 0; i < N; i++) {
+                    ResolveInfo packageInfo = activities.get(i);
                     String className = packageInfo.serviceInfo.name;
                     if (className.startsWith(mPackageName)) {
                         className = className.substring(mPackageName.length());

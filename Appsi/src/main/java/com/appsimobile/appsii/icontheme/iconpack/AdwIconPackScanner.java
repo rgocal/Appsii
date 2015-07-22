@@ -32,13 +32,13 @@ public class AdwIconPackScanner implements IconPackFormatScanner {
     public static final String ADW_THEME_ACTION = "org.adw.launcher.THEMES";
 
     @Override
-    public List<IconPack> scan(Context context) {
+    public ArrayList<IconPack> scan(Context context) {
         Intent intent = new Intent(ADW_THEME_ACTION);
         PackageManager packageManager = context.getPackageManager();
         List<ResolveInfo> resolveInfos = packageManager.queryIntentActivities(intent, 0);
         if (resolveInfos.isEmpty()) return null;
 
-        List<IconPack> result = new ArrayList<IconPack>(resolveInfos.size());
+        ArrayList<IconPack> result = new ArrayList<>(resolveInfos.size());
         int count = resolveInfos.size();
         for (int i = 0; i < count; i++) {
             ResolveInfo resolveInfo = resolveInfos.get(i);

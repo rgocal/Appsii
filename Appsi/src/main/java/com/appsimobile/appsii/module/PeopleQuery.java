@@ -20,8 +20,9 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
 
+import com.appsimobile.util.CollectionUtils;
+
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by nick on 16/02/15.
@@ -57,8 +58,10 @@ public class PeopleQuery {
 
     };
 
-    public static List<? extends BaseContactInfo> cursorToContactInfos(Cursor cursor) {
-        List<BaseContactInfo> result = new ArrayList<>();
+    public static ArrayList<? extends BaseContactInfo> cursorToContactInfos(Cursor cursor) {
+        if (cursor == null) return CollectionUtils.emptyList();
+
+        ArrayList<BaseContactInfo> result = new ArrayList<>();
         cursor.moveToPosition(-1);
 
         while (cursor.moveToNext()) {

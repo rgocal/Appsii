@@ -19,14 +19,13 @@ package com.appsimobile.appsii.module.home;
 import android.graphics.Bitmap;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by nick on 28/03/15.
  */
 class Contact {
 
-    final List<RawContact> mRawContacts = new ArrayList<>();
+    final ArrayList<RawContact> mRawContacts = new ArrayList<>();
 
     long mId;
 

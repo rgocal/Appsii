@@ -29,13 +29,12 @@ import com.appsimobile.appsii.module.home.provider.HomeContract;
 import com.appsimobile.util.ConvertedCursorLoader;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A loader that can load the hotspots present in the system
  * Created by nick on 22/09/14.
  */
-public class HotspotsPagesLoader extends ConvertedCursorLoader<List<HotspotPageEntry>> {
+public class HotspotsPagesLoader extends ConvertedCursorLoader<ArrayList<HotspotPageEntry>> {
 
 
     /**
@@ -62,15 +61,15 @@ public class HotspotsPagesLoader extends ConvertedCursorLoader<List<HotspotPageE
     }
 
     @Override
-    protected List<HotspotPageEntry> convertPermissionDeniedException(PermissionDeniedException e) {
+    protected ArrayList<HotspotPageEntry> convertPermissionDeniedException(PermissionDeniedException e) {
         return null;
     }
 
     @Override
-    protected List<HotspotPageEntry> convertCursor(@NonNull Cursor c) {
+    protected ArrayList<HotspotPageEntry> convertCursor(@NonNull Cursor c) {
         c.moveToPosition(-1);
 
-        List<HotspotPageEntry> result = new ArrayList<>(c.getCount());
+        ArrayList<HotspotPageEntry> result = new ArrayList<>(c.getCount());
         while (c.moveToNext()) {
 
             int pageType = c.getInt(HotspotPagesQuery.PAGE_TYPE);
@@ -96,7 +95,7 @@ public class HotspotsPagesLoader extends ConvertedCursorLoader<List<HotspotPageE
     }
 
     @Override
-    protected void cleanup(List<HotspotPageEntry> old) {
+    protected void cleanup(ArrayList<HotspotPageEntry> old) {
 
     }
 

@@ -22,23 +22,22 @@ import android.database.Cursor;
 
 import com.appsimobile.appsii.HotspotItem;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
+import com.appsimobile.util.CollectionUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Created by nick on 30/01/15.
  */
 public class HotspotLoader {
 
-    public static List<HotspotItem> loadHotspots(Context c) {
+    public static ArrayList<HotspotItem> loadHotspots(Context c) {
         ContentResolver r = c.getContentResolver();
         Cursor cursor = r.query(HomeContract.Hotspots.CONTENT_URI,
                 HotspotQuery.PROJECTION,
                 null, null, null);
         if (cursor != null) {
-            List<HotspotItem> result = new ArrayList<>(cursor.getCount());
+            ArrayList<HotspotItem> result = new ArrayList<>(cursor.getCount());
 
             try {
                 while (cursor.moveToNext()) {
@@ -64,6 +63,6 @@ public class HotspotLoader {
             }
             return result;
         }
-        return Collections.emptyList();
+        return CollectionUtils.emptyList();
     }
 }

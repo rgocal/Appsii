@@ -26,21 +26,21 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.UserHandle;
+import android.support.v4.util.SimpleArrayMap;
 
 import com.appsimobile.appsii.AppsiiUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class LauncherAppsCompatVL extends LauncherAppsCompat {
 
     final Context mContext;
 
-    private final Map<OnAppsChangedCallbackCompat, WrappedCallback> mCallbacks = new HashMap<>();
+    private final SimpleArrayMap<OnAppsChangedCallbackCompat, WrappedCallback> mCallbacks =
+            new SimpleArrayMap<>();
 
     private final LauncherApps mLauncherApps;
 

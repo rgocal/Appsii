@@ -28,6 +28,7 @@ import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.ResponseParserException;
 import com.appsimobile.appsii.annotation.VisibleForTesting;
 import com.appsimobile.appsii.module.weather.Utils;
+import com.appsimobile.util.CollectionUtils;
 
 import org.json.JSONException;
 import org.xmlpull.v1.XmlPullParser;
@@ -82,10 +83,10 @@ public class YahooWeatherApiClient {
         }
     }
 
-    public static List<WeatherData> getWeatherForWoeids(String[] woeids, String unit)
+    public static ArrayList<WeatherData> getWeatherForWoeids(String[] woeids, String unit)
             throws CantGetWeatherException {
 
-        if (woeids == null || woeids.length == 0) return Collections.emptyList();
+        if (woeids == null || woeids.length == 0) return CollectionUtils.emptyList();
 
         HttpURLConnection connection = null;
         try {
@@ -94,7 +95,7 @@ public class YahooWeatherApiClient {
 
             connection = Utils.openUrlConnection(url);
 
-            List<WeatherData> result = new ArrayList<>();
+            ArrayList<WeatherData> result = new ArrayList<>();
             WeatherDataParser.parseWeatherData(result, connection.getInputStream(), woeids);
 
             return result;
@@ -159,7 +160,7 @@ public class YahooWeatherApiClient {
             LocationInfo li, InputStream in)
             throws XmlPullParserException, IOException, CantGetWeatherException {
 
-        List<Pair<String, String>> alternateWoeids = new ArrayList<>();
+        ArrayList<Pair<String, String>> alternateWoeids = new ArrayList<>();
         String primaryWoeid = null;
 
         XmlPullParser xpp = sXmlPullParserFactory.newPullParser();
@@ -231,7 +232,9 @@ public class YahooWeatherApiClient {
             }
         });
 
-        for (Pair<String, String> pair : alternateWoeids) {
+        int N = alternateWoeids.size();
+        for (int i = 0; i < N; i++) {
+            Pair<String, String> pair = alternateWoeids.get(i);
             li.woeids.add(pair.second);
         }
 
@@ -239,8 +242,7 @@ public class YahooWeatherApiClient {
             return li;
         }
 
-        throw new CantGetWeatherException(true, R.string.no_weather_data,
-                "No WOEIDs found nearby.");
+        throw new CantGetWeatherException(true, R.string.no_weather_data, "No WOEIDs found nearby.");
     }
 
     public static List<LocationSearchResult> findLocationsAutocomplete(String startsWith) {
@@ -383,7 +385,7 @@ public class YahooWeatherApiClient {
 
         // Sorted by decreasing precision
         // (point of interest, locality3, locality2, locality1, admin3, admin2, admin1, etc.)
-        public final List<String> woeids = new ArrayList<String>();
+        public final ArrayList<String> woeids = new ArrayList<String>();
 
         public String town;
 

@@ -55,22 +55,28 @@ class AppPageData {
         mRecentApps = recentApps;
         mAppTags = tags;
 
-        SimpleArrayMap<ComponentName, AppEntry> appEntriesByComponent = new SimpleArrayMap<>();
+        SimpleArrayMap<ComponentName, AppEntry> appEntriesByComponent;
         if (allApps != null) {
-            for (AppEntry app : allApps) {
+            int N = allApps.size();
+            appEntriesByComponent = new SimpleArrayMap<>(N);
+            for (int i = 0; i < N; i++) {
+                AppEntry app = allApps.get(i);
                 appEntriesByComponent.put(app.getComponentName(), app);
             }
+        } else {
+            appEntriesByComponent = new SimpleArrayMap<>(0);
         }
 
 
-        long recentAppsTagId = recentAppsTagid(tags);
-        long allAppsTagId = allAppsTagid(tags);
+        long recentAppsTagId = recentAppsTagId(tags);
+        long allAppsTagId = allAppsTagId(tags);
 
         mAppsPerTag.put(allAppsTagId, mAllApps);
 
-        List<AppEntry> recentAppEntries = new ArrayList<>();
-        for (HistoryItem i : recentApps) {
-            AppEntry e = appEntriesByComponent.get(i.componentName);
+        List<AppEntry> recentAppEntries = new ArrayList<>(recentApps.size());
+        for (int i = 0; i < recentApps.size(); i++) {
+            HistoryItem item = recentApps.get(i);
+            AppEntry e = appEntriesByComponent.get(item.componentName);
             if (e != null) {
                 recentAppEntries.add(e);
             }
@@ -79,7 +85,7 @@ class AppPageData {
         mAppsPerTag.put(recentAppsTagId, recentAppEntries);
     }
 
-    private long recentAppsTagid(List<AppTag> tags) {
+    private long recentAppsTagId(List<AppTag> tags) {
         for (AppTag tag : tags) {
             if (tag.tagType == AppsContract.TagColumns.TAG_TYPE_RECENT) {
                 return tag.id;
@@ -88,8 +94,10 @@ class AppPageData {
         return 0;
     }
 
-    private long allAppsTagid(List<AppTag> tags) {
-        for (AppTag tag : tags) {
+    private long allAppsTagId(List<AppTag> tags) {
+        int N = tags.size();
+        for (int i = 0; i < N; i++) {
+            AppTag tag = tags.get(i);
             if (tag.tagType == AppsContract.TagColumns.TAG_TYPE_ALL) {
                 return tag.id;
             }

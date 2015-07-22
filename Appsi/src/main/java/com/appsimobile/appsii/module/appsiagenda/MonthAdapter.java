@@ -17,6 +17,7 @@
 package com.appsimobile.appsii.module.appsiagenda;
 
 import android.content.Context;
+import android.support.v4.util.SimpleArrayMap;
 import android.text.format.Time;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +25,6 @@ import android.widget.AbsListView.LayoutParams;
 import android.widget.BaseAdapter;
 
 import java.util.Calendar;
-import java.util.HashMap;
 
 /**
  * An adapter for a list of {@link MonthView} items.
@@ -172,11 +172,11 @@ public abstract class MonthAdapter extends BaseAdapter implements MonthView.OnDa
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         MonthView v;
-        HashMap<String, Integer> drawingParams = null;
+        SimpleArrayMap<String, Integer> drawingParams = null;
         if (convertView != null) {
             v = (MonthView) convertView;
             // We store the drawing parameters in the view so it can be recycled
-            drawingParams = (HashMap<String, Integer>) v.getTag();
+            drawingParams = (SimpleArrayMap<String, Integer>) v.getTag();
         } else {
             v = createMonthView(mContext);
             // Set up the new view
@@ -187,7 +187,7 @@ public abstract class MonthAdapter extends BaseAdapter implements MonthView.OnDa
             v.setOnDayClickListener(this);
         }
         if (drawingParams == null) {
-            drawingParams = new HashMap<String, Integer>();
+            drawingParams = new SimpleArrayMap<String, Integer>();
         }
         drawingParams.clear();
 

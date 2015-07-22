@@ -34,7 +34,7 @@ import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.mobeta.android.dslv.ConditionalRemovableAdapter;
 import com.mobeta.android.dslv.DragSortListView;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created by nick on 14/06/15.
@@ -63,7 +63,7 @@ public class ReorderController implements DragSortListView.DropListener,
     /**
      * Called when the hotspot-pages are loaded. Sets them in the adapter
      */
-    void setHotspotPages(List<HotspotPageEntry> hotspotPageEntries) {
+    void setHotspotPages(ArrayList<HotspotPageEntry> hotspotPageEntries) {
         mHotspotAdapter.setItems(hotspotPageEntries);
     }
 

@@ -19,12 +19,14 @@ package com.appsimobile.appsii.timezonepicker;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
+import android.support.v4.util.SimpleArrayMap;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.util.SparseArray;
 
 import com.appsimobile.appsii.R;
+import com.appsimobile.util.IntList;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,7 +35,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Locale;
@@ -61,15 +62,15 @@ public class TimeZoneData {
 
     ArrayList<TimeZoneInfo> mTimeZones;
 
-    LinkedHashMap<String, ArrayList<Integer>> mTimeZonesByCountry;
+    LinkedHashMap<String, IntList> mTimeZonesByCountry;
 
-    final HashSet<String> mTimeZoneNames = new HashSet<String>();
+    final HashSet<String> mTimeZoneNames = new HashSet<>();
 
-    SparseArray<ArrayList<Integer>> mTimeZonesByOffsets;
+    SparseArray<IntList> mTimeZonesByOffsets;
 
     private long mTimeMillis;
 
-    private final HashMap<String, String> mCountryCodeToNameMap = new HashMap<String, String>();
+    private final SimpleArrayMap<String, String> mCountryCodeToNameMap = new SimpleArrayMap<>();
 
     private TimeZoneInfo mDefaultTimeZoneInfo;
 
@@ -77,7 +78,7 @@ public class TimeZoneData {
 
     private String mDefaultTimeZoneCountry;
 
-    private HashMap<String, TimeZoneInfo> mTimeZonesById;
+    private SimpleArrayMap<String, TimeZoneInfo> mTimeZonesById;
 
     private final boolean[] mHasTimeZonesInHrOffset = new boolean[40];
 
@@ -110,7 +111,7 @@ public class TimeZoneData {
     }
 
     void loadTzs(Context context) {
-        mTimeZones = new ArrayList<TimeZoneInfo>();
+        mTimeZones = new ArrayList<>();
         HashSet<String> processedTimeZones = loadTzsInZoneTab(context);
         String[] tzIds = TimeZone.getAvailableIDs();
 
@@ -171,21 +172,24 @@ public class TimeZoneData {
         // Don't change the order of mTimeZones after this sort
         Collections.sort(mTimeZones);
 
-        mTimeZonesByCountry = new LinkedHashMap<String, ArrayList<Integer>>();
-        mTimeZonesByOffsets = new SparseArray<ArrayList<Integer>>(mHasTimeZonesInHrOffset.length);
-        mTimeZonesById = new HashMap<String, TimeZoneInfo>(mTimeZones.size());
-        for (TimeZoneInfo tz : mTimeZones) {
+        mTimeZonesByCountry = new LinkedHashMap<>();
+        mTimeZonesByOffsets = new SparseArray<>(mHasTimeZonesInHrOffset.length);
+        int N = mTimeZones.size();
+        mTimeZonesById = new SimpleArrayMap<>(N);
+        for (int i = 0; i < N; i++) {
+            TimeZoneInfo tz = mTimeZones.get(i);
             // /////////////////////
             // Lookup map for id -> tz
             mTimeZonesById.put(tz.mTzId, tz);
         }
-        populateDisplayNameOverrides(mContext.getResources());
+        populateDisplayNameOverrides(mTimeZonesById, mContext.getResources());
 
         Date date = new Date(mTimeMillis);
         Locale defaultLocal = Locale.getDefault();
 
         int idx = 0;
-        for (TimeZoneInfo tz : mTimeZones) {
+        for (int i = 0; i < N; i++) {
+            TimeZoneInfo tz = mTimeZones.get(i);
             // /////////////////////
             // Populate display name
             if (tz.mDisplayName == null) {
@@ -195,9 +199,9 @@ public class TimeZoneData {
 
             // /////////////////////
             // Grouping tz's by country for search by country
-            ArrayList<Integer> group = mTimeZonesByCountry.get(tz.mCountry);
+            IntList group = mTimeZonesByCountry.get(tz.mCountry);
             if (group == null) {
-                group = new ArrayList<Integer>();
+                group = new IntList();
                 mTimeZonesByCountry.put(tz.mCountry, group);
             }
 
@@ -222,7 +226,7 @@ public class TimeZoneData {
     }
 
     private HashSet<String> loadTzsInZoneTab(Context context) {
-        HashSet<String> processedTimeZones = new HashSet<String>();
+        HashSet<String> processedTimeZones = new HashSet<>();
         AssetManager am = context.getAssets();
         InputStream is = null;
 
@@ -387,23 +391,24 @@ public class TimeZoneData {
     }
 
     private int getIdenticalTimeZoneInTheCountry(TimeZoneInfo timeZoneInfo) {
-        int idx = 0;
-        for (TimeZoneInfo tzi : mTimeZones) {
+        for (int i = 0; i < mTimeZones.size(); i++) {
+            TimeZoneInfo tzi = mTimeZones.get(i);
             if (tzi.hasSameRules(timeZoneInfo)) {
                 if (tzi.mCountry == null) {
                     if (timeZoneInfo.mCountry == null) {
-                        return idx;
+                        return i;
                     }
                 } else if (tzi.mCountry.equals(timeZoneInfo.mCountry)) {
-                    return idx;
+                    return i;
                 }
             }
-            ++idx;
         }
         return -1;
     }
 
-    private void populateDisplayNameOverrides(Resources resources) {
+    private static void populateDisplayNameOverrides(
+            SimpleArrayMap<String, TimeZoneInfo> timeZonesById, Resources resources) {
+
         String[] ids = resources.getStringArray(R.array.timezone_rename_ids);
         String[] labels = resources.getStringArray(R.array.timezone_rename_labels);
 
@@ -415,7 +420,7 @@ public class TimeZoneData {
         }
 
         for (int i = 0; i < length; i++) {
-            TimeZoneInfo tzi = mTimeZonesById.get(ids[i]);
+            TimeZoneInfo tzi = timeZonesById.get(ids[i]);
             if (tzi != null) {
                 tzi.mDisplayName = labels[i];
             } else {
@@ -429,9 +434,9 @@ public class TimeZoneData {
         int index = OFFSET_ARRAY_OFFSET + (int) (offsetMillis / DateUtils.HOUR_IN_MILLIS);
         mHasTimeZonesInHrOffset[index] = true;
 
-        ArrayList<Integer> group = mTimeZonesByOffsets.get(index);
+        IntList group = mTimeZonesByOffsets.get(index);
         if (group == null) {
-            group = new ArrayList<Integer>();
+            group = new IntList(1);
             mTimeZonesByOffsets.put(index, group);
         }
         group.add(idx);
@@ -487,12 +492,12 @@ public class TimeZoneData {
 
     // TODO speed this up
     public int findIndexByTimeZoneIdSlow(String timeZoneId) {
-        int idx = 0;
-        for (TimeZoneInfo tzi : mTimeZones) {
+        int N = mTimeZones.size();
+        for (int i = 0; i < N; i++) {
+            TimeZoneInfo tzi = mTimeZones.get(i);
             if (timeZoneId.equals(tzi.mTzId)) {
-                return idx;
+                return i;
             }
-            idx++;
         }
         return -1;
     }
@@ -539,7 +544,7 @@ public class TimeZoneData {
         return mHasTimeZonesInHrOffset[index];
     }
 
-    public ArrayList<Integer> getTimeZonesByOffset(int offsetHr) {
+    public IntList getTimeZonesByOffset(int offsetHr) {
         int index = OFFSET_ARRAY_OFFSET + offsetHr;
         if (index >= mHasTimeZonesInHrOffset.length || index < 0) {
             return null;

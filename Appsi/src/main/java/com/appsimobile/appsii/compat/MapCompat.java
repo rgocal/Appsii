@@ -21,7 +21,6 @@ package com.appsimobile.appsii.compat;
 import android.os.Build;
 import android.util.ArrayMap;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -33,14 +32,14 @@ public class MapCompat {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             return new ArrayMap<>(capacity);
         }
-        return new HashMap<>(capacity);
+        return new android.support.v4.util.ArrayMap<>(capacity);
     }
 
     public static <K, V> Map<K, V> createMap() {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             return new ArrayMap<>();
         }
-        return new HashMap<>();
+        return new android.support.v4.util.ArrayMap<>();
     }
 
 }

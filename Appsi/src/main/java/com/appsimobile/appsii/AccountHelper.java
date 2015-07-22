@@ -176,7 +176,9 @@ public class AccountHelper implements SharedPreferences.OnSharedPreferenceChange
     public void updateSyncSettings() {
         Bundle bundle = createDefaultSyncBundle();
         List<PeriodicSync> syncs = ContentResolver.getPeriodicSyncs(mAccount, AUTHORITY);
-        for (PeriodicSync sync : syncs) {
+        int N = syncs.size();
+        for (int i = 0; i < N; i++) {
+            PeriodicSync sync = syncs.get(i);
             ContentResolver.removePeriodicSync(sync.account, sync.authority, sync.extras);
         }
         ContentResolver.addPeriodicSync(

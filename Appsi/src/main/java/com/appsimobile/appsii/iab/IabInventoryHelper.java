@@ -202,10 +202,12 @@ public class IabInventoryHelper extends BaseIabHelper {
             }
         }
 
-        List<String> responseList = skuDetails.getStringArrayList(
+        ArrayList<String> responseList = skuDetails.getStringArrayList(
                 RESPONSE_GET_SKU_DETAILS_LIST);
 
-        for (String thisResponse : responseList) {
+        int N = responseList.size();
+        for (int i = 0; i < N; i++) {
+            String thisResponse = responseList.get(i);
             SkuDetails d = new SkuDetails(itemType, thisResponse);
             logDebug("Got sku details: " + d);
             inv.addSkuDetails(d);

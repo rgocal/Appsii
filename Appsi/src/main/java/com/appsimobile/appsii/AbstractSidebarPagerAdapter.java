@@ -29,7 +29,7 @@ import android.view.ViewGroup;
 import com.appsimobile.appsii.annotation.VisibleForTesting;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * A pager adapter that holds client state. This is modeled after
@@ -94,7 +94,7 @@ public abstract class AbstractSidebarPagerAdapter extends PagerAdapter {
         mFlagListener = flagListener;
     }
 
-    public void setPages(List<HotspotPageEntry> pages) {
+    public void setPages(ArrayList<HotspotPageEntry> pages) {
         if (mActivePageKeys.equals(pages)) return;
 
         // temporary keep the old items in a separate list so we can
@@ -111,8 +111,8 @@ public abstract class AbstractSidebarPagerAdapter extends PagerAdapter {
         mActivePageKeys.clear();
         mActivePageControllers.clear();
 
-        int position = 0;
-        for (HotspotPageEntry page : pages) {
+        for (int i = 0; i < pages.size(); i++) {
+            HotspotPageEntry page = pages.get(i);
             if (!page.mEnabled) continue;
             if (page.mPageType == HomeContract.Pages.PAGE_SETTINGS) continue;
             if (page.mPageType == HomeContract.Pages.PAGE_SMS) continue;
@@ -122,10 +122,8 @@ public abstract class AbstractSidebarPagerAdapter extends PagerAdapter {
             if (controller == null) {
                 controller = instantiateAndCacheControllerForPage(page);
             }
-            mActivePageKeys.put(position, page);
-            mActivePageControllers.put(position, controller);
-
-            position++;
+            mActivePageKeys.put(i, page);
+            mActivePageControllers.put(i, controller);
         }
         notifyDataSetChanged();
     }

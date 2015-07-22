@@ -29,10 +29,10 @@ import android.util.Log;
 
 import com.appsimobile.appsii.module.weather.loader.CantGetWeatherException;
 import com.appsimobile.appsii.module.weather.loader.YahooWeatherApiClient;
+import com.appsimobile.util.CollectionUtils;
 
 import java.lang.ref.WeakReference;
-import java.util.Collections;
-import java.util.List;
+import java.util.ArrayList;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
@@ -62,11 +62,12 @@ public class LocationLoader {
 
     @RequiresPermission(anyOf = {ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION})
     public boolean requestLocationUpdate(Context context) throws SecurityException {
+        mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+
         if (!mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             return false;
         }
-
-        mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        
         Location lastKnown =
                 mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         if (lastKnown != null) {
@@ -106,8 +107,8 @@ public class LocationLoader {
     }
 
     void onLocationInfoLoaded(@Nullable YahooWeatherApiClient.LocationInfo locationInfo) {
-        List<String> woeids = locationInfo == null ?
-                Collections.<String>emptyList() : locationInfo.woeids;
+        ArrayList<String> woeids = locationInfo == null ?
+                CollectionUtils.<String>emptyList() : locationInfo.woeids;
 
         String town = locationInfo == null ? null : locationInfo.town;
         String country = locationInfo == null ? null : locationInfo.country;

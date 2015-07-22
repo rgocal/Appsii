@@ -28,7 +28,7 @@ import java.util.List;
 public class IconPackScanner {
 
     private static final List<Class<? extends IconPackFormatScanner>> sScannerList =
-            new ArrayList<Class<? extends IconPackFormatScanner>>();
+            new ArrayList<>();
 
     static {
         sScannerList.add(AdwIconPackScanner.class);
@@ -46,14 +46,14 @@ public class IconPackScanner {
         return new IconPackScanner(context);
     }
 
-    public List<IconPack> getIconPacks() {
+    public ArrayList<IconPack> getIconPacks() {
         int count = sScannerList.size();
-        List<IconPack> result = new ArrayList<IconPack>();
+        ArrayList<IconPack> result = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             Class<? extends IconPackFormatScanner> scannerClass = sScannerList.get(i);
             try {
                 IconPackFormatScanner scanner = scannerClass.newInstance();
-                List<IconPack> iconPacks = scanner.scan(mContext);
+                ArrayList<IconPack> iconPacks = scanner.scan(mContext);
                 if (iconPacks != null) {
                     result.addAll(iconPacks);
                 }

@@ -78,7 +78,10 @@ public class EditPackageDialog extends DialogFragment implements TextView.OnEdit
 
         PackageManager packageManager = getActivity().getPackageManager();
         List<PackageInfo> packageInfos = packageManager.getInstalledPackages(0);
-        for (PackageInfo packageInfo : packageInfos) {
+
+        int N = packageInfos.size();
+        for (int i = 0; i < N; i++) {
+            PackageInfo packageInfo = packageInfos.get(i);
             mPackageItems.add(packageInfo.packageName);
         }
     }

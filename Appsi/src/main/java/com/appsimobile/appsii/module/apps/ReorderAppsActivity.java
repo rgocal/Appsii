@@ -101,8 +101,9 @@ public class ReorderAppsActivity extends Activity implements AppTagUtils.AppTagL
     private void preselectSelection(List<AppTag> appTags) {
         if (!mPreselected) {
             mPreselected = true;
-            int idx = 0;
-            for (AppTag appTag : appTags) {
+            int N = appTags.size();
+            for (int i = 0, idx = 0; i < N; i++) {
+                AppTag appTag = appTags.get(i);
                 if (appTag.id == mPreselectId) {
                     mSpinner.setSelection(idx);
                     break;
@@ -115,7 +116,7 @@ public class ReorderAppsActivity extends Activity implements AppTagUtils.AppTagL
     }
 
     @Override
-    public void onTagsChanged(List<AppTag> appTags) {
+    public void onTagsChanged(ArrayList<AppTag> appTags) {
         mSpinnerAdapter.setItems(appTags);
         preselectSelection(appTags);
     }

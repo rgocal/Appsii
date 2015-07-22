@@ -59,7 +59,10 @@ class AppWidgetManagerCompatVL extends AppWidgetManagerCompat {
     @Override
     public List<AppWidgetProviderInfo> getAllProviders() {
         ArrayList<AppWidgetProviderInfo> providers = new ArrayList<AppWidgetProviderInfo>();
-        for (UserHandle user : mUserManager.getUserProfiles()) {
+        List<UserHandle> userProfiles = mUserManager.getUserProfiles();
+        int N = userProfiles.size();
+        for (int i = 0; i < N; i++) {
+            UserHandle user = userProfiles.get(i);
             providers.addAll(mAppWidgetManager.getInstalledProvidersForProfile(user));
         }
         return providers;

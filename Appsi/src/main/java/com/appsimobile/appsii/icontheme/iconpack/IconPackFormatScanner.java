@@ -18,13 +18,13 @@ package com.appsimobile.appsii.icontheme.iconpack;
 
 import android.content.Context;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created by Nick Martens on 9/14/13.
  */
 public interface IconPackFormatScanner {
 
-    List<IconPack> scan(Context context);
+    ArrayList<IconPack> scan(Context context);
 
 }

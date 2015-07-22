@@ -79,9 +79,11 @@ class AppItemTileViewHolder extends RecyclerView.ViewHolder implements View.OnCl
         mRecyclerView.setAdapter(mItemAdapter);
     }
 
-    public void bindResults(String title, List<AppEntry> items) {
+    public void bindResults(String title, ArrayList<AppEntry> items) {
         mItems.clear();
-        for (AppEntry item : items) {
+        int N = items.size();
+        for (int i = 0; i < N; i++) {
+            AppEntry item = items.get(i);
             mItems.add(item);
         }
 

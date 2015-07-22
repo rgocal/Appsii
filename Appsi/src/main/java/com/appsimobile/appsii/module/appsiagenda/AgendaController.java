@@ -67,9 +67,9 @@ import com.appsimobile.util.TimeUtils;
 import com.crashlytics.android.Crashlytics;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Formatter;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -837,7 +837,7 @@ public class AgendaController extends PageController
 
         final MonthAdapter.CalendarDay mSelected;
 
-        private final List<OnDateChangedListener> mListeners = new LinkedList<>();
+        private final List<OnDateChangedListener> mListeners = new ArrayList<>(3);
 
         private SparseBooleanArray mEventDays;
 
@@ -952,7 +952,9 @@ public class AgendaController extends PageController
         }
 
         private void notifySelectionChanged(boolean fromTap) {
-            for (OnDateChangedListener l : mListeners) {
+            int N = mListeners.size();
+            for (int i = 0; i < N; i++) {
+                OnDateChangedListener l = mListeners.get(i);
                 l.onDateChanged(mSelected.year, mSelected.month, mSelected.day, fromTap);
             }
         }

@@ -32,7 +32,7 @@ import java.util.WeakHashMap;
  */
 public abstract class BaseListAdapter<I, VH extends ViewHolder> extends BaseAdapter {
 
-    private final List<I> mItems = new ArrayList<>();
+    private final ArrayList<I> mItems = new ArrayList<>();
 
     private final WeakHashMap<View, VH> mViewHolders = new WeakHashMap<>();
 
@@ -79,7 +79,7 @@ public abstract class BaseListAdapter<I, VH extends ViewHolder> extends BaseAdap
         notifyDataSetChanged();
     }
 
-    public List<I> getItems() {
+    public ArrayList<I> getItems() {
         return mItems;
     }
 

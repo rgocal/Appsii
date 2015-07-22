@@ -21,23 +21,21 @@ package com.appsimobile.appsii.module.home.config;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.util.SimpleArrayMap;
 import android.text.TextUtils;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by nick on 24/03/15.
  */
 public class MockHomeItemConfiguration extends AbstractHomeItemConfiguration {
 
-    final Map<String, String> mProperties;
+    final SimpleArrayMap<String, String> mProperties;
 
     final Handler mHandler;
 
     public MockHomeItemConfiguration(Context context) {
         super(context);
-        mProperties = new HashMap<>();
+        mProperties = new SimpleArrayMap<>();
         mHandler = new Handler(Looper.getMainLooper());
     }
 
@@ -75,7 +73,9 @@ public class MockHomeItemConfiguration extends AbstractHomeItemConfiguration {
 
     @Override
     public void removeAllProperties(long cellId) {
-        for (String key : mProperties.keySet()) {
+        int N = mProperties.size();
+        for (int i = 0; i < N; i++) {
+            String key = mProperties.keyAt(i);
             removeProperty(cellId, key);
         }
     }

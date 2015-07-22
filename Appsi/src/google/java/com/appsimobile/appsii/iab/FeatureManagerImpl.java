@@ -39,7 +39,7 @@ class FeatureManagerImpl implements FeatureManager, BaseIabHelper.OnIabSetupFini
     static final List<String> sAllSkus;
 
     static {
-        List<String> result = new ArrayList<>();
+        ArrayList<String> result = new ArrayList<>();
         result.add(AGENDA_FEATURE);
         result.add(PEOPLE_FEATURE);
         result.add(SETTINGS_FEATURE);
@@ -56,7 +56,7 @@ class FeatureManagerImpl implements FeatureManager, BaseIabHelper.OnIabSetupFini
      */
     final Context mContext;
 
-    final List<FeatureManagerListener> mFeatureManagerListeners = new ArrayList<>(4);
+    final ArrayList<FeatureManagerListener> mFeatureManagerListeners = new ArrayList<>(4);
 
     /**
      * The inventory that was loaded

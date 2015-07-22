@@ -43,7 +43,7 @@ import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
-import android.support.v4.util.ArrayMap;
+import android.support.v4.util.SimpleArrayMap;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
@@ -87,7 +87,6 @@ import com.appsimobile.paintjob.ViewPainters;
 
 import java.util.ArrayList;
 import java.util.Formatter;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -110,7 +109,7 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
     /**
      * The list of home items in the adapter.
      */
-    final List<HomeItem> mHomeItems = new ArrayList<>(24);
+    final ArrayList<HomeItem> mHomeItems = new ArrayList<>(24);
 
     /**
      * A cached layout-inflater to prevent having to get it all the time
@@ -218,7 +217,9 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
     }
 
     public void getItemsInRow(long rowId, List<HomeItem> homeItems) {
-        for (HomeItem homeItem : mHomeItems) {
+        int N = mHomeItems.size();
+        for (int i = 0; i < N; i++) {
+            HomeItem homeItem = mHomeItems.get(i);
             if (homeItem.mRowId == rowId) {
                 homeItems.add(homeItem);
             }
@@ -401,7 +402,9 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
 
     public void setHomeItems(List<HomeItem> data) {
         mHomeItems.clear();
-        for (HomeItem item : data) {
+        int N = data.size();
+        for (int i = 0; i < N; i++) {
+            HomeItem item = data.get(i);
             if (item.mPageId == mHomeId) {
                 mHomeItems.add(item);
             }
@@ -468,12 +471,12 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
     }
 
     public int getPositionOfId(long lastId) {
-        int position = 0;
-        for (HomeItem item : mHomeItems) {
+        int N = mHomeItems.size();
+        for (int i = 0; i < N; i++) {
+            HomeItem item = mHomeItems.get(i);
             if (item.mId == lastId) {
-                return position;
+                return i;
             }
-            position++;
         }
         return -1;
     }
@@ -503,7 +506,9 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
                 findCellWithPropertyValue("app_widget_id", String.valueOf(appWidgetId));
 
         if (cellId != -1) {
-            for (HomeItem homeItem : mHomeItems) {
+            int N = mHomeItems.size();
+            for (int i = 0; i < N; i++) {
+                HomeItem homeItem = mHomeItems.get(i);
                 if (homeItem.mId == cellId) {
                     return homeItem;
                 }
@@ -934,7 +939,7 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
 
     static class AutoAdvanceHelper implements Handler.Callback {
 
-        final ArrayMap<View, AppWidgetProviderInfo> mWidgetsToAdvance = new ArrayMap<>();
+        final SimpleArrayMap<View, AppWidgetProviderInfo> mWidgetsToAdvance = new SimpleArrayMap<>();
 
         private final int ADVANCE_MSG = 1;
 
@@ -1002,8 +1007,9 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
         @Override
         public boolean handleMessage(Message msg) {
             if (msg.what == ADVANCE_MSG) {
-                int i = 0;
-                for (View key : mWidgetsToAdvance.keySet()) {
+                int count = mWidgetsToAdvance.size();
+                for (int i = 0; i < count; i++) {
+                    View key = mWidgetsToAdvance.keyAt(i);
                     final View v = key.findViewById(mWidgetsToAdvance.get(key).autoAdvanceViewId);
                     final int delay = mAdvanceStagger * i;
                     if (v instanceof Advanceable) {
@@ -1014,7 +1020,6 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
                             }
                         }, delay);
                     }
-                    i++;
                 }
                 sendAdvanceMessage(mAdvanceInterval);
                 return true;
@@ -1716,9 +1721,11 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
             int rowStartIdx = 0;
             long rowId = -1;
 
-            mHomeItemSpans = new int[homeItems.size()];
-            int pos = 0;
-            for (HomeItem homeItem : homeItems) {
+            int N = homeItems.size();
+            mHomeItemSpans = new int[N];
+            int pos;
+            for (pos = 0; pos < N; pos++) {
+                HomeItem homeItem = homeItems.get(pos);
                 //if (homeItem.mPageId != pageId) continue;
 
                 if (row != homeItem.mRowPosition) {
@@ -1731,8 +1738,6 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
                 }
                 mHomeItemSpans[pos] = homeItem.mColspan;
                 totalItems += homeItem.mColspan;
-
-                pos++;
             }
             multiplyPositions(totalItems, rowStartIdx, pos);
 
@@ -2138,7 +2143,7 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
 
     class HomeAdapterEditor {
 
-        final List<HomeItem> mTemp = new LinkedList<>();
+        final ArrayList<HomeItem> mTemp = new ArrayList<>();
 
         /**
          * The builder used to create the operations. This allows tests to
@@ -2154,7 +2159,9 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
             boolean addedOpDown = false;
             boolean addedOpUp = false;
 
-            for (HomeItem homeItem : mHomeItems) {
+            int N = mHomeItems.size();
+            for (int i = 0; i < N; i++) {
+                HomeItem homeItem = mHomeItems.get(i);
                 if (homeItem.mRowPosition == rowPosition) {
                     homeItem.mRowPosition++;
                     if (!addedOpDown) {
@@ -2172,7 +2179,9 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
         }
 
         boolean isLastRow(int rowPosition) {
-            for (HomeItem homeItem : mHomeItems) {
+            int N = mHomeItems.size();
+            for (int i = 0; i < N; i++) {
+                HomeItem homeItem = mHomeItems.get(i);
                 if (homeItem.mRowPosition > rowPosition) return false;
             }
             return true;
@@ -2196,7 +2205,9 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
             boolean addedOpDown = false;
             boolean addedOpUp = false;
 
-            for (HomeItem homeItem : mHomeItems) {
+            int N = mHomeItems.size();
+            for (int i = 0; i < N; i++) {
+                HomeItem homeItem = mHomeItems.get(i);
                 if (homeItem.mRowPosition == rowPosition) {
                     homeItem.mRowPosition--;
                     if (!addedOpUp) {
@@ -2215,7 +2226,9 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
 
         public int getItemPosition(long id) {
             int position = 0;
-            for (HomeItem homeItem : mHomeItems) {
+            int N = mHomeItems.size();
+            for (int i = 0; i < N; i++) {
+                HomeItem homeItem = mHomeItems.get(i);
                 if (homeItem.mId == id) return position;
                 position++;
             }
@@ -2302,7 +2315,9 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
 
         private int getTotalSpanForRow(int rowPosition) {
             int spanCount = 0;
-            for (HomeItem homeItem : mHomeItems) {
+            int N = mHomeItems.size();
+            for (int i = 0; i < N; i++) {
+                HomeItem homeItem = mHomeItems.get(i);
                 if (homeItem.mRowPosition == rowPosition) {
                     spanCount += homeItem.mColspan;
                 }
@@ -2312,7 +2327,9 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
 
         private int getItemCountInRow(int rowPosition) {
             int itemCount = 0;
-            for (HomeItem homeItem : mHomeItems) {
+            int N = mHomeItems.size();
+            for (int i = 0; i < N; i++) {
+                HomeItem homeItem = mHomeItems.get(i);
                 if (homeItem.mRowPosition == rowPosition) {
                     itemCount++;
                 }
@@ -2795,7 +2812,9 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
          */
         public boolean hasAtLeastTwoRows() {
             long rowId = -1;
-            for (HomeItem homeItem : mHomeItems) {
+            int N = mHomeItems.size();
+            for (int i = 0; i < N; i++) {
+                HomeItem homeItem = mHomeItems.get(i);
                 if (rowId == -1) {
                     rowId = homeItem.mRowId;
                 } else if (rowId != homeItem.mRowId) {

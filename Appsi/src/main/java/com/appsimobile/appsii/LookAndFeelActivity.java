@@ -44,7 +44,6 @@ import com.appsimobile.appsii.icontheme.iconpack.VoidIconPack;
 import com.appsimobile.appsii.theme.CustomThemeActivity;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Nick Martens on 6/21/13.
@@ -93,9 +92,9 @@ public class LookAndFeelActivity extends AppCompatActivity {
 
         private static final int TYPE_HEADER = 1;
 
-        private final List<IconPackItem> mIconPacks = new ArrayList<IconPackItem>();
+        private final ArrayList<IconPackItem> mIconPacks = new ArrayList<>();
 
-        public void initIconPacks(Context context, List<IconPack> iconPacks) {
+        public void initIconPacks(Context context, ArrayList<IconPack> iconPacks) {
             mIconPacks.clear();
             int count = iconPacks.size();
             String lastType = null;
@@ -274,7 +273,7 @@ public class LookAndFeelActivity extends AppCompatActivity {
         private void showIconPackPicker() {
             Context context = getActivity();
             IconPackScanner scanner = IconPackScanner.iconPackScanner(context);
-            List<IconPack> iconPacks = scanner.getIconPacks();
+            ArrayList<IconPack> iconPacks = scanner.getIconPacks();
             iconPacks.add(0, mNoIconPack);
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             final IconPackAdapter iconPackAdapter = new IconPackAdapter();

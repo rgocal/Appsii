@@ -28,13 +28,12 @@ import com.appsimobile.appsii.module.home.provider.HomeContract;
 import com.appsimobile.util.ConvertedCursorLoader;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A loader that can load the hotspots present in the system
  * Created by nick on 22/09/14.
  */
-public class HotspotsLoader extends ConvertedCursorLoader<List<HotspotItem>> {
+public class HotspotsLoader extends ConvertedCursorLoader<ArrayList<HotspotItem>> {
 
 
     /**
@@ -61,17 +60,17 @@ public class HotspotsLoader extends ConvertedCursorLoader<List<HotspotItem>> {
     }
 
     @Override
-    protected List<HotspotItem> convertPermissionDeniedException(PermissionDeniedException e) {
+    protected ArrayList<HotspotItem> convertPermissionDeniedException(PermissionDeniedException e) {
         return null;
     }
 
     @Override
-    protected List<HotspotItem> convertCursor(@NonNull Cursor cursor) {
+    protected ArrayList<HotspotItem> convertCursor(@NonNull Cursor cursor) {
 
 
         cursor.moveToPosition(-1);
 
-        List<HotspotItem> result = new ArrayList<>();
+        ArrayList<HotspotItem> result = new ArrayList<>();
 
         try {
             while (cursor.moveToNext()) {
@@ -100,7 +99,7 @@ public class HotspotsLoader extends ConvertedCursorLoader<List<HotspotItem>> {
     }
 
     @Override
-    protected void cleanup(List<HotspotItem> old) {
+    protected void cleanup(ArrayList<HotspotItem> old) {
 
     }
 

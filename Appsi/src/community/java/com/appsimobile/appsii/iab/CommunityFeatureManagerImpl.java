@@ -17,9 +17,7 @@
 package com.appsimobile.appsii.iab;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,7 +55,7 @@ class CommunityFeatureManagerImpl implements FeatureManager {
      */
     final Context mContext;
 
-    final List<FeatureManagerListener> mFeatureManagerListeners = new ArrayList<>(4);
+    final ArrayList<FeatureManagerListener> mFeatureManagerListeners = new ArrayList<>(4);
 
     /**
      * The inventory that was loaded

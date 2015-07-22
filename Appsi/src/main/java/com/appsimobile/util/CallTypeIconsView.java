@@ -25,9 +25,6 @@ import android.view.View;
 
 import com.appsimobile.appsii.R;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * View that draws one or more symbols for different types of calls (missed calls, outgoing etc).
  * The symbols are set up horizontally. As this view doesn't create subviews, it is better suited
@@ -35,7 +32,7 @@ import java.util.List;
  */
 public class CallTypeIconsView extends View {
 
-    private final List<Integer> mCallTypes = new ArrayList<>(3);
+    private final IntList mCallTypes = new IntList(3);
 
     private final Resources mResources;
 
@@ -72,7 +69,9 @@ public class CallTypeIconsView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         int left = 0;
-        for (Integer callType : mCallTypes) {
+        int N = mCallTypes.size();
+        for (int i = 0; i < N; i++) {
+            int callType = mCallTypes.get(i);
             final Drawable drawable = getCallTypeDrawable(callType);
             final int right = left + drawable.getIntrinsicWidth();
             drawable.setBounds(left, 0, right, drawable.getIntrinsicHeight());

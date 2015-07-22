@@ -118,7 +118,7 @@ public class ReorderAppTagsFragment extends Fragment implements DragSortListView
     }
 
     @Override
-    public void onTagsChanged(List<AppTag> appTags) {
+    public void onTagsChanged(ArrayList<AppTag> appTags) {
         if (!mIsChangeInProgress) {
             mTagAdapter.setItems(appTags);
         }

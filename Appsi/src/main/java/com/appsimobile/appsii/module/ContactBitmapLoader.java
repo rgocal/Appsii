@@ -28,6 +28,8 @@ import android.os.RemoteException;
 import android.provider.ContactsContract;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -140,8 +142,7 @@ public class ContactBitmapLoader extends AsyncTask<Void, Void, Bitmap> {
     }
 
     private static Bitmap loadFromContentProvider(Context context, Uri lookupUri) {
-        InputStream in = ContactsContract.Contacts
-                .openContactPhotoInputStream(context.getContentResolver(), lookupUri, true);
+        InputStream in = openContactPhotoInputStream(context, lookupUri);
         if (in != null) {
             try {
                 return BitmapFactory.decodeStream(in);
@@ -154,6 +155,17 @@ public class ContactBitmapLoader extends AsyncTask<Void, Void, Bitmap> {
             }
         }
         return null;
+    }
+
+    private static InputStream openContactPhotoInputStream(Context context, Uri lookupUri) {
+        try {
+            return ContactsContract.Contacts
+                    .openContactPhotoInputStream(context.getContentResolver(), lookupUri, true);
+            // There was a bug report #152 in crashlytics a crash in the method called
+        } catch (NullPointerException e) {
+            Crashlytics.logException(e);
+            return null;
+        }
     }
 
     public void enqueue() {

@@ -31,6 +31,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.util.SimpleArrayMap;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -50,7 +51,6 @@ import com.appsimobile.appsii.module.home.config.HomeItemConfigurationHelper;
 import java.text.Collator;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -349,14 +349,14 @@ public class WidgetChooserActivity extends Activity
 
         private final PackageManager mPackageManager;
 
-        private final HashMap<Object, String> mLabelCache;
+        private final SimpleArrayMap<Object, String> mLabelCache;
 
         private final Collator mCollator;
 
         WidgetNameComparator(Context context) {
             mManager = AppWidgetManagerCompat.getInstance(context);
             mPackageManager = context.getPackageManager();
-            mLabelCache = new HashMap<>();
+            mLabelCache = new SimpleArrayMap<>();
             mCollator = Collator.getInstance();
         }
 

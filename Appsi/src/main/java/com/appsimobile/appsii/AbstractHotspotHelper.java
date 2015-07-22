@@ -23,7 +23,7 @@ import android.view.Display;
 import android.view.Gravity;
 import android.view.WindowManager;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created by nick on 13/02/15.
@@ -51,7 +51,7 @@ public abstract class AbstractHotspotHelper {
 
     public abstract void removeHotspots();
 
-    public abstract void onHotspotsLoaded(List<HotspotItem> configurations);
+    public abstract void onHotspotsLoaded(ArrayList<HotspotItem> configurations);
 
     public abstract int getTopOffset();
 

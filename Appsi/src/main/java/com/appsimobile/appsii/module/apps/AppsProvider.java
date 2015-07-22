@@ -27,12 +27,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 
 import com.appsimobile.appsii.BuildConfig;
 import com.appsimobile.appsii.R;
-
-import java.util.HashMap;
 
 import static com.appsimobile.appsii.module.apps.AppsContract.LaunchHistoryColumns;
 import static com.appsimobile.appsii.module.apps.AppsContract.TagColumns;
@@ -63,11 +62,11 @@ public class AppsProvider extends ContentProvider {
 
     private static final UriMatcher sURLMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
-    private static final HashMap<String, String> sAppsProjectionMap;
+    private static final ArrayMap<String, String> sAppsProjectionMap;
 
-    private static final HashMap<String, String> sTagsProjectionMap;
+    private static final ArrayMap<String, String> sTagsProjectionMap;
 
-    private static final HashMap<String, String> sHistoryProjectionMap;
+    private static final ArrayMap<String, String> sHistoryProjectionMap;
 
     static {
         sURLMatcher.addURI(AUTHORITY, "taggedApps", TABLE_APPS);
@@ -78,7 +77,7 @@ public class AppsProvider extends ContentProvider {
         sURLMatcher.addURI(AUTHORITY, "launchHistory/#", TABLE_HISTORY_ITEM);
 
 
-        sAppsProjectionMap = new HashMap<>(8);
+        sAppsProjectionMap = new ArrayMap<>(8);
         // Events columns
         sAppsProjectionMap.put(TaggedAppColumns._ID,
                 TaggedAppColumns.TABLE_NAME + "." + TaggedAppColumns._ID);
@@ -99,7 +98,7 @@ public class AppsProvider extends ContentProvider {
                 TagColumns.TABLE_NAME + "." + TagColumns._ID);
 
 
-        sTagsProjectionMap = new HashMap<>(8);
+        sTagsProjectionMap = new ArrayMap<>(8);
         // Events columns
         sTagsProjectionMap.put(TagColumns._ID, TagColumns._ID);
         sTagsProjectionMap.put(TagColumns.POSITION, TagColumns.POSITION);
@@ -109,7 +108,7 @@ public class AppsProvider extends ContentProvider {
         sTagsProjectionMap.put(TagColumns.COLUMN_COUNT, TagColumns.COLUMN_COUNT);
         sTagsProjectionMap.put(TagColumns.TAG_TYPE, TagColumns.TAG_TYPE);
 
-        sHistoryProjectionMap = new HashMap<>(5);
+        sHistoryProjectionMap = new ArrayMap<>(5);
         // Events columns
         sHistoryProjectionMap.put(LaunchHistoryColumns._ID, LaunchHistoryColumns._ID);
         sHistoryProjectionMap.put(LaunchHistoryColumns.COMPONENT_NAME,

@@ -25,6 +25,7 @@ import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.util.SimpleArrayMap;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
 import android.support.v4.widget.ExploreByTouchHelper;
@@ -42,7 +43,6 @@ import com.appsimobile.appsii.R;
 import java.security.InvalidParameterException;
 import java.util.Calendar;
 import java.util.Formatter;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -403,7 +403,7 @@ public abstract class MonthView extends View {
      * @param params A map of the new parameters, see
      * {@link #VIEW_PARAMS_HEIGHT}
      */
-    public void setMonthParams(HashMap<String, Integer> params) {
+    public void setMonthParams(SimpleArrayMap<String, Integer> params) {
         if (!params.containsKey(VIEW_PARAMS_MONTH) && !params.containsKey(VIEW_PARAMS_YEAR)) {
             throw new InvalidParameterException("You must specify month and year for this view");
         }

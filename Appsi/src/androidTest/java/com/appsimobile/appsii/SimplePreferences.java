@@ -26,8 +26,7 @@ import com.appsimobile.appsii.preference.Preferences;
 
 import net.jcip.annotations.GuardedBy;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,7 +37,7 @@ public class SimplePreferences implements Preferences, SharedPreferences {
 
     final Handler mHandler = new Handler(Looper.getMainLooper());
 
-    final List<OnSharedPreferenceChangeListener> mListeners = new LinkedList<>();
+    final ArrayList<OnSharedPreferenceChangeListener> mListeners = new ArrayList<>();
 
     @GuardedBy("this")
     SimplePreferenceState mState = new SimplePreferenceState();
@@ -104,7 +103,7 @@ public class SimplePreferences implements Preferences, SharedPreferences {
         mState.put(key, value);
     }
 
-    void saveNewValuesAndNotify(final SimplePreferenceState state, final List<String> changedKeys) {
+    void saveNewValuesAndNotify(final SimplePreferenceState state, final ArrayList<String> changedKeys) {
         if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
             doSaveNewValuesAndNotify(state, changedKeys);
         } else {
@@ -118,10 +117,14 @@ public class SimplePreferences implements Preferences, SharedPreferences {
     }
 
     synchronized void doSaveNewValuesAndNotify(SimplePreferenceState state,
-            List<String> changedKeys) {
+            ArrayList<String> changedKeys) {
         mState = state;
-        for (OnSharedPreferenceChangeListener listener : mListeners) {
-            for (String key : changedKeys) {
+        int N = mListeners.size();
+        for (int i = 0; i < N; i++) {
+            OnSharedPreferenceChangeListener listener = mListeners.get(i);
+            int M = changedKeys.size();
+            for (int j = 0; j < M; j++) {
+                String key = changedKeys.get(j);
                 listener.onSharedPreferenceChanged(this, key);
             }
         }
@@ -131,7 +134,7 @@ public class SimplePreferences implements Preferences, SharedPreferences {
 
         final SimplePreferenceState mState;
 
-        final List<String> mChangedKeys = new LinkedList<>();
+        final ArrayList<String> mChangedKeys = new ArrayList<>(8);
 
 
         public SimpleEditor(

@@ -22,20 +22,18 @@ import android.content.ContentProviderOperation;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.net.Uri;
+import android.support.v4.util.SimpleArrayMap;
 
 import com.appsimobile.appsii.module.home.HomeAdapter.Operation;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by nick on 11/03/15.
  */
 public class TestOpsBuilder implements HomeAdapter.OpsBuilder {
 
-    final List<OperationWrapper> mOperationWrappers = new ArrayList<>();
+    final ArrayList<OperationWrapper> mOperationWrappers = new ArrayList<>();
 
     void reset() {
         mOperationWrappers.clear();
@@ -78,7 +76,7 @@ public class TestOpsBuilder implements HomeAdapter.OpsBuilder {
 
         final ContentValues mContentValues = new ContentValues();
 
-        final Map<String, Integer> mBackReferences = new HashMap<>();
+        final SimpleArrayMap<String, Integer> mBackReferences = new SimpleArrayMap<>();
 
         public OperationWrapper(ContentProviderOperation.Builder builder, int type, Uri uri) {
             mBuilder = builder;

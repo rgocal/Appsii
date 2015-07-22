@@ -34,7 +34,7 @@ import com.appsimobile.appsii.SidebarHotspot.SidebarGestureCallback;
 import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.crashlytics.android.Crashlytics;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class HotspotHelperImpl extends AbstractHotspotHelper
         implements OnClickListener, View.OnLongClickListener, SidebarGestureCallback,
@@ -77,7 +77,7 @@ public class HotspotHelperImpl extends AbstractHotspotHelper
 
     private boolean mHotspotsActive;
 
-    private List<HotspotItem> mHotspotItems;
+    private ArrayList<HotspotItem> mHotspotItems;
 
     public HotspotHelperImpl(Context context, HotspotHelperListener callback,
             PopupLayer popupLayer) {
@@ -219,7 +219,7 @@ public class HotspotHelperImpl extends AbstractHotspotHelper
     }
 
     @Override
-    public void onHotspotsLoaded(List<HotspotItem> configurations) {
+    public void onHotspotsLoaded(ArrayList<HotspotItem> configurations) {
         mHotspotItems = configurations;
     }
 
@@ -292,7 +292,7 @@ public class HotspotHelperImpl extends AbstractHotspotHelper
             //return mCallback.openSidebar(conf, null, 0);
             return null;
         } else {
-            List<HotspotPageEntry> entries = hotspot.getHotspotPageEntries();
+            ArrayList<HotspotPageEntry> entries = hotspot.getHotspotPageEntries();
             return mCallback.openSidebar(conf, entries, Appsi.OPEN_FLAG_LIKE_NOTIFICATION_BAR);
         }
     }

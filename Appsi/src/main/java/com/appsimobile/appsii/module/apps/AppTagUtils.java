@@ -58,7 +58,7 @@ public class AppTagUtils {
 
     final ContentObserver mContentObserver;
 
-    private final List<AppTag> mAppTags = new ArrayList<>(6);
+    private final ArrayList<AppTag> mAppTags = new ArrayList<>(6);
 
     private final WeakHashMap<AppTagListener, Void> mListeners = new WeakHashMap<>();
 
@@ -175,7 +175,7 @@ public class AppTagUtils {
 
     public interface AppTagListener {
 
-        void onTagsChanged(List<AppTag> appTags);
+        void onTagsChanged(ArrayList<AppTag> appTags);
     }
 
 }

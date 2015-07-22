@@ -24,14 +24,13 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by nick on 20/01/15.
  */
 public class HomeViewWrapper extends FrameLayout {
 
-    static final List<HomeItemListener> ACTIVATION_LISTENERS = new ArrayList<>();
+    static final ArrayList<HomeItemListener> ACTIVATION_LISTENERS = new ArrayList<>();
 
     private static boolean sAllowLoads;
 
@@ -65,7 +64,9 @@ public class HomeViewWrapper extends FrameLayout {
     }
 
     private static void runDelayedListeners() {
-        for (HomeItemListener l : ACTIVATION_LISTENERS) {
+        int N = ACTIVATION_LISTENERS.size();
+        for (int i = 0; i < N; i++) {
+            HomeItemListener l = ACTIVATION_LISTENERS.get(i);
             l.onAllowLoads();
         }
         ACTIVATION_LISTENERS.clear();

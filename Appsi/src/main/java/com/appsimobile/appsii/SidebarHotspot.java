@@ -38,7 +38,6 @@ import com.appsimobile.appsii.module.home.provider.HomeContract;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.List;
 
 public class SidebarHotspot extends View {
 
@@ -53,7 +52,7 @@ public class SidebarHotspot extends View {
 
     private static final int SIDEBAR_MINIMUM_MOVE = 0;
 
-    final List<HotspotPageEntry> mHotspotPageEntries = new ArrayList<>(8);
+    final ArrayList<HotspotPageEntry> mHotspotPageEntries = new ArrayList<>(8);
 
     final Handler mHandler = new Handler();
 
@@ -75,7 +74,7 @@ public class SidebarHotspot extends View {
 
     ContentObserver mHotspotsPagesObserver;
 
-    AsyncTask<Void, Void, List<HotspotPageEntry>> mLoadDataTask;
+    AsyncTask<Void, Void, ArrayList<HotspotPageEntry>> mLoadDataTask;
 
     private float mMinimumMove;
 
@@ -271,11 +270,11 @@ public class SidebarHotspot extends View {
         final Context context = getContext();
         if (mLoadDataTask != null) mLoadDataTask.cancel(true);
         mLoadDataTask =
-                new AsyncTask<Void, Void, List<HotspotPageEntry>>() {
+                new AsyncTask<Void, Void, ArrayList<HotspotPageEntry>>() {
 
 
                     @Override
-                    protected List<HotspotPageEntry> doInBackground(Void... params) {
+                    protected ArrayList<HotspotPageEntry> doInBackground(Void... params) {
 
                         Cursor c = context.getContentResolver().
                                 query(HotspotPagesQuery.createUri(hotspotId),
@@ -284,7 +283,7 @@ public class SidebarHotspot extends View {
                                         null,
                                         HomeContract.HotspotDetails.POSITION + " ASC"
                                 );
-                        List<HotspotPageEntry> result = new ArrayList<>(c.getCount());
+                        ArrayList<HotspotPageEntry> result = new ArrayList<>(c.getCount());
                         while (c.moveToNext()) {
                             HotspotPageEntry entry = new HotspotPageEntry();
                             entry.mEnabled = c.getInt(HotspotPagesQuery.ENABLED) == 1;
@@ -301,7 +300,7 @@ public class SidebarHotspot extends View {
                     }
 
                     @Override
-                    protected void onPostExecute(List<HotspotPageEntry> hotspotPageEntries) {
+                    protected void onPostExecute(ArrayList<HotspotPageEntry> hotspotPageEntries) {
                         onHotspotEntriesLoaded(hotspotPageEntries);
                     }
                 };
@@ -326,7 +325,7 @@ public class SidebarHotspot extends View {
         setBackground(bg);
     }
 
-    void onHotspotEntriesLoaded(List<HotspotPageEntry> hotspotPageEntries) {
+    void onHotspotEntriesLoaded(ArrayList<HotspotPageEntry> hotspotPageEntries) {
         mHotspotPageEntries.clear();
         mHotspotPageEntries.addAll(hotspotPageEntries);
     }
@@ -367,7 +366,7 @@ public class SidebarHotspot extends View {
         setupBackground();
     }
 
-    public List<HotspotPageEntry> getHotspotPageEntries() {
+    public ArrayList<HotspotPageEntry> getHotspotPageEntries() {
         return mHotspotPageEntries;
     }
 

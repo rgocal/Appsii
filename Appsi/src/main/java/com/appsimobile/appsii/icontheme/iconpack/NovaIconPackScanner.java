@@ -32,13 +32,13 @@ public class NovaIconPackScanner implements IconPackFormatScanner {
     public static final String NOVA_THEME_ACTION = "com.novalauncher.THEME";
 
     @Override
-    public List<IconPack> scan(Context context) {
+    public ArrayList<IconPack> scan(Context context) {
         Intent intent = new Intent(NOVA_THEME_ACTION);
         PackageManager packageManager = context.getPackageManager();
         List<ResolveInfo> resolveInfos = packageManager.queryIntentActivities(intent, 0);
         int count = resolveInfos.size();
 
-        List<IconPack> result = new ArrayList<IconPack>();
+        ArrayList<IconPack> result = new ArrayList<>();
 
         for (int i = 0; i < count; i++) {
             ResolveInfo resolveInfo = resolveInfos.get(i);

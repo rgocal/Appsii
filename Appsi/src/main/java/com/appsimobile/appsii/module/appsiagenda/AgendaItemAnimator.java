@@ -70,7 +70,9 @@ public class AgendaItemAnimator extends RecyclerView.ItemAnimator {
             return;
         }
         // First, remove stuff
-        for (ViewHolder holder : mPendingRemovals) {
+        int N = mPendingRemovals.size();
+        for (int i = 0; i < N; i++) {
+            ViewHolder holder = mPendingRemovals.get(i);
             animateRemoveImpl(holder);
         }
         mPendingRemovals.clear();
@@ -83,7 +85,8 @@ public class AgendaItemAnimator extends RecyclerView.ItemAnimator {
             Runnable mover = new Runnable() {
                 @Override
                 public void run() {
-                    for (MoveInfo moveInfo : moves) {
+                    for (int i = 0; i < moves.size(); i++) {
+                        MoveInfo moveInfo = moves.get(i);
                         animateMoveImpl(moveInfo.holder, moveInfo.fromX, moveInfo.fromY,
                                 moveInfo.toX, moveInfo.toY);
                     }
@@ -129,7 +132,8 @@ public class AgendaItemAnimator extends RecyclerView.ItemAnimator {
             mPendingAdditions.clear();
             Runnable adder = new Runnable() {
                 public void run() {
-                    for (ViewHolder holder : additions) {
+                    for (int i = 0; i < additions.size(); i++) {
+                        ViewHolder holder = additions.get(i);
                         animateAddImpl(holder);
                     }
                     additions.clear();

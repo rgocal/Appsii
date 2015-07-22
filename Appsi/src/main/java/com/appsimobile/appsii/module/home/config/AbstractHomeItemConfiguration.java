@@ -21,8 +21,7 @@ import android.support.v4.util.LongSparseArray;
 
 import com.appsimobile.appsii.annotation.VisibleForTesting;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * A helper facility to ease the process of loading and saving configurations for multiple
@@ -34,7 +33,7 @@ public abstract class AbstractHomeItemConfiguration implements HomeItemConfigura
 
     final Context mContext;
 
-    private final List<ConfigurationListener> mConfigurationListeners = new LinkedList<>();
+    private final ArrayList<ConfigurationListener> mConfigurationListeners = new ArrayList<>(8);
 
     protected AbstractHomeItemConfiguration(Context context) {
         mContext = context.getApplicationContext();
@@ -61,13 +60,17 @@ public abstract class AbstractHomeItemConfiguration implements HomeItemConfigura
     }
 
     protected void notifyPropertyChanged(long cellId, String key, String value) {
-        for (ConfigurationListener l : mConfigurationListeners) {
+        int N = mConfigurationListeners.size();
+        for (int i = 0; i < N; i++) {
+            ConfigurationListener l = mConfigurationListeners.get(i);
             l.onConfigurationOptionUpdated(cellId, key, value);
         }
     }
 
     protected void notifyPropertyDeleted(long cellId, String key) {
-        for (ConfigurationListener l : mConfigurationListeners) {
+        int N = mConfigurationListeners.size();
+        for (int i = 0; i < N; i++) {
+            ConfigurationListener l = mConfigurationListeners.get(i);
             l.onConfigurationOptionDeleted(cellId, key);
         }
     }

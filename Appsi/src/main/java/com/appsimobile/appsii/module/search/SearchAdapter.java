@@ -46,7 +46,7 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implem
 
     static final int TYPE_PERSON = 3;
 
-    final List<Object> mItems = new ArrayList<>(12);
+    final ArrayList<Object> mItems = new ArrayList<>(12);
 
     final OnAppClickedListener mOnAppClickedListener;
 
@@ -54,9 +54,9 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implem
 
     final ContactView.PeopleActionListener mPeopleActionListener;
 
-    final List<BaseContactInfo> mContactInfos = new ArrayList<>(12);
+    final ArrayList<BaseContactInfo> mContactInfos = new ArrayList<>(12);
 
-    final List<AppEntry> mApps = new ArrayList<>(12);
+    final ArrayList<AppEntry> mApps = new ArrayList<>(12);
 
     boolean mShowPlainApps;
 
@@ -201,7 +201,7 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implem
     }
 
     public void onBindItemTileViewHolder(AppItemTileViewHolder holder, int position) {
-        List<AppEntry> o = (List<AppEntry>) mItems.get(position);
+        ArrayList<AppEntry> o = (ArrayList<AppEntry>) mItems.get(position);
         Resources res = holder.itemView.getResources();
         String title = res.getQuantityString(R.plurals.search_app_count, o.size(), o.size());
 
@@ -209,7 +209,7 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implem
     }
 
     public void onBindItemTileViewHolder(ContactItemTileViewHolder holder, int position) {
-        List<BaseContactInfo> o = (List<BaseContactInfo>) mItems.get(position);
+        ArrayList<BaseContactInfo> o = (ArrayList<BaseContactInfo>) mItems.get(position);
         Resources res = holder.itemView.getResources();
 
         String title = res.getQuantityString(R.plurals.search_people_count, o.size(), o.size());

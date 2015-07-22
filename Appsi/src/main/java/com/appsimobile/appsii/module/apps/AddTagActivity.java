@@ -34,7 +34,7 @@ import android.widget.TextView;
 
 import com.appsimobile.appsii.R;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created by nick on 24/08/14.
@@ -72,7 +72,7 @@ public class AddTagActivity extends Activity implements View.OnClickListener,
      */
     private QueryHandler mQueryHandler;
 
-    private List<AppTag> mAppTags;
+    private ArrayList<AppTag> mAppTags;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,7 +136,7 @@ public class AddTagActivity extends Activity implements View.OnClickListener,
     }
 
     @Override
-    public void onTagsChanged(List<AppTag> appTags) {
+    public void onTagsChanged(ArrayList<AppTag> appTags) {
         mAppTags = appTags;
     }
 

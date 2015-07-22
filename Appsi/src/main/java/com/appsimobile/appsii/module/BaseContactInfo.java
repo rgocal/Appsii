@@ -21,7 +21,7 @@ import android.provider.ContactsContract;
 
 import com.appsimobile.appsii.module.avatar.AvatarBuilder;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created by nick on 07/06/14.
@@ -42,7 +42,7 @@ public class BaseContactInfo {
 
     public String mPhotoUri;
 
-    public List<TypedPhoneNumber> mPhoneNumbers;
+    public ArrayList<TypedPhoneNumber> mPhoneNumbers;
 
     private AvatarBuilder.DefaultImageRequest mDefaultImageRequest;
 

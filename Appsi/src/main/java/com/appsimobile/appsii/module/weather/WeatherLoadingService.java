@@ -37,6 +37,7 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresPermission;
+import android.support.v4.util.SimpleArrayMap;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.WindowManager;
@@ -67,9 +68,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -187,7 +186,7 @@ public class WeatherLoadingService {
 
         if (BuildConfig.DEBUG) Log.d("WeatherLoadingService", "find timezones");
         int N = woeids.length;
-        Map<String, String> woeidTimezones = new HashMap<>(N);
+        SimpleArrayMap<String, String> woeidTimezones = new SimpleArrayMap<>(N);
         for (int i = 0; i < N; i++) {
             String woeid = woeids[i];
             long cellId = mConfigurationHelper.findCellWithPropertyValue(
@@ -218,7 +217,7 @@ public class WeatherLoadingService {
             if (BuildConfig.DEBUG) Log.d("WeatherLoadingService", "- request location");
 
 
-            Map<String, WeatherData> previousData = new HashMap<>(woeids.length);
+            SimpleArrayMap<String, WeatherData> previousData = new SimpleArrayMap<>(woeids.length);
             for (String woeid : woeids) {
                 WeatherData data = WeatherUtils.getWeatherData(mContext, woeid);
                 previousData.put(woeid, data);
@@ -231,7 +230,10 @@ public class WeatherLoadingService {
             if (BuildConfig.DEBUG) Log.d("WeatherLoadingService", "- load data");
 
             if (BuildConfig.DEBUG) Log.d("WeatherLoadingService", "sync images");
-            for (WeatherData weatherData : data) {
+
+            int size = data.size();
+            for (int i = 0; i < size; i++) {
+                WeatherData weatherData = data.get(i);
                 try {
                     syncImages(result, cm, preferenceHelper, woeidTimezones, previousData,
                             weatherData);
@@ -278,7 +280,9 @@ public class WeatherLoadingService {
         return result;
     }
 
-    private String[] addFallbackWoeid(String[] woeids, Map<String, String> woeidTimezones) {
+    private String[] addFallbackWoeid(String[] woeids,
+            SimpleArrayMap<String, String> woeidTimezones) {
+
         PreferenceHelper preferenceHelper = PreferenceHelper.getInstance(mContext);
         String woeid = preferenceHelper.getDefaultLocationWoeId();
         if (woeid != null) {
@@ -296,8 +300,8 @@ public class WeatherLoadingService {
     }
 
     private void syncImages(SyncResult result, ConnectivityManager cm,
-            PreferenceHelper preferenceHelper, Map<String, String> woeidTimezones,
-            Map<String, WeatherData> previousData, WeatherData weatherData) throws VolleyError {
+            PreferenceHelper preferenceHelper, SimpleArrayMap<String, String> woeidTimezones,
+            SimpleArrayMap<String, WeatherData> previousData, WeatherData weatherData) throws VolleyError {
 
         NetworkInfo netInfo;
         String woeid = weatherData.woeid;
@@ -490,9 +494,11 @@ public class WeatherLoadingService {
         }
     }
 
-    void onWeatherDataLoaded(List<WeatherData> weatherDataList, String unit) {
+    void onWeatherDataLoaded(ArrayList<WeatherData> weatherDataList, String unit) {
 
-        for (WeatherData weatherData : weatherDataList) {
+        int N = weatherDataList.size();
+        for (int i1 = 0; i1 < N; i1++) {
+            WeatherData weatherData = weatherDataList.get(i1);
 
             ContentValues weatherValues = new ContentValues();
 
@@ -627,7 +633,7 @@ public class WeatherLoadingService {
 
             // get the woeids from the list
             String currentWoeid = saveAndGetCurrentWoeid(locationInfo);
-            List<String> woeidsToLoad = new ArrayList<>();
+            ArrayList<String> woeidsToLoad = new ArrayList<>();
             if (currentWoeid != null) {
                 woeidsToLoad.add(currentWoeid);
             }
@@ -640,7 +646,7 @@ public class WeatherLoadingService {
 
             String[] woeidsArray = woeidsToLoad.toArray(new String[woeidsToLoad.size()]);
 
-            List<WeatherData> data =
+            ArrayList<WeatherData> data =
                     YahooWeatherApiClient.getWeatherForWoeids(woeidsArray, mUnit);
 
             processResult(data);
@@ -672,7 +678,7 @@ public class WeatherLoadingService {
 
         }
 
-        protected void processResult(List<WeatherData> weatherData) {
+        protected void processResult(ArrayList<WeatherData> weatherData) {
             onWeatherDataLoaded(weatherData, mUnit);
         }
     }

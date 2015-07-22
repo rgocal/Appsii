@@ -188,18 +188,23 @@ public abstract class DragSortCursorAdapter extends CursorAdapter
      * Remove unnecessary mappings from sparse array.
      */
     private void cleanMapping() {
-        ArrayList<Integer> toRemove = new ArrayList<Integer>();
+        ArrayList<Integer> toRemove = null;
 
         int size = mListMapping.size();
         for (int i = 0; i < size; ++i) {
             if (mListMapping.keyAt(i) == mListMapping.valueAt(i)) {
+                if (toRemove == null) {
+                    toRemove = new ArrayList<>();
+                }
                 toRemove.add(mListMapping.keyAt(i));
             }
         }
 
-        size = toRemove.size();
-        for (int i = 0; i < size; ++i) {
-            mListMapping.delete(toRemove.get(i));
+        if (toRemove != null) {
+            size = toRemove.size();
+            for (int i = 0; i < size; ++i) {
+                mListMapping.delete(toRemove.get(i));
+            }
         }
     }
 

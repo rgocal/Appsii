@@ -32,6 +32,7 @@ import android.widget.TextView;
 
 import com.appsimobile.appsii.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -162,7 +163,7 @@ public class EditTagActivity extends Activity implements View.OnClickListener,
     }
 
     @Override
-    public void onTagsChanged(List<AppTag> appTags) {
+    public void onTagsChanged(ArrayList<AppTag> appTags) {
         mAppTags = appTags;
     }
 

@@ -17,13 +17,12 @@
 package com.appsimobile.appsii.module.appsiagenda;
 
 import android.content.Context;
+import android.support.v4.util.SimpleArrayMap;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.Time;
 import android.util.SparseBooleanArray;
 import android.view.ViewGroup;
 import android.widget.AbsListView.LayoutParams;
-
-import java.util.HashMap;
 
 /**
  * An adapter for a list of {@link com.appsimobile.appsii.module.appsiagenda.MonthView} items.
@@ -105,12 +104,12 @@ public abstract class MonthAdapter2 extends RecyclerView.Adapter<RecyclerView.Vi
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
         MonthView v = (MonthView) holder.itemView;
-        HashMap<String, Integer> drawingParams = null;
+        SimpleArrayMap<String, Integer> drawingParams;
         // We store the drawing parameters in the view so it can be recycled
-        drawingParams = (HashMap<String, Integer>) v.getTag();
+        drawingParams = (SimpleArrayMap<String, Integer>) v.getTag();
 
         if (drawingParams == null) {
-            drawingParams = new HashMap<String, Integer>();
+            drawingParams = new SimpleArrayMap<>();
         }
         drawingParams.clear();
 

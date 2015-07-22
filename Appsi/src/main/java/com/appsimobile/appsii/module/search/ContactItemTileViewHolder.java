@@ -84,9 +84,11 @@ class ContactItemTileViewHolder extends RecyclerView.ViewHolder implements View.
         mRecyclerView.setAdapter(mItemAdapter);
     }
 
-    public void bindResults(String title, List<BaseContactInfo> items) {
+    public void bindResults(String title, ArrayList<BaseContactInfo> items) {
         mItems.clear();
-        for (BaseContactInfo item : items) {
+        int N = items.size();
+        for (int i = 0; i < N; i++) {
+            BaseContactInfo item = items.get(i);
             mItems.add(item);
         }
 

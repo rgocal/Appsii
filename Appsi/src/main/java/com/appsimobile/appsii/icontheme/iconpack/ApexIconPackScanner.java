@@ -33,14 +33,14 @@ public class ApexIconPackScanner implements IconPackFormatScanner {
     public static final String APEX_THEME_CATEGORY = "com.anddoes.launcher.THEME";
 
     @Override
-    public List<IconPack> scan(Context context) {
+    public ArrayList<IconPack> scan(Context context) {
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.addCategory(APEX_THEME_CATEGORY);
         PackageManager packageManager = context.getPackageManager();
         List<ResolveInfo> resolveInfos = packageManager.queryIntentActivities(intent, 0);
         int count = resolveInfos.size();
 
-        List<IconPack> result = new ArrayList<IconPack>();
+        ArrayList<IconPack> result = new ArrayList<IconPack>();
 
         for (int i = 0; i < count; i++) {
             ResolveInfo resolveInfo = resolveInfos.get(i);

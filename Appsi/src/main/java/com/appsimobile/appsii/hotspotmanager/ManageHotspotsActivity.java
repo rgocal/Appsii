@@ -43,7 +43,6 @@ import com.appsimobile.appsii.module.home.provider.HomeContract;
 import com.appsimobile.appsii.preference.PreferencesFactory;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The main view of this feature. This shows a list of the hot-spots and
@@ -54,7 +53,7 @@ import java.util.List;
  */
 public class ManageHotspotsActivity extends AppCompatActivity
         implements HotspotActionListener,
-        LoaderManager.LoaderCallbacks<List<HotspotItem>> {
+        LoaderManager.LoaderCallbacks<ArrayList<HotspotItem>> {
 
     /**
      * The adapter showing all of the hotspots
@@ -155,25 +154,25 @@ public class ManageHotspotsActivity extends AppCompatActivity
     }
 
     @Override
-    public Loader<List<HotspotItem>> onCreateLoader(int id, Bundle args) {
+    public Loader<ArrayList<HotspotItem>> onCreateLoader(int id, Bundle args) {
         return new HotspotsLoader(this);
     }
 
     @Override
-    public void onLoadFinished(Loader<List<HotspotItem>> loader,
-            List<HotspotItem> data) {
+    public void onLoadFinished(Loader<ArrayList<HotspotItem>> loader,
+            ArrayList<HotspotItem> data) {
         onHotspotsLoaded(data);
     }
 
     /**
      * Called when the hotspots are loaded from the database
      */
-    void onHotspotsLoaded(List<HotspotItem> hotspotItems) {
+    void onHotspotsLoaded(ArrayList<HotspotItem> hotspotItems) {
         mHotspotAdapter.setHotspots(hotspotItems);
     }
 
     @Override
-    public void onLoaderReset(Loader<List<HotspotItem>> loader) {
+    public void onLoaderReset(Loader<ArrayList<HotspotItem>> loader) {
 
     }
 
@@ -186,7 +185,7 @@ public class ManageHotspotsActivity extends AppCompatActivity
 
         final HotspotActionListener mActionListener;
 
-        final List<HotspotItem> mHotspotItems = new ArrayList<>();
+        final ArrayList<HotspotItem> mHotspotItems = new ArrayList<>();
 
         final SharedPreferences mPreferences;
 
@@ -253,7 +252,7 @@ public class ManageHotspotsActivity extends AppCompatActivity
             return mHotspotItems.size();
         }
 
-        public void setHotspots(List<HotspotItem> hotspotItems) {
+        public void setHotspots(ArrayList<HotspotItem> hotspotItems) {
             mHotspotItems.clear();
             mHotspotItems.addAll(hotspotItems);
             notifyDataSetChanged();

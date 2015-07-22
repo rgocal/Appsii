@@ -68,7 +68,7 @@ public class ProcessMonitorFactory {
          * <p/>
          * Process started before this monitoring starts, will not be reported
          */
-        void startMonitoringProcesses(List<String> processesToReport, long updateIntervalMs);
+        void startMonitoringProcesses(ArrayList<String> processesToReport, long updateIntervalMs);
 
         /**
          * Stops monitoring the registered processes
@@ -176,7 +176,7 @@ public class ProcessMonitorFactory {
 
         @Override
         @UiThread
-        public void startMonitoringProcesses(List<String> processesToReport,
+        public void startMonitoringProcesses(ArrayList<String> processesToReport,
                 long updateIntervalMs) {
             checkThread("startMonitoringProcesses");
             mMts.setProcessesToReport(processesToReport);
@@ -245,10 +245,12 @@ public class ProcessMonitorFactory {
 
             Set<String> running = null;
 
-            for (RunningAppProcessInfo process : processes) {
+            int N = processes.size();
+            for (int i1 = 0; i1 < N; i1++) {
+                RunningAppProcessInfo process = processes.get(i1);
                 if (process.importance <= RunningAppProcessInfo.IMPORTANCE_VISIBLE) {
-                    int N = process.pkgList.length;
-                    for (int i = 0; i < N; i++) {
+                    int len = process.pkgList.length;
+                    for (int i = 0; i < len; i++) {
                         String packageName = process.pkgList[i];
                         if (mMts.isMonitoringPackage(packageName)) {
                             if (running == null) {
@@ -305,7 +307,7 @@ public class ProcessMonitorFactory {
             final Handler mMainHandler;
 
             @GuardedBy("this")
-            private final List<String> mPackageNamesToReport = new ArrayList<>(8);
+            private final ArrayList<String> mPackageNamesToReport = new ArrayList<>(8);
 
             MultiThreadState() {
                 mMainHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
@@ -322,7 +324,7 @@ public class ProcessMonitorFactory {
                 return mPackageNamesToReport.contains(packageName);
             }
 
-            public synchronized void setProcessesToReport(List<String> processesToReport) {
+            public synchronized void setProcessesToReport(ArrayList<String> processesToReport) {
                 mPackageNamesToReport.clear();
                 mPackageNamesToReport.addAll(processesToReport);
             }

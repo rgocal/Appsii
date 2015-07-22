@@ -15,10 +15,11 @@
 
 package com.appsimobile.appsii.iab;
 
+import android.support.v4.util.SimpleArrayMap;
+
+import com.appsimobile.util.CollectionUtils;
+
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Represents a block of information about in-app items.
@@ -26,9 +27,9 @@ import java.util.Map;
  */
 public class Inventory {
 
-    final Map<String, SkuDetails> mSkuMap = new HashMap<String, SkuDetails>();
+    final SimpleArrayMap<String, SkuDetails> mSkuMap = new SimpleArrayMap<>();
 
-    final Map<String, Purchase> mPurchaseMap = new HashMap<String, Purchase>();
+    final SimpleArrayMap<String, Purchase> mPurchaseMap = new SimpleArrayMap<>();
 
     Inventory() {
     }
@@ -76,16 +77,23 @@ public class Inventory {
     /**
      * Returns a list of all owned product IDs.
      */
-    List<String> getAllOwnedSkus() {
-        return new ArrayList<String>(mPurchaseMap.keySet());
+    ArrayList<String> getAllOwnedSkus() {
+        int N = mPurchaseMap.size();
+        ArrayList<String> result = new ArrayList<>(N);
+        for (int i = 0; i < N; i++) {
+            result.add(mPurchaseMap.keyAt(i));
+        }
+        return result;
     }
 
     /**
      * Returns a list of all owned product IDs of a given type
      */
-    List<String> getAllOwnedSkus(String itemType) {
-        List<String> result = new ArrayList<String>();
-        for (Purchase p : mPurchaseMap.values()) {
+    ArrayList<String> getAllOwnedSkus(String itemType) {
+        ArrayList<String> result = new ArrayList<>(mPurchaseMap.size());
+        int N = mPurchaseMap.size();
+        for (int i = 0; i < N; i++) {
+            Purchase p = mPurchaseMap.valueAt(i);
             if (p.getItemType().equals(itemType)) result.add(p.getSku());
         }
         return result;
@@ -94,8 +102,10 @@ public class Inventory {
     /**
      * Returns a list of all purchases.
      */
-    List<Purchase> getAllPurchases() {
-        return new ArrayList<Purchase>(mPurchaseMap.values());
+    ArrayList<Purchase> getAllPurchases() {
+        ArrayList<Purchase> result = new ArrayList<>(mPurchaseMap.size());
+        CollectionUtils.addValues(mPurchaseMap, result);
+        return result;
     }
 
     void addSkuDetails(SkuDetails d) {

@@ -32,6 +32,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -185,7 +186,11 @@ class RawContactsLoader extends AsyncTaskLoader<Contact> {
      * that the contact has just been loaded
      */
     private static void postViewNotificationToSyncAdapter(Context context, Contact contact) {
-        for (RawContact rawContact : contact.mRawContacts) {
+        ArrayList<RawContact> mRawContacts = contact.mRawContacts;
+
+        int N = mRawContacts.size();
+        for (int i = 0; i < N; i++) {
+            RawContact rawContact = mRawContacts.get(i);
             final long rawContactId = rawContact.mId;
             if (sNotifiedRawContactIds.contains(rawContactId)) {
                 continue; // Already notified for this raw contact.

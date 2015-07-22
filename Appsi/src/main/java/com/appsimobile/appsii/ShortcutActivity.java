@@ -27,7 +27,6 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Nick Martens on 8/28/13.
@@ -54,7 +53,7 @@ public class ShortcutActivity extends Activity implements View.OnClickListener {
 
 //    DatasetAdapter mDatasetAdapter = new DatasetAdapter();
 
-    private final List<DatasetInfo> mDatasetInfo = new ArrayList<DatasetInfo>();
+    private final ArrayList<DatasetInfo> mDatasetInfo = new ArrayList<DatasetInfo>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

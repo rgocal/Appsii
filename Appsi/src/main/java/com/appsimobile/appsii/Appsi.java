@@ -68,7 +68,6 @@ import com.appsimobile.appsii.tinting.AppsiLayoutInflater;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Appsii's main service.
@@ -301,7 +300,7 @@ public class Appsi extends Service
      * The hotspot configurations that have been found in the
      * appsi database.
      */
-    private List<HotspotItem> mHotspotItems;
+    private ArrayList<HotspotItem> mHotspotItems;
 
     private LoaderManagerImpl mLoaderManager;
 
@@ -440,7 +439,7 @@ public class Appsi extends Service
             HotspotPageEntry entry = intent.getParcelableExtra("entry");
             HotspotItem hotspotItem = intent.getParcelableExtra("hotspot");
             if (entry != null && hotspotItem != null) {
-                List<HotspotPageEntry> entries = new ArrayList<>(1);
+                ArrayList<HotspotPageEntry> entries = new ArrayList<>(1);
                 entries.add(entry);
                 openSidebar(hotspotItem, entries, 0, true);
             }
@@ -529,7 +528,7 @@ public class Appsi extends Service
     }
 
     public SidebarHotspot.SwipeListener openSidebar(HotspotItem conf,
-            List<HotspotPageEntry> entries, int flags, boolean animate) {
+            ArrayList<HotspotPageEntry> entries, int flags, boolean animate) {
 
         LockableAsyncQueryHandler.lock();
         mSidebar.setSidebarOpening(true);
@@ -859,7 +858,7 @@ public class Appsi extends Service
      * Called when loading the hotspots completes. This will remove currently
      * visible hotspots, and add new ones in case the screen is not locked
      */
-    public void onHotspotsLoaded(List<HotspotItem> configurations) {
+    public void onHotspotsLoaded(ArrayList<HotspotItem> configurations) {
         mHotspotItems = configurations;
         mConfiguredPluginCount = configurations.size();
         updateNotificationStatus();
@@ -941,7 +940,7 @@ public class Appsi extends Service
     }
 
     @Override
-    public SwipeListener openSidebar(HotspotItem conf, List<HotspotPageEntry> entries,
+    public SwipeListener openSidebar(HotspotItem conf, ArrayList<HotspotPageEntry> entries,
             int flags) {
         return openSidebar(conf, entries, flags, true /* animate */);
     }
@@ -1007,7 +1006,7 @@ public class Appsi extends Service
         mHandler.removeMessages(MESSAGE_CLOSE_SIDEBAR);
     }
 
-    static class HotspotLoader extends AsyncTask<Void, Void, List<HotspotItem>> {
+    static class HotspotLoader extends AsyncTask<Void, Void, ArrayList<HotspotItem>> {
 
         private final WeakReference<Appsi> mContext;
 
@@ -1016,14 +1015,14 @@ public class Appsi extends Service
         }
 
         @Override
-        protected List<HotspotItem> doInBackground(Void... params) {
+        protected ArrayList<HotspotItem> doInBackground(Void... params) {
             Context context = mContext.get();
             if (context == null) return null;
             return com.appsimobile.appsii.module.HotspotLoader.loadHotspots(context);
         }
 
         @Override
-        protected void onPostExecute(List<HotspotItem> result) {
+        protected void onPostExecute(ArrayList<HotspotItem> result) {
             Appsi appsi = mContext.get();
             if (appsi != null) {
                 appsi.onHotspotsLoaded(result);

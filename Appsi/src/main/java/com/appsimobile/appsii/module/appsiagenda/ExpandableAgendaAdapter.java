@@ -52,7 +52,7 @@ class ExpandableAgendaAdapter extends AgendaAdapter<AgendaViewHolder>
 
     private final Time mTime = new Time(Time.TIMEZONE_UTC);
 
-    final List<Object> mVisibleItems = new ArrayList<>();
+    final ArrayList<Object> mVisibleItems = new ArrayList<>();
 
     private final ParallaxHeaderItem mHeaderView;
 
@@ -236,16 +236,16 @@ class ExpandableAgendaAdapter extends AgendaAdapter<AgendaViewHolder>
 
     @Override
     public int positionOfJulianDay(int julianDay) {
-        int position = 0;
-        for (Object o : mVisibleItems) {
+        int N = mVisibleItems.size();
+        for (int i = 0; i < N; i++) {
+            Object o = mVisibleItems.get(i);
 
             if (o instanceof HeaderItem) {
                 HeaderItem item = (HeaderItem) o;
                 if (item.mJulianDay >= julianDay) {
-                    return position;
+                    return i;
                 }
             }
-            position++;
         }
         return -1;
     }

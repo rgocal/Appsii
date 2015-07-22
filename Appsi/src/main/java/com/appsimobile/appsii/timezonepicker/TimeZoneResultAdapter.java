@@ -29,8 +29,8 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.appsimobile.appsii.R;
+import com.appsimobile.util.IntList;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 
@@ -142,17 +142,21 @@ public class TimeZoneResultAdapter extends BaseAdapter implements OnItemClickLis
 
                 break;
             case TimeZoneFilterTypeAdapter.FILTER_TYPE_GMT:
-                ArrayList<Integer> indices = mTimeZoneData.getTimeZonesByOffset(time);
+                IntList indices = mTimeZoneData.getTimeZonesByOffset(time);
                 if (indices != null) {
-                    for (Integer i : indices) {
+                    int N = indices.size();
+                    for (int pos = 0; pos < N; pos ++) {
+                        int i = indices.get(pos);
                         mFilteredTimeZoneIndices[mFilteredTimeZoneLength++] = i;
                     }
                 }
                 break;
             case TimeZoneFilterTypeAdapter.FILTER_TYPE_COUNTRY:
-                ArrayList<Integer> tzIds = mTimeZoneData.mTimeZonesByCountry.get(str);
+                IntList tzIds = mTimeZoneData.mTimeZonesByCountry.get(str);
                 if (tzIds != null) {
-                    for (Integer tzi : tzIds) {
+                    int N = tzIds.size();
+                    for (int pos = 0; pos < N; pos++) {
+                        int tzi = tzIds.get(pos);
                         mFilteredTimeZoneIndices[mFilteredTimeZoneLength++] = tzi;
                     }
                 }

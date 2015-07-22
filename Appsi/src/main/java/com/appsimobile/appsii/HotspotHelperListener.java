@@ -18,11 +18,11 @@ package com.appsimobile.appsii;
 
 import com.appsimobile.appsii.SidebarHotspot.SwipeListener;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public interface HotspotHelperListener {
 
-    SwipeListener openSidebar(HotspotItem conf, List<HotspotPageEntry> pages, int flags);
+    SwipeListener openSidebar(HotspotItem conf, ArrayList<HotspotPageEntry> pages, int flags);
 
     boolean canShowSidebar(HotspotItem conf);
 

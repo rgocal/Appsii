@@ -48,7 +48,7 @@ import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
 import com.mobeta.android.dslv.DragSortListView;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * A dialog that shows the general options for a hotspot. The user
@@ -113,7 +113,7 @@ public class HotspotSettingsFragment extends DialogFragment
 
     long mDefaultPageId;
 
-    List<HotspotPageEntry> mHotspotPages;
+    ArrayList<HotspotPageEntry> mHotspotPages;
 
     public HotspotSettingsFragment() {
         setStyle(DialogFragment.STYLE_NO_TITLE, 0);
@@ -281,9 +281,10 @@ public class HotspotSettingsFragment extends DialogFragment
         // TODO: add boolean that the dialog was showing for orientation changes
     }
 
-    private static int getEnabledCount(List<HotspotPageEntry> hotspotPages) {
+    private static int getEnabledCount(ArrayList<HotspotPageEntry> hotspotPages) {
         int result = 0;
-        for (HotspotPageEntry e : hotspotPages) {
+        for (int i = 0; i < hotspotPages.size(); i++) {
+            HotspotPageEntry e = hotspotPages.get(i);
             if (e.mEnabled) result++;
         }
         return result;
@@ -301,7 +302,7 @@ public class HotspotSettingsFragment extends DialogFragment
         mQueryHandler.updateDefaultPage(mHotspotId, mDefaultPageId);
     }
 
-    private void updateSelectedPageText(long defaultPageId, List<HotspotPageEntry> pages) {
+    private void updateSelectedPageText(long defaultPageId, ArrayList<HotspotPageEntry> pages) {
         String text = getString(R.string.reopen_last_plugin);
         for (int i = 0; i < pages.size(); i++) {
             HotspotPageEntry page = pages.get(i);
@@ -334,14 +335,14 @@ public class HotspotSettingsFragment extends DialogFragment
         mHandler.sendMessageDelayed(message, 500);
     }
 
-    void onHotspotPagesLoaded(List<HotspotPageEntry> pages) {
+    void onHotspotPagesLoaded(ArrayList<HotspotPageEntry> pages) {
         mHotspotPages = pages;
         mReorderController.setHotspotPages(pages);
         validateSelectedDefaultPage(mDefaultPageId, pages);
         updateSelectedPageText(mDefaultPageId, pages);
     }
 
-    private void validateSelectedDefaultPage(long defaultPageId, List<HotspotPageEntry> pages) {
+    private void validateSelectedDefaultPage(long defaultPageId, ArrayList<HotspotPageEntry> pages) {
         boolean found = false;
         for (int i = 0; i < pages.size(); i++) {
             HotspotPageEntry page = pages.get(i);
@@ -394,25 +395,25 @@ public class HotspotSettingsFragment extends DialogFragment
     }
 
     private class HotspotPagesLoaderCallbacks
-            implements LoaderManager.LoaderCallbacks<List<HotspotPageEntry>> {
+            implements LoaderManager.LoaderCallbacks<ArrayList<HotspotPageEntry>> {
 
         HotspotPagesLoaderCallbacks() {
 
         }
 
         @Override
-        public Loader<List<HotspotPageEntry>> onCreateLoader(int id, Bundle args) {
+        public Loader<ArrayList<HotspotPageEntry>> onCreateLoader(int id, Bundle args) {
             return new HotspotsPagesLoader(getActivity(), mHotspotId);
         }
 
         @Override
-        public void onLoadFinished(Loader<List<HotspotPageEntry>> loader,
-                List<HotspotPageEntry> data) {
+        public void onLoadFinished(Loader<ArrayList<HotspotPageEntry>> loader,
+                ArrayList<HotspotPageEntry> data) {
             onHotspotPagesLoaded(data);
         }
 
         @Override
-        public void onLoaderReset(Loader<List<HotspotPageEntry>> loader) {
+        public void onLoaderReset(Loader<ArrayList<HotspotPageEntry>> loader) {
 
         }
     }

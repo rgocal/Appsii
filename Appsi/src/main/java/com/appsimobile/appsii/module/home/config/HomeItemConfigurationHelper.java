@@ -33,7 +33,6 @@ import net.jcip.annotations.GuardedBy;
 
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -225,7 +224,7 @@ public final class HomeItemConfigurationHelper extends AbstractHomeItemConfigura
          * again.
          * SimpleCookie instances must not be leaked outside this class.
          */
-        final List<SimpleCookie> mCookiePool = new LinkedList<>();
+        final LinkedList<SimpleCookie> mCookiePool = new LinkedList<>();
 
         public QueryHandlerImpl(ContentResolver cr) {
             super(cr);

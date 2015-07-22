@@ -27,8 +27,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import java.util.Arrays;
-import java.util.List;
+import com.appsimobile.util.CollectionUtils;
+
+import java.util.ArrayList;
 
 /**
  * Created by nick on 30/03/15.
@@ -46,9 +47,9 @@ public class SidebarPagerAdapterTest extends InstrumentationTestCase {
 
     public void testSetPrimaryItem() {
 
-        Pair<List<HotspotPageEntry>, MockSidebarPagerAdapter> pair = createAdapter();
+        Pair<ArrayList<HotspotPageEntry>, MockSidebarPagerAdapter> pair = createAdapter();
 
-        List<HotspotPageEntry> entries = pair.first;
+        ArrayList<HotspotPageEntry> entries = pair.first;
         MockSidebarPagerAdapter adapter = pair.second;
 
         FrameLayout container = new FrameLayout(mContext);
@@ -117,10 +118,10 @@ public class SidebarPagerAdapterTest extends InstrumentationTestCase {
 
     }
 
-    Pair<List<HotspotPageEntry>, MockSidebarPagerAdapter> createAdapter() {
+    Pair<ArrayList<HotspotPageEntry>, MockSidebarPagerAdapter> createAdapter() {
         MockSidebarPagerAdapter adapter = new MockSidebarPagerAdapter();
 
-        List<HotspotPageEntry> entries = Arrays.asList(
+        ArrayList<HotspotPageEntry> entries = CollectionUtils.asList(
                 entry(),
                 entry(),
                 entry(),

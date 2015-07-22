@@ -31,7 +31,6 @@ import com.appsimobile.appsii.compat.UserHandleCompat;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,7 +42,8 @@ public class AppPageLoader extends AsyncTaskLoader<AppPageData> {
 
     static final Map<ComponentName, CharSequence> sLabelCache = new ConcurrentHashMap<>();
 
-    static final Map<ComponentName, ResolveInfoAppEntry> sEntryCache = new HashMap<>();
+    static final SimpleArrayMap<ComponentName, ResolveInfoAppEntry> sEntryCache
+            = new SimpleArrayMap<>();
 
     final InterestingConfigChanges mLastConfig = new InterestingConfigChanges();
 

@@ -39,7 +39,6 @@ import com.appsimobile.appsii.annotation.VisibleForTesting;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A simple wrapper for a page, used to save instance state of the
@@ -64,7 +63,7 @@ public abstract class PageController implements ViewTreeObserver.OnGlobalLayoutL
 
     protected final String mTitle;
 
-    final List<Runnable> mDeferredRunnables = new ArrayList<>(8);
+    final ArrayList<Runnable> mDeferredRunnables = new ArrayList<>(8);
 
     private final SidebarContext mContext;
 

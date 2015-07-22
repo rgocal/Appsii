@@ -267,7 +267,7 @@ public class AppView extends FrameLayout implements View.OnClickListener,
     }
 
     @Override
-    public void onTagsChanged(List<AppTag> appTags) {
+    public void onTagsChanged(ArrayList<AppTag> appTags) {
         mAppTags = appTags;
     }
 

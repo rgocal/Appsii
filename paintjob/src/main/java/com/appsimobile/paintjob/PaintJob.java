@@ -197,7 +197,9 @@ public class PaintJob {
     }
 
     private void applyPalette(@Nullable Palette palette, boolean immediate) {
-        for (ViewPainter viewPainter : mViewPainters) {
+        int N = mViewPainters.size();
+        for (int i = 0; i < N; i++) {
+            ViewPainter viewPainter = mViewPainters.get(i);
             viewPainter.apply(palette, mRootView, this, immediate, mDuration);
         }
     }

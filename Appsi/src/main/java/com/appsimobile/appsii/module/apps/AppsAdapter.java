@@ -103,7 +103,10 @@ class AppsAdapter extends RecyclerView.Adapter<AppsController.AbstractAppViewHol
         // parallax-view
         mVisibleItems.add(null);
 
-        for (AppTag tag : mData.mAppTags) {
+        List<AppTag> mAppTags = mData.mAppTags;
+        int N = mAppTags.size();
+        for (int i = 0; i < N; i++) {
+            AppTag tag = mAppTags.get(i);
             if (firstRun) {
                 mExpandedTags.put(tag.id, tag.defaultExpanded ? Boolean.TRUE : Boolean.FALSE);
             }
@@ -120,7 +123,7 @@ class AppsAdapter extends RecyclerView.Adapter<AppsController.AbstractAppViewHol
                     mVisibleItems.add(new EmptyTagAppsItem());
                 } else if (empty && tag.tagType == AppsContract.TagColumns.TAG_TYPE_RECENT) {
                     mVisibleItems.add(new NoRecentAppsItem());
-                } else {
+                } else if (!empty) {
                     mVisibleItems.addAll(appsInTag);
                 }
             }
@@ -263,7 +266,10 @@ class AppsAdapter extends RecyclerView.Adapter<AppsController.AbstractAppViewHol
     public void onTrimMemory(int level) {
         if (mData == null || mData.mAllApps == null) return;
 
-        for (AppEntry tag : mData.mAllApps) {
+        List<AppEntry> mAllApps = mData.mAllApps;
+        int N = mAllApps.size();
+        for (int i = 0; i < N; i++) {
+            AppEntry tag = mAllApps.get(i);
             tag.trimMemory();
         }
     }

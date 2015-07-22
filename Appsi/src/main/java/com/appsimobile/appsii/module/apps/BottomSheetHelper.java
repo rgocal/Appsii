@@ -485,7 +485,9 @@ class BottomSheetHelper {
 
         public void setItems(List<AppTag> allTags) {
             mAppTags.clear();
-            for (AppTag tag : allTags) {
+            int N = allTags.size();
+            for (int i = 0; i < N; i++) {
+                AppTag tag = allTags.get(i);
                 if (tag.tagType == AppsContract.TagColumns.TAG_TYPE_USER) {
                     mAppTags.add(tag);
                 }
