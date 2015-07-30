@@ -252,28 +252,29 @@ public class WidgetChooserActivity extends Activity
     public void onClick(View v) {
         int viewId = v.getId();
         if (viewId == R.id.ok_button) {
-            // TODO: start config activity
+            if (mSelectedAppWidgetProviderInfo != null) {
 
+                AppWidgetProviderInfo info = mSelectedAppWidgetProviderInfo;
 
-            AppWidgetProviderInfo info = mSelectedAppWidgetProviderInfo;
+                // In this case, we either need to start an activity to get permission to bind
+                // the widget, or we need to start an activity to configure the widget, or both.
+                mPendingAddWidgetId = mAppWidgetHost.allocateAppWidgetId();
+                boolean success =
+                        mAppWidgetManager.bindAppWidgetIdIfAllowed(mPendingAddWidgetId, info, null);
+                if (success) {
+                    onAppWidgetSelected(mPendingAddWidgetId, info);
+                } else {
+                    Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_BIND);
+                    intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mPendingAddWidgetId);
+                    intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER, info.provider);
 
-            // In this case, we either need to start an activity to get permission to bind
-            // the widget, or we need to start an activity to configure the widget, or both.
-            mPendingAddWidgetId = mAppWidgetHost.allocateAppWidgetId();
-            boolean success =
-                    mAppWidgetManager.bindAppWidgetIdIfAllowed(mPendingAddWidgetId, info, null);
-            if (success) {
-                onAppWidgetSelected(mPendingAddWidgetId, info);
-            } else {
-                Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_BIND);
-                intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mPendingAddWidgetId);
-                intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER, info.provider);
-
-                mAppWidgetManager.getUser(mSelectedAppWidgetProviderInfo)
-                        .addToIntent(intent, AppWidgetManager.EXTRA_APPWIDGET_PROVIDER_PROFILE);
-                // TODO: we need to make sure that this accounts for the options bundle.
-//                intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_OPTIONS, (Parcelable) null);
-                startActivityForResult(intent, REQUEST_BIND_APPWIDGET);
+                    mAppWidgetManager.getUser(mSelectedAppWidgetProviderInfo)
+                            .addToIntent(intent, AppWidgetManager.EXTRA_APPWIDGET_PROVIDER_PROFILE);
+                    // TODO: we need to make sure that this accounts for the options bundle.
+                    //                intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_OPTIONS,
+                    // (Parcelable) null);
+                    startActivityForResult(intent, REQUEST_BIND_APPWIDGET);
+                }
             }
 
         } else if (viewId == R.id.cancel) {

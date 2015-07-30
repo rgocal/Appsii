@@ -130,6 +130,11 @@ public final class FirstRunFragment extends Fragment
     }
 
     @Override
+    public void onSettingsFatalError() {
+        mOnFirstRunCompletedListener.onFatalError();
+    }
+
+    @Override
     public void onLocationCompleted() {
         showDoneFragment();
     }
@@ -152,5 +157,7 @@ public final class FirstRunFragment extends Fragment
     public interface OnFirstRunCompletedListener {
 
         void onFirstRunCompleted();
+
+        void onFatalError();
     }
 }

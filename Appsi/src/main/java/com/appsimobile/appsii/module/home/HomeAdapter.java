@@ -422,7 +422,7 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
         int newRowIdx = 0;
         int N = homeItems.size();
 
-        ArrayList<ContentProviderOperation> ops = new ArrayList<>();
+        ArrayList<ContentProviderOperation> ops = new ArrayList<>(8);
 
         boolean done;
 
@@ -2309,8 +2309,7 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
             int itemCountInRow = getItemCountInRow(mRowPosition);
 
             if (itemCountInRow == 1) return false;
-            if (totalSpan >= 4) return false;
-            return true;
+            return totalSpan < 4;
         }
 
         private int getTotalSpanForRow(int rowPosition) {
@@ -2411,7 +2410,6 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
             if (positionFrom < 0) return;
             if (positionTo < 0) return;
 
-            // TODO: the selection seems not to have been updated in the ui. update it
             if (positionTo >= mHomeItems.size() || positionFrom >= mHomeItems.size()) return;
 
             HomeItem h1 = mHomeItems.get(positionTo);
@@ -2436,7 +2434,6 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
         }
 
         public boolean canAddCellsInItemRow(int position) {
-            // TODO: the selection seems not to have been updated in the ui. update it
             if (position >= mHomeItems.size()) return false;
 
             HomeItem homeItem = mHomeItems.get(position);
@@ -2493,14 +2490,12 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
 
             int size = mHomeItems.size();
 
-            int rangeCount = 0;
             int rangeStart = -1;
 
             int lastRowPosition = -1;
             for (int i = size - 1; i >= 0; i--) {
                 HomeItem homeItem = mHomeItems.get(i);
                 if (homeItem.mRowPosition == rowPosition) {
-                    rangeCount++;
                     addDeleteCellOp(ops, homeItem);
                 } else if (homeItem.mRowPosition > rowPosition) {
                     homeItem.mRowPosition--;

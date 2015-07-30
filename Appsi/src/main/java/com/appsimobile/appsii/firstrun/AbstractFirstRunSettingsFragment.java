@@ -22,13 +22,16 @@ import android.app.Fragment;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.appsimobile.appsii.AccountHelper;
 import com.appsimobile.appsii.AppsiiUtils;
 import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.permissions.PermissionUtils;
+import com.crashlytics.android.Crashlytics;
 
 /**
  * Base class for the settings fragment. The list of checkboxes is different in
@@ -85,7 +88,22 @@ public abstract class AbstractFirstRunSettingsFragment
                 grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             mNextButton.setEnabled(true);
             mPermissionsButton.setEnabled(false);
-            AccountHelper.getInstance(getActivity()).createAccountIfNeeded();
+            try {
+                AccountHelper.getInstance(getActivity()).createAccountIfNeeded();
+            } catch (SecurityException e) {
+                // I am not really sure what causes this; but since this normally passes
+                // without problems, I suspect something like privacy guard. Just inform
+                // the user and exit.
+                Log.e("FirstRun", "error creating account. This is needed for Appsi", e);
+                Toast.makeText(getActivity(),
+                        "There was an error creating the sync account. " +
+                                "Appsii can't run without this and will now exit",
+                        Toast.LENGTH_SHORT).show();
+
+                // Log this in crashlytics as well
+                Crashlytics.logException(e);
+                mOnSettingsCompletedListener.onSettingsFatalError();
+            }
         }
 
     }
@@ -135,6 +153,8 @@ public abstract class AbstractFirstRunSettingsFragment
     interface OnSettingsCompletedListener {
 
         void onSettingsCompleted();
+
+        void onSettingsFatalError();
     }
 
 }

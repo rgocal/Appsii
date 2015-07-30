@@ -99,7 +99,7 @@ public class AgendaLoader extends ConvertedCursorLoader<AgendaEventsResult> {
     protected AgendaEventsResult convertCursor(@NonNull Cursor c) {
 
 
-        List<AgendaEvent> result = new ArrayList<>();
+        List<AgendaEvent> result = new ArrayList<>(c.getCount());
 
         c.moveToPosition(-1);
 

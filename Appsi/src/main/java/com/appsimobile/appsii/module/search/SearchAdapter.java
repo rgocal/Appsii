@@ -251,7 +251,11 @@ class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implem
 
     public void setApps(List<AppEntry> apps) {
         mApps.clear();
-        mApps.addAll(apps);
+        if (apps != null) {
+            // this may be null. Probably in case it failed to load the list
+            // of apps for some reason
+            mApps.addAll(apps);
+        }
         rebuildItemList();
         notifyDataSetChanged();
     }

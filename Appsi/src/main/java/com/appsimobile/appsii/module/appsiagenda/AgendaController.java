@@ -63,6 +63,7 @@ import com.appsimobile.appsii.module.SpacingItemDecoration;
 import com.appsimobile.appsii.module.ToolbarScrollListener;
 import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.appsimobile.appsii.preference.PreferencesFactory;
+import com.appsimobile.util.CollectionUtils;
 import com.appsimobile.util.TimeUtils;
 import com.crashlytics.android.Crashlytics;
 
@@ -650,6 +651,12 @@ public class AgendaController extends PageController
     }
 
     void onAgendaDaysResult(AgendaDaysResult data) {
+        if (data == null) {
+            Crashlytics.logException(
+                    new NullPointerException("null data received in agenda controller"));
+
+            data = new AgendaDaysResult(new SparseBooleanArray(0));
+        }
         if (data.mException != null) {
             onPermissionDenied(data.mException);
         } else {
@@ -674,6 +681,11 @@ public class AgendaController extends PageController
     }
 
     void onAgendaEventsResult(AgendaEventsResult data) {
+        if (data == null) {
+            data = new AgendaEventsResult(CollectionUtils.<AgendaEvent>emptyList());
+            Crashlytics.logException(
+                    new NullPointerException("data == null; this should not happen"));
+        }
         if (data.mPermissionDeniedException != null) {
             onPermissionDenied(data.mPermissionDeniedException);
         } else {

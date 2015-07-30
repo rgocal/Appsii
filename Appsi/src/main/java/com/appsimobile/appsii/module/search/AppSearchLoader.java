@@ -19,10 +19,10 @@ package com.appsimobile.appsii.module.search;
 import android.content.AsyncTaskLoader;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.appsimobile.appsii.compat.LauncherActivityInfoCompat;
 import com.appsimobile.appsii.compat.LauncherAppsCompat;
@@ -32,6 +32,7 @@ import com.appsimobile.appsii.module.apps.InterestingConfigChanges;
 import com.appsimobile.appsii.module.apps.PackageIntentReceiver;
 import com.appsimobile.appsii.module.apps.ResolveInfoAppEntry;
 import com.appsimobile.appsii.module.apps.ShortcutNameComparator;
+import com.crashlytics.android.Crashlytics;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,11 +51,11 @@ public class AppSearchLoader extends AsyncTaskLoader<List<AppEntry>> {
 
     final String mQuery;
 
+    final PackageManager mPackageManager;
+
     private final ShortcutNameComparator mShortcutNameComparator;
 
     private final Map<ComponentName, CharSequence> mLabelCache;
-
-    final PackageManager mPackageManager;
 
     List<AppEntry> mApps;
 
@@ -102,11 +103,9 @@ public class AppSearchLoader extends AsyncTaskLoader<List<AppEntry>> {
     @Override
     public List<AppEntry> loadInBackground() {
 
-        List<AppEntry> result = new ArrayList<>();
 
         LauncherAppsCompat lap = LauncherAppsCompat.getInstance(getContext());
-        List<LauncherActivityInfoCompat> apps =
-                lap.getActivityList(null, UserHandleCompat.myUserHandle());
+        List<LauncherActivityInfoCompat> apps = getLauncherInfosSafely(lap);
 
         // Fail if we don't have any apps
         if (apps == null || apps.isEmpty()) {
@@ -115,8 +114,10 @@ public class AppSearchLoader extends AsyncTaskLoader<List<AppEntry>> {
         // Sort the applications by name
         Collections.sort(apps, mShortcutNameComparator);
 
+        int N = apps.size();
+        List<AppEntry> result = new ArrayList<>(N);
         // Create the ApplicationInfos
-        for (int i = 0; i < apps.size(); i++) {
+        for (int i = 0; i < N; i++) {
             LauncherActivityInfoCompat app = apps.get(i);
 
             CharSequence label;
@@ -150,26 +151,44 @@ public class AppSearchLoader extends AsyncTaskLoader<List<AppEntry>> {
     }
 
     @Nullable
-    private List<ResolveInfo> getResolveInfosSafely(Intent mainIntent) {
-        return getResolveInfosSafely(mainIntent, 0);
+    private List<LauncherActivityInfoCompat> getLauncherInfosSafely(LauncherAppsCompat lap) {
+        return getLauncherInfosSafely(lap, 0, null);
     }
 
     @Nullable
-    private List<ResolveInfo> getResolveInfosSafely(Intent mainIntent, int counter) {
+    private List<LauncherActivityInfoCompat> getLauncherInfosSafely(LauncherAppsCompat lap,
+            int counter, Exception exception) {
         try {
-            return mPackageManager.queryIntentActivities(mainIntent, 0);
+            List<LauncherActivityInfoCompat> activityList =
+                    lap.getActivityList(null, UserHandleCompat.myUserHandle());
+
+            // we want these exceptions logged.
+            if (exception != null) {
+                Crashlytics.logException(new RuntimeException("count=" + counter, exception));
+            }
+
+            return activityList;
         } catch (RuntimeException e) {
             // We try to fix the package manager here to fix this exception
             // Caused by: java.lang.RuntimeException: Package manager has died
             if (counter < 6) {
+                int sleepTime = counter * 100;
+                Log.e("Apps", "error loading apps, retrying in " + sleepTime + "ms");
                 counter++;
                 try {
-                    Thread.sleep(counter * 100);
-                } catch (InterruptedException ignore) {
+                    Thread.sleep(sleepTime);
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
                     return null;
                 }
-                return getResolveInfosSafely(mainIntent, counter);
+                return getLauncherInfosSafely(lap, counter, e);
 
+            } else {
+                // Log this case. We need to know if 6 is sufficient. Otherwise we may need
+                // to increase the repeat count
+                Log.e("Apps", "error loading apps, for " + counter + " times. Giving up");
+                Crashlytics.logException(new RuntimeException(
+                        "Still failed after " + counter + " retries. Giving up", e));
             }
         }
         return null;

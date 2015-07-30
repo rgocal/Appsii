@@ -33,7 +33,7 @@ import java.util.List;
  */
 public class ColoredAgendaAdapter extends AgendaAdapter<ColoredAgendaViewHolder> {
 
-    final ArrayList<AgendaEvent> mEvents = new ArrayList<>();
+    final ArrayList<AgendaEvent> mEvents = new ArrayList<>(120);
 
     final Time mRecycleTime = new Time(Time.TIMEZONE_UTC);
 
@@ -135,6 +135,7 @@ public class ColoredAgendaAdapter extends AgendaAdapter<ColoredAgendaViewHolder>
 
     @Override
     int getJulianDayAtPosition(int position) {
+        if (position >= mEvents.size()) return -1;
         return mEvents.get(position).startDay;
     }
 

@@ -111,7 +111,7 @@ public abstract class AbstractSidebarPagerAdapter extends PagerAdapter {
         mActivePageKeys.clear();
         mActivePageControllers.clear();
 
-        for (int i = 0; i < pages.size(); i++) {
+        for (int i = 0, position = 0; i < pages.size(); i++) {
             HotspotPageEntry page = pages.get(i);
             if (!page.mEnabled) continue;
             if (page.mPageType == HomeContract.Pages.PAGE_SETTINGS) continue;
@@ -122,8 +122,9 @@ public abstract class AbstractSidebarPagerAdapter extends PagerAdapter {
             if (controller == null) {
                 controller = instantiateAndCacheControllerForPage(page);
             }
-            mActivePageKeys.put(i, page);
-            mActivePageControllers.put(i, controller);
+            mActivePageKeys.put(position, page);
+            mActivePageControllers.put(position, controller);
+            position++;
         }
         notifyDataSetChanged();
     }
@@ -269,7 +270,7 @@ public abstract class AbstractSidebarPagerAdapter extends PagerAdapter {
         }
     }
 
-    <T> int keyOf(SparseArray<T> array, T object) {
+    static <T> int keyOf(SparseArray<T> array, T object) {
         int length = array.size();
         for (int i = 0; i < length; i++) {
             T value = array.valueAt(i);

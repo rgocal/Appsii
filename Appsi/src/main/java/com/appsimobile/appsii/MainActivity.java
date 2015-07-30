@@ -116,6 +116,13 @@ public class MainActivity extends AppCompatActivity
         onFirstRunFragmentComplete();
     }
 
+    @Override
+    public void onFatalError() {
+        // The fragment involved should have shown a message
+        // most likely case is some app blocking this anyway
+        finish();
+    }
+
     private void onFirstRunFragmentComplete() {
         mPreferences.edit().putBoolean(PREF_FIRST_RUN, false).apply();
         mFirstRun = false;

@@ -29,6 +29,7 @@ import android.os.UserHandle;
 import android.support.v4.util.SimpleArrayMap;
 
 import com.appsimobile.appsii.AppsiiUtils;
+import com.crashlytics.android.Crashlytics;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -79,7 +80,13 @@ public class LauncherAppsCompatVL extends LauncherAppsCompat {
     @Override
     public void startActivityForProfile(ComponentName component, UserHandleCompat user,
             Rect sourceBounds, Bundle opts) {
-        mLauncherApps.startMainActivity(component, user.getUser(), sourceBounds, opts);
+        try {
+            mLauncherApps.startMainActivity(component, user.getUser(), sourceBounds, opts);
+        } catch (RuntimeException e) {
+            // for some reason a report with an NPE here occurred. This may indicate that
+            // the app was uninstalled and the list was not updated. This is strange
+            Crashlytics.logException(e);
+        }
         AppsiiUtils.closeSidebar(mContext);
     }
 
