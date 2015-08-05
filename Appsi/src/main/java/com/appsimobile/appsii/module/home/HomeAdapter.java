@@ -84,6 +84,7 @@ import com.appsimobile.appsii.module.weather.loader.WeatherData;
 import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.appsimobile.paintjob.PaintJob;
 import com.appsimobile.paintjob.ViewPainters;
+import com.crashlytics.android.Crashlytics;
 
 import java.util.ArrayList;
 import java.util.Formatter;
@@ -1964,7 +1965,12 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
                         // can happen when the view was detached earlier
                         if (destH == 0 || destW == 0) return null;
 
-                        return Bitmap.createScaledBitmap(contact.mBitmap, destW, destH, true);
+                        try {
+                            return Bitmap.createScaledBitmap(contact.mBitmap, destW, destH, true);
+                        } catch (OutOfMemoryError e) {
+                            Crashlytics.logException(e);
+                            return contact.mBitmap;
+                        }
                     }
                 }
 

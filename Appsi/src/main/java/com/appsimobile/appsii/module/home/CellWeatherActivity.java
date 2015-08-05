@@ -19,6 +19,7 @@ package com.appsimobile.appsii.module.home;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.appsimobile.appsii.ActivityUtils;
 import com.appsimobile.appsii.BuildConfig;
@@ -45,6 +46,11 @@ public class CellWeatherActivity extends AppCompatActivity {
     private void handleIntent(Intent intent, boolean isNewIntent) {
         long cellId = intent.getLongExtra(EXTRA_CELL_ID, -1);
         int cellType = intent.getIntExtra(EXTRA_CELL_TYPE, -1);
+
+        if (cellType == -1 || cellId == -1) {
+            Log.w("Weather", "invalid extras; cellId: " + cellId + ", cellType: " + cellType);
+            return;
+        }
 
         WeatherFragment fragment =
                 (WeatherFragment) getFragmentManager().findFragmentByTag("weather");

@@ -29,6 +29,7 @@ import android.util.Log;
 
 import com.appsimobile.appsii.iab.FeatureManager;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
+import com.crashlytics.android.Crashlytics;
 
 /**
  * Created by nick on 16/06/15.
@@ -180,6 +181,11 @@ public class PageHelper {
 
         @Override
         protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+
+            if (cursor == null) {
+                Log.e("PageHelper", "cursor == null");
+                Crashlytics.logException(new NullPointerException("cursor == null"));
+            }
 
             switch (token) {
                 case QUERY_PAGE_INSERTED:

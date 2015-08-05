@@ -146,6 +146,9 @@ public class ContactBitmapLoader extends AsyncTask<Void, Void, Bitmap> {
         if (in != null) {
             try {
                 return BitmapFactory.decodeStream(in);
+            } catch (OutOfMemoryError e) {
+                Crashlytics.logException(e);
+                return null;
             } finally {
                 try {
                     in.close();

@@ -33,6 +33,7 @@ public class CollectionUtils {
         }
     };
 
+    @SuppressWarnings("unchecked")
     public static <T> ArrayList<T> emptyList() {
         return (ArrayList<T>) EMPTY_ARRAY_LIST;
     }
@@ -54,8 +55,9 @@ public class CollectionUtils {
         }
     }
 
-    public static <T> ArrayList<T> asList(T... items) {
-        ArrayList result = new ArrayList();
+    @SafeVarargs
+    public static <T> ArrayList<?> asList(T... items) {
+        ArrayList<T> result = new ArrayList<>();
         if (items != null) {
             for (T t : items) {
                 result.add(t);

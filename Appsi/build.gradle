@@ -65,7 +65,7 @@ android {
             buildConfigField 'boolean', 'TEST_PURCHASES', 'false'
         }
         debug {
-//            testCoverageEnabled true
+            useJack=true
             buildConfigField 'boolean', 'TEST_PURCHASES', 'true'
         }
     }

@@ -87,6 +87,19 @@ public class WeatherFragment extends Fragment
     private SwitchCompat mLocationImageSwitch;
 
     public static WeatherFragment createInstance(long cellId, int cellType) {
+        // check validity of the cellType
+        switch (cellType) {
+            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_SUNRISE:
+            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_SUNRISE_WALLPAPER:
+            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_TEMP:
+            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_TEMP_WALLPAPER:
+            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_WIND:
+            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_WIND_WALLPAPER:
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid cell type");
+        }
+
         WeatherFragment result = new WeatherFragment();
         Bundle args = new Bundle();
         args.putLong("cellId", cellId);
@@ -107,6 +120,8 @@ public class WeatherFragment extends Fragment
         Bundle arguments = getArguments();
         mCellId = arguments.getLong("cellId");
         mCellType = arguments.getInt("cellType");
+
+
     }
 
     @Override
