@@ -65,7 +65,7 @@ android {
             buildConfigField 'boolean', 'TEST_PURCHASES', 'false'
         }
         debug {
-            useJack=true
+            useJack=false
             buildConfigField 'boolean', 'TEST_PURCHASES', 'true'
         }
     }
@@ -112,16 +112,22 @@ dependencies {
     // goal of this is to allow users to create modules for toggles
     //    compile 'org.mozilla:rhino:1.7R5'
     compile 'com.mcxiaoke.volley:library:1.0.15'
+    compile('com.crashlytics.sdk.android:crashlytics:2.2.2@aar') {
+        transitive = true;
+    }
+    compile 'com.android.support:design:22.2.1'
+
     compile project(':dslv')
     compile project(':paintjob')
+
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.0'
     androidTestCompile 'com.android.support.test.espresso:espresso-idling-resource:2.0'
     androidTestCompile 'com.android.support.test:testing-support-lib:0.1'
     androidTestCompile 'org.mockito:mockito-core:1.10.8'
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.1'
+
+    // Unit testing dependencies
     testCompile 'junit:junit:4.12'
-    compile('com.crashlytics.sdk.android:crashlytics:2.2.2@aar') {
-        transitive = true;
-    }
-    compile 'com.android.support:design:22.2.1'
+    // Set this dependency if you want to use Mockito
+    testCompile 'org.mockito:mockito-core:1.10.19'
 }

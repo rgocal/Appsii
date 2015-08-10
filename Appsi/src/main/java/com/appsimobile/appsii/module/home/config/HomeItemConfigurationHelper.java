@@ -40,7 +40,7 @@ import java.util.Set;
  * small views.
  * Created by nick on 21/01/15.
  */
-public final class HomeItemConfigurationHelper extends AbstractHomeItemConfiguration {
+public class HomeItemConfigurationHelper extends AbstractHomeItemConfiguration {
 
     private static HomeItemConfigurationFactory sFactory = new HomeItemConfigurationFactoryImpl();
 
@@ -70,7 +70,7 @@ public final class HomeItemConfigurationHelper extends AbstractHomeItemConfigura
     }
 
     @VisibleForTesting
-    final LongSparseArray<ConfigurationProperty> loadConfigurations(Context context) {
+    LongSparseArray<ConfigurationProperty> loadConfigurations(Context context) {
         ContentResolver resolver = context.getContentResolver();
         String[] projection = new String[]{
                 HomeContract.Configuration._CELL_ID,

@@ -16,19 +16,19 @@
  *
  */
 
-package com.appsimobile.appsii.module.home;
+package com.appsimobile.appsii.module.home.config;
 
 import android.content.ContentResolver;
 import android.content.Context;
-import android.support.v4.util.LongSparseArray;
 import android.test.mock.MockContentResolver;
 import android.test.mock.MockContext;
 
-import com.appsimobile.appsii.module.home.config.HomeItemConfigurationHelper;
-
-import junit.framework.TestCase;
-
 import net.jcip.annotations.GuardedBy;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,87 +36,28 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNull;
+
 /**
  * Created by nick on 08/03/15.
  */
-public class HomeItemConfigurationHelperTest extends TestCase {
+@RunWith(MockitoJUnitRunner.class)
+public class HomeItemConfigurationHelperTest {
 
     HomeItemConfigurationHelper mHomeItemConfigurationHelper;
 
     ArrayList<Runnable> mRunnables;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         mRunnables = new ArrayList<>();
-        mHomeItemConfigurationHelper = new HomeItemConfigurationHelper(new TestMockContext()) {
-
-            @Override
-            LongSparseArray<ConfigurationProperty> loadConfigurations(Context context) {
-                LongSparseArray<ConfigurationProperty> result = new LongSparseArray<>();
-
-                ConfigurationProperty p0 = createProperty(result, 0);
-                ConfigurationProperty p1 = createProperty(result, 1);
-                ConfigurationProperty p2 = createProperty(result, 2);
-                ConfigurationProperty p3 = createProperty(result, 3);
-
-                p0.put("keya", "0a");
-                p0.put("keyb", "0b");
-                p1.put("keya", "1a");
-                p2.put("keya", "2a");
-                p2.put("keyc", "2c");
-
-
-                return result;
-            }
-
-
-            @Override
-            public void updateProperty(final long cellId, final String key, final String value) {
-                mRunnables.add(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(50);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        onPropertyUpdated(cellId, key, value);
-                    }
-                });
-            }
-
-
-            @Override
-            public void removeProperty(final long cellId, final String key) {
-                mRunnables.add(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(50);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        onPropertyDeleted(cellId, key);
-                    }
-                });
-            }
-        };
+        mHomeItemConfigurationHelper =
+                new MockHomeItemConfigurationHelper(new TestMockContext(), mRunnables);
     }
 
-    void runPendingRunnables() {
-        final List<Runnable> runnableList = new ArrayList<>(mRunnables);
-        mRunnables.clear();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for (Runnable r : runnableList) {
-                    r.run();
-                }
-            }
-        }).start();
-    }
 
+    @Test
     public void testGetValue() {
         assertEquals("0a", mHomeItemConfigurationHelper.getProperty(0, "keya", null));
         assertEquals("0b", mHomeItemConfigurationHelper.getProperty(0, "keyb", null));
@@ -139,6 +80,7 @@ public class HomeItemConfigurationHelperTest extends TestCase {
         assertNull(mHomeItemConfigurationHelper.getProperty(4, "keyc", null));
     }
 
+    @Test
     public void testUpdate() throws InterruptedException {
         TestConfigurationListener l = new TestConfigurationListener(1, 1);
         mHomeItemConfigurationHelper.addConfigurationListener(l);
@@ -191,6 +133,7 @@ public class HomeItemConfigurationHelperTest extends TestCase {
 
     }
 
+    @Test
     public void testUpdateWithIntermediateDelete() throws InterruptedException {
         TestConfigurationListener l;
         final AtomicInteger clearCount = new AtomicInteger();
@@ -234,6 +177,19 @@ public class HomeItemConfigurationHelperTest extends TestCase {
         assertEquals("test", lastValue.get());
         assertEquals(1, clearCount.get());
         mHomeItemConfigurationHelper.removeConfigurationListener(l);
+    }
+
+    void runPendingRunnables() {
+        final List<Runnable> runnableList = new ArrayList<>(mRunnables);
+        mRunnables.clear();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (Runnable r : runnableList) {
+                    r.run();
+                }
+            }
+        }).start();
     }
 
     private class TestConfigurationListener

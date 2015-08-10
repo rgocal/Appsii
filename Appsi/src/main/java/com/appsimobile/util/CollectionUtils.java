@@ -56,7 +56,7 @@ public class CollectionUtils {
     }
 
     @SafeVarargs
-    public static <T> ArrayList<?> asList(T... items) {
+    public static <T> ArrayList<T> asList(T... items) {
         ArrayList<T> result = new ArrayList<>();
         if (items != null) {
             for (T t : items) {
