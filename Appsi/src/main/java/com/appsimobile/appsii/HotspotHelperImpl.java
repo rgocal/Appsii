@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v4.util.CircularArray;
 import android.support.v4.util.LongSparseArray;
 import android.util.Log;
@@ -154,8 +155,10 @@ public class HotspotHelperImpl extends AbstractHotspotHelper
                         WindowManager.LayoutParams lp =
                                 configureHotspot(hotspotContainerHelper, conf, prefs);
                         try {
-                            PermissionUtils.throwIfNotPermitted(
-                                    mContext, Manifest.permission.SYSTEM_ALERT_WINDOW);
+                            if (!Settings.canDrawOverlays(mContext)) {
+                                throw new PermissionDeniedException(
+                                        Manifest.permission.SYSTEM_ALERT_WINDOW);
+                            }
 
                             mWindowManager.addView(hotspotContainerHelper.mHotspotParent, lp);
                         } catch (PermissionDeniedException e) {
@@ -169,6 +172,7 @@ public class HotspotHelperImpl extends AbstractHotspotHelper
             }
             addScreenWatcher();
         } catch (PermissionDeniedException e) {
+            // STOPSHIP: FIXME: this must be changed!
             PermissionUtils.showPermissionNotification(mContext, 1001,
                     Manifest.permission.SYSTEM_ALERT_WINDOW, 0);
             mHotspotsActive = false;
@@ -190,7 +194,11 @@ public class HotspotHelperImpl extends AbstractHotspotHelper
     }
 
     private void addScreenWatcher() throws PermissionDeniedException {
-        PermissionUtils.throwIfNotPermitted(mContext, Manifest.permission.SYSTEM_ALERT_WINDOW);
+        if (!Settings.canDrawOverlays(mContext)) {
+            throw new PermissionDeniedException(
+                    Manifest.permission.SYSTEM_ALERT_WINDOW);
+        }
+
         mWindowManager.addView(mFullScreenWatcher, createInsetParams());
         mFullScreenWatcherAttached = true;
     }

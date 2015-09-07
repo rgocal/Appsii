@@ -80,7 +80,7 @@ public abstract class AbstractFirstRunSettingsFragment
         mOnSettingsCompletedListener.onSettingsCompleted();
     }
 
-    //@Override
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
             @NonNull int[] grantResults) {
 

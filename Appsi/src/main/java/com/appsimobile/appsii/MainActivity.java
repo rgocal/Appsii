@@ -16,12 +16,15 @@
 
 package com.appsimobile.appsii;
 
-import android.Manifest;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -29,7 +32,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.appsimobile.appsii.firstrun.FirstRunFragment;
-import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.appsimobile.appsii.preference.PreferencesFactory;
 
 
@@ -94,7 +96,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        if (!PermissionUtils.holdsPermission(this, Manifest.permission.SYSTEM_ALERT_WINDOW)) {
+        if (!Settings.canDrawOverlays(this)) {
             showSystemAlertWindowPermissionErrorIfNotFirstRun();
         } else if (!mFirstRun) {
             // when we are in the first run, Appsii is started on
@@ -107,8 +109,12 @@ public class MainActivity extends AppCompatActivity
 
     private void showSystemAlertWindowPermissionErrorIfNotFirstRun() {
         if (mFirstRun) return;
-        PermissionUtils.requestPermission(this, 1, Manifest.permission.SYSTEM_ALERT_WINDOW);
-        // TODO: implement better
+        // STOPSHIP: TODO: implement better
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Intent i = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:" + BuildConfig.APPLICATION_ID));
+            startActivity(i);
+        }
     }
 
     @Override
