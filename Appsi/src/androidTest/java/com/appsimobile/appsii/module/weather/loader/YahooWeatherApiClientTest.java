@@ -19,14 +19,13 @@
 package com.appsimobile.appsii.module.weather.loader;
 
 import android.content.res.AssetManager;
+import android.support.v4.util.CircularArray;
 import android.test.AndroidTestCase;
 
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by nick on 24/01/15.
@@ -59,7 +58,7 @@ public class YahooWeatherApiClientTest extends AndroidTestCase {
 
     public void testParseLocationSearchResult_tokyo()
             throws IOException, CantGetWeatherException, XmlPullParserException {
-        List<YahooWeatherApiClient.LocationSearchResult> result = new ArrayList<>();
+        CircularArray<YahooWeatherApiClient.LocationSearchResult> result = new CircularArray<>();
 
         AssetManager manager = getContext().getAssets();
         InputStream in = manager.open("places_query_tokyo.xml");
@@ -79,7 +78,7 @@ public class YahooWeatherApiClientTest extends AndroidTestCase {
 
     public void testParseLocationSearchResult_cambridge()
             throws IOException, CantGetWeatherException, XmlPullParserException {
-        List<YahooWeatherApiClient.LocationSearchResult> result = new ArrayList<>();
+        CircularArray<YahooWeatherApiClient.LocationSearchResult> result = new CircularArray<>();
 
         AssetManager manager = getContext().getAssets();
         InputStream in = manager.open("places_query_cambridge.xml");

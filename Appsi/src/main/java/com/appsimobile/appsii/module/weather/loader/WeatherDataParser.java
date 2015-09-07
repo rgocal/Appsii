@@ -17,6 +17,7 @@
 package com.appsimobile.appsii.module.weather.loader;
 
 import android.support.annotation.Nullable;
+import android.support.v4.util.CircularArray;
 import android.text.TextUtils;
 import android.text.format.Time;
 import android.util.Log;
@@ -35,7 +36,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -45,8 +45,8 @@ import java.util.TimeZone;
 public class WeatherDataParser {
 
 
-    public static void parseWeatherData(List<WeatherData> result, InputStream inputStream,
-            String[] woeids)
+    public static void parseWeatherData(CircularArray<WeatherData> result, InputStream inputStream,
+            CircularArray<String> woeids)
             throws JSONException, ResponseParserException, ParseException, IOException {
         String json = readStreamToString(inputStream, new StringBuilder());
         if (BuildConfig.DEBUG) Log.d("WeatherDataParser", "json: " + json);
@@ -69,11 +69,11 @@ public class WeatherDataParser {
 
     }
 
-    public static void parseWeatherData(List<WeatherData> result, String jsonString,
-            String[] woeids)
+    public static void parseWeatherData(CircularArray<WeatherData> result, String jsonString,
+            CircularArray<String> woeids)
             throws JSONException, ResponseParserException, ParseException {
 
-        if (woeids.length == 0) return;
+        if (woeids.isEmpty()) return;
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.US);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone(Time.TIMEZONE_UTC));
@@ -89,10 +89,10 @@ public class WeatherDataParser {
             JSONObject weatherObject = json.optJsonObject("query.results.channel");
             if (weatherObject == null) return;
 
-            String woeid = woeids[0];
+            String woeid = woeids.get(0);
             WeatherData weatherData = parseWeatherData(woeid, simpleDateFormat, weatherObject);
             if (weatherData != null) {
-                result.add(weatherData);
+                result.addLast(weatherData);
             }
             return;
         }
@@ -101,10 +101,11 @@ public class WeatherDataParser {
         int length = resultsArray.length();
         for (int i = 0; i < length; i++) {
             JSONObject weatherJson = resultsArray.getJSONObject(i);
-            WeatherData weatherData = parseWeatherData(woeids[i], simpleDateFormat, weatherJson);
+            WeatherData weatherData =
+                    parseWeatherData(woeids.get(i), simpleDateFormat, weatherJson);
             if (weatherData == null) continue;
 
-            result.add(weatherData);
+            result.addLast(weatherData);
 
         }
     }

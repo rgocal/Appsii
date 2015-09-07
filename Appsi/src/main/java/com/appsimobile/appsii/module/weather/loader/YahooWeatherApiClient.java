@@ -19,6 +19,8 @@ package com.appsimobile.appsii.module.weather.loader;
 import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
+import android.support.v4.util.CircularArray;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
@@ -28,7 +30,7 @@ import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.ResponseParserException;
 import com.appsimobile.appsii.annotation.VisibleForTesting;
 import com.appsimobile.appsii.module.weather.Utils;
-import com.appsimobile.util.CollectionUtils;
+import com.appsimobile.util.ArrayUtils;
 
 import org.json.JSONException;
 import org.xmlpull.v1.XmlPullParser;
@@ -42,10 +44,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Locale;
 
 /**
@@ -83,10 +82,11 @@ public class YahooWeatherApiClient {
         }
     }
 
-    public static ArrayList<WeatherData> getWeatherForWoeids(String[] woeids, String unit)
+    @Nullable
+    public static CircularArray<WeatherData> getWeatherForWoeids(CircularArray<String> woeids, String unit)
             throws CantGetWeatherException {
 
-        if (woeids == null || woeids.length == 0) return CollectionUtils.emptyList();
+        if (woeids == null || woeids.isEmpty()) return null;
 
         HttpURLConnection connection = null;
         try {
@@ -95,7 +95,7 @@ public class YahooWeatherApiClient {
 
             connection = Utils.openUrlConnection(url);
 
-            ArrayList<WeatherData> result = new ArrayList<>();
+            CircularArray<WeatherData> result = new CircularArray<>();
             WeatherDataParser.parseWeatherData(result, connection.getInputStream(), woeids);
 
             return result;
@@ -110,11 +110,11 @@ public class YahooWeatherApiClient {
         }
     }
 
-    private static String buildWeatherQueryUrl(String[] woeids, String unit) {
+    private static String buildWeatherQueryUrl(CircularArray<String> woeids, String unit) {
         // http://developer.yahoo.com/weather/
         String endPoint = "https://query.yahooapis.com/v1/public/yql?format=json&q=";
         String query = "select * from weather.forecast where woeid in (%s) and u=\"%s\"";
-        String param = TextUtils.join(", ", woeids);
+        String param = ArrayUtils.join(", ", woeids);
         String queryString = String.format(Locale.ROOT, query, param, unit);
         if (BuildConfig.DEBUG) Log.d("YahooWeatherApiClient", "yql query: " + queryString);
         try {
@@ -160,7 +160,7 @@ public class YahooWeatherApiClient {
             LocationInfo li, InputStream in)
             throws XmlPullParserException, IOException, CantGetWeatherException {
 
-        ArrayList<Pair<String, String>> alternateWoeids = new ArrayList<>();
+        CircularArray<Pair<String, String>> alternateWoeids = new CircularArray<>();
         String primaryWoeid = null;
 
         XmlPullParser xpp = sXmlPullParserFactory.newPullParser();
@@ -197,7 +197,7 @@ public class YahooWeatherApiClient {
                     } else if ("woeid".equals(attrName)) {
                         String woeid = xpp.getAttributeValue(i);
                         if (!TextUtils.isEmpty(woeid)) {
-                            alternateWoeids.add(
+                            alternateWoeids.addLast(
                                     new Pair<>(tagName, woeid));
                         }
                     }
@@ -220,12 +220,12 @@ public class YahooWeatherApiClient {
 
         // Add the primary woeid if it was found.
         if (!TextUtils.isEmpty(primaryWoeid)) {
-            li.woeids.add(primaryWoeid);
+            li.woeids.addLast(primaryWoeid);
         }
 
         // Sort by descending tag name to order by decreasing precision
         // (locality3, locality2, locality1, admin3, admin2, admin1, etc.)
-        Collections.sort(alternateWoeids, new Comparator<Pair<String, String>>() {
+        ArrayUtils.sort(alternateWoeids, new Comparator<Pair<String, String>>() {
             @Override
             public int compare(Pair<String, String> pair1, Pair<String, String> pair2) {
                 return pair1.first.compareTo(pair2.first);
@@ -235,7 +235,7 @@ public class YahooWeatherApiClient {
         int N = alternateWoeids.size();
         for (int i = 0; i < N; i++) {
             Pair<String, String> pair = alternateWoeids.get(i);
-            li.woeids.add(pair.second);
+            li.woeids.addLast(pair.second);
         }
 
         if (li.woeids.size() > 0) {
@@ -245,8 +245,8 @@ public class YahooWeatherApiClient {
         throw new CantGetWeatherException(true, R.string.no_weather_data, "No WOEIDs found nearby.");
     }
 
-    public static List<LocationSearchResult> findLocationsAutocomplete(String startsWith) {
-        List<LocationSearchResult> results = new ArrayList<>();
+    public static CircularArray<LocationSearchResult> findLocationsAutocomplete(String startsWith) {
+        CircularArray<LocationSearchResult> results = new CircularArray<>();
 
         HttpURLConnection connection = null;
         try {
@@ -276,7 +276,7 @@ public class YahooWeatherApiClient {
 
     @VisibleForTesting
     static void parseLocationSearchResults(
-            List<LocationSearchResult> results, InputStream inputStream)
+            CircularArray<LocationSearchResult> results, InputStream inputStream)
             throws XmlPullParserException, IOException {
         XmlPullParser xpp = sXmlPullParserFactory.newPullParser();
         xpp.setInput(new InputStreamReader(inputStream));
@@ -363,7 +363,7 @@ public class YahooWeatherApiClient {
                     result.displayName = sb.toString();
                     result.country = country;
                     result.timezone = timezone;
-                    results.add(result);
+                    results.addLast(result);
                     state = PARSE_STATE_NONE;
 
                 } else if (state != PARSE_STATE_NONE) {
@@ -385,7 +385,7 @@ public class YahooWeatherApiClient {
 
         // Sorted by decreasing precision
         // (point of interest, locality3, locality2, locality1, admin3, admin2, admin1, etc.)
-        public final ArrayList<String> woeids = new ArrayList<String>();
+        public final CircularArray<String> woeids = new CircularArray<>();
 
         public String town;
 

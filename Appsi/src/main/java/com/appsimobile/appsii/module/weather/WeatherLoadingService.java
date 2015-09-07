@@ -37,6 +37,7 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresPermission;
+import android.support.v4.util.CircularArray;
 import android.support.v4.util.SimpleArrayMap;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -54,6 +55,7 @@ import com.appsimobile.appsii.module.weather.loader.YahooWeatherApiClient;
 import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.appsimobile.appsii.preference.PreferenceHelper;
 import com.appsimobile.appsii.preference.PreferencesFactory;
+import com.appsimobile.util.ArrayUtils;
 
 import org.json.JSONObject;
 
@@ -225,7 +227,7 @@ public class WeatherLoadingService {
 
             if (BuildConfig.DEBUG) Log.d("WeatherLoadingService", "load data");
             WeatherDataLoader loader = new WeatherDataLoader(location, woeids, defaultUnit);
-            List<WeatherData> data = loader.queryWeather();
+            CircularArray<WeatherData> data = loader.queryWeather();
             result.stats.numUpdates++;
             if (BuildConfig.DEBUG) Log.d("WeatherLoadingService", "- load data");
 
@@ -252,7 +254,7 @@ public class WeatherLoadingService {
 
     }
 
-    void bailOut(String reason) {
+    static void bailOut(String reason) {
         Log.i("WeatherLoadingService", "not updating weather for reason: " + reason);
     }
 
@@ -494,9 +496,9 @@ public class WeatherLoadingService {
         }
     }
 
-    void onWeatherDataLoaded(ArrayList<WeatherData> weatherDataList, String unit) {
+    void onWeatherDataLoaded(@Nullable CircularArray<WeatherData> weatherDataList, String unit) {
 
-        int N = weatherDataList.size();
+        int N = weatherDataList == null ? 0 : weatherDataList.size();
         for (int i1 = 0; i1 < N; i1++) {
             WeatherData weatherData = weatherDataList.get(i1);
 
@@ -627,27 +629,25 @@ public class WeatherLoadingService {
             mUnit = unit;
         }
 
-        public List<WeatherData> queryWeather() throws CantGetWeatherException {
+        public CircularArray<WeatherData> queryWeather() throws CantGetWeatherException {
             YahooWeatherApiClient.LocationInfo locationInfo = mLocation == null ?
                     null : YahooWeatherApiClient.getLocationInfo(mLocation);
 
             // get the woeids from the list
             String currentWoeid = saveAndGetCurrentWoeid(locationInfo);
-            ArrayList<String> woeidsToLoad = new ArrayList<>();
+            CircularArray<String> woeidsToLoad = new CircularArray<>();
             if (currentWoeid != null) {
-                woeidsToLoad.add(currentWoeid);
+                woeidsToLoad.addLast(currentWoeid);
             }
 
             for (String woeid : mWoeids) {
-                if (!woeidsToLoad.contains(woeid)) {
-                    woeidsToLoad.add(woeid);
+                if (!ArrayUtils.contains(woeidsToLoad, woeid)) {
+                    woeidsToLoad.addLast(woeid);
                 }
             }
 
-            String[] woeidsArray = woeidsToLoad.toArray(new String[woeidsToLoad.size()]);
-
-            ArrayList<WeatherData> data =
-                    YahooWeatherApiClient.getWeatherForWoeids(woeidsArray, mUnit);
+            CircularArray<WeatherData> data =
+                    YahooWeatherApiClient.getWeatherForWoeids(woeidsToLoad, mUnit);
 
             processResult(data);
             return data;
@@ -659,7 +659,7 @@ public class WeatherLoadingService {
                 return null;
             }
 
-            List<String> currentWoeids = locationInfo.woeids;
+            CircularArray<String> currentWoeids = locationInfo.woeids;
             if (!currentWoeids.isEmpty()) {
                 String currentWoeid = currentWoeids.get(0);
 
@@ -678,7 +678,7 @@ public class WeatherLoadingService {
 
         }
 
-        protected void processResult(ArrayList<WeatherData> weatherData) {
+        protected void processResult(CircularArray<WeatherData> weatherData) {
             onWeatherDataLoaded(weatherData, mUnit);
         }
     }

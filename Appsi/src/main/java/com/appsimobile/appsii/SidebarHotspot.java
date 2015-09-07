@@ -27,6 +27,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.support.v4.util.CircularArray;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -35,9 +36,9 @@ import android.view.VelocityTracker;
 import android.view.View;
 
 import com.appsimobile.appsii.module.home.provider.HomeContract;
+import com.appsimobile.util.ArrayUtils;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 
 public class SidebarHotspot extends View {
 
@@ -52,7 +53,7 @@ public class SidebarHotspot extends View {
 
     private static final int SIDEBAR_MINIMUM_MOVE = 0;
 
-    final ArrayList<HotspotPageEntry> mHotspotPageEntries = new ArrayList<>(8);
+    final CircularArray<HotspotPageEntry> mHotspotPageEntries = new CircularArray<>(8);
 
     final Handler mHandler = new Handler();
 
@@ -74,7 +75,7 @@ public class SidebarHotspot extends View {
 
     ContentObserver mHotspotsPagesObserver;
 
-    AsyncTask<Void, Void, ArrayList<HotspotPageEntry>> mLoadDataTask;
+    AsyncTask<Void, Void, CircularArray<HotspotPageEntry>> mLoadDataTask;
 
     private float mMinimumMove;
 
@@ -270,11 +271,11 @@ public class SidebarHotspot extends View {
         final Context context = getContext();
         if (mLoadDataTask != null) mLoadDataTask.cancel(true);
         mLoadDataTask =
-                new AsyncTask<Void, Void, ArrayList<HotspotPageEntry>>() {
+                new AsyncTask<Void, Void, CircularArray<HotspotPageEntry>>() {
 
 
                     @Override
-                    protected ArrayList<HotspotPageEntry> doInBackground(Void... params) {
+                    protected CircularArray<HotspotPageEntry> doInBackground(Void... params) {
 
                         Cursor c = context.getContentResolver().
                                 query(HotspotPagesQuery.createUri(hotspotId),
@@ -283,7 +284,7 @@ public class SidebarHotspot extends View {
                                         null,
                                         HomeContract.HotspotDetails.POSITION + " ASC"
                                 );
-                        ArrayList<HotspotPageEntry> result = new ArrayList<>(c.getCount());
+                        CircularArray<HotspotPageEntry> result = new CircularArray<>(c.getCount());
                         while (c.moveToNext()) {
                             HotspotPageEntry entry = new HotspotPageEntry();
                             entry.mEnabled = c.getInt(HotspotPagesQuery.ENABLED) == 1;
@@ -293,14 +294,14 @@ public class SidebarHotspot extends View {
                             entry.mHotspotName = c.getString(HotspotPagesQuery.HOTSPOT_NAME);
                             entry.mPosition = c.getInt(HotspotPagesQuery.POSITION);
                             entry.mPageType = c.getInt(HotspotPagesQuery.PAGE_TYPE);
-                            result.add(entry);
+                            result.addLast(entry);
                         }
                         c.close();
                         return result;
                     }
 
                     @Override
-                    protected void onPostExecute(ArrayList<HotspotPageEntry> hotspotPageEntries) {
+                    protected void onPostExecute(CircularArray<HotspotPageEntry> hotspotPageEntries) {
                         onHotspotEntriesLoaded(hotspotPageEntries);
                     }
                 };
@@ -325,9 +326,9 @@ public class SidebarHotspot extends View {
         setBackground(bg);
     }
 
-    void onHotspotEntriesLoaded(ArrayList<HotspotPageEntry> hotspotPageEntries) {
+    void onHotspotEntriesLoaded(CircularArray<HotspotPageEntry> hotspotPageEntries) {
         mHotspotPageEntries.clear();
-        mHotspotPageEntries.addAll(hotspotPageEntries);
+        ArrayUtils.addAll(mHotspotPageEntries, hotspotPageEntries);
     }
 
     @Override
@@ -366,7 +367,7 @@ public class SidebarHotspot extends View {
         setupBackground();
     }
 
-    public ArrayList<HotspotPageEntry> getHotspotPageEntries() {
+    public CircularArray<HotspotPageEntry> getHotspotPageEntries() {
         return mHotspotPageEntries;
     }
 

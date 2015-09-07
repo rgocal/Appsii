@@ -23,6 +23,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.v4.util.CircularArray;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
@@ -30,8 +31,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-
-import java.util.ArrayList;
 
 /**
  * This class is the basic implementation of the sidebar. It communicates various
@@ -353,7 +352,7 @@ public class Sidebar extends RelativeLayout
         mAdapter.onDetachedFromWindow();
     }
 
-    public void updateAdapterData(long defaultPage, ArrayList<HotspotPageEntry> entries) {
+    public void updateAdapterData(long defaultPage, CircularArray<HotspotPageEntry> entries) {
         mAdapter.setPages(entries);
         int idx = indexOfId(entries, defaultPage);
         if (idx != -1L) {
@@ -361,7 +360,7 @@ public class Sidebar extends RelativeLayout
         }
     }
 
-    private static int indexOfId(ArrayList<HotspotPageEntry> entries, long defaultPage) {
+    private static int indexOfId(CircularArray<HotspotPageEntry> entries, long defaultPage) {
         if (defaultPage == -1L) return -1;
         for (int i = 0; i < entries.size(); i++) {
             HotspotPageEntry e = entries.get(i);

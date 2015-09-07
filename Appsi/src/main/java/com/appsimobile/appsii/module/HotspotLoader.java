@@ -19,25 +19,24 @@ package com.appsimobile.appsii.module;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.support.v4.util.CircularArray;
 
 import com.appsimobile.appsii.HotspotItem;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
 import com.appsimobile.util.CollectionUtils;
-
-import java.util.ArrayList;
 
 /**
  * Created by nick on 30/01/15.
  */
 public class HotspotLoader {
 
-    public static ArrayList<HotspotItem> loadHotspots(Context c) {
+    public static CircularArray<HotspotItem> loadHotspots(Context c) {
         ContentResolver r = c.getContentResolver();
         Cursor cursor = r.query(HomeContract.Hotspots.CONTENT_URI,
                 HotspotQuery.PROJECTION,
                 null, null, null);
         if (cursor != null) {
-            ArrayList<HotspotItem> result = new ArrayList<>(cursor.getCount());
+            CircularArray<HotspotItem> result = new CircularArray<>(cursor.getCount());
 
             try {
                 while (cursor.moveToNext()) {
@@ -56,13 +55,13 @@ public class HotspotLoader {
                     conf.init(id, name, height, ypos, left, needsConfiguration,
                             defaultPageId);
 
-                    result.add(conf);
+                    result.addLast(conf);
                 }
             } finally {
                 cursor.close();
             }
             return result;
         }
-        return CollectionUtils.emptyList();
+        return CollectionUtils.emptyArray();
     }
 }

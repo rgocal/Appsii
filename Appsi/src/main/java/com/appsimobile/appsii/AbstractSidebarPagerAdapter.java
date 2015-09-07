@@ -19,6 +19,7 @@ package com.appsimobile.appsii;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
+import android.support.v4.util.CircularArray;
 import android.support.v4.util.SimpleArrayMap;
 import android.support.v4.view.PagerAdapter;
 import android.util.SparseArray;
@@ -28,8 +29,6 @@ import android.view.ViewGroup;
 
 import com.appsimobile.appsii.annotation.VisibleForTesting;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
-
-import java.util.ArrayList;
 
 /**
  * A pager adapter that holds client state. This is modeled after
@@ -94,7 +93,8 @@ public abstract class AbstractSidebarPagerAdapter extends PagerAdapter {
         mFlagListener = flagListener;
     }
 
-    public void setPages(ArrayList<HotspotPageEntry> pages) {
+    public void setPages(CircularArray<HotspotPageEntry> pages) {
+        // FIXME: this is a bug
         if (mActivePageKeys.equals(pages)) return;
 
         // temporary keep the old items in a separate list so we can
