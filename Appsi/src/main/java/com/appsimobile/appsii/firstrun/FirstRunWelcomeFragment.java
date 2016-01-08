@@ -17,11 +17,11 @@
 
 package com.appsimobile.appsii.firstrun;
 
-import android.Manifest;
 import android.app.Fragment;
-import android.content.pm.PackageManager;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +29,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Switch;
 
+import com.appsimobile.appsii.BuildConfig;
 import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.appsimobile.appsii.preference.PreferenceHelper;
@@ -80,8 +81,7 @@ public final class FirstRunWelcomeFragment extends Fragment implements View.OnCl
 
     private void updatePermissions() {
         if (PermissionUtils.runtimePermissionsAvailable()) {
-            boolean holdsPermission = PermissionUtils.holdsPermission(getActivity(),
-                    Manifest.permission.SYSTEM_ALERT_WINDOW);
+            boolean holdsPermission = Settings.canDrawOverlays(getActivity());
             mNextButton.setEnabled(holdsPermission);
             mPermissionsButton.setEnabled(!holdsPermission);
         } else {
@@ -110,25 +110,15 @@ public final class FirstRunWelcomeFragment extends Fragment implements View.OnCl
     }
 
     private void onPermissionButtonPressed() {
-        PermissionUtils.requestPermission(
-                this, 1, Manifest.permission.SYSTEM_ALERT_WINDOW);
+        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                Uri.parse("package:" + BuildConfig.APPLICATION_ID));
+        startActivity(intent);
     }
 
     private void onNextButtonPressed() {
         PreferenceHelper preferenceHelper = PreferenceHelper.getInstance(getActivity());
         preferenceHelper.setAutoStart(mAutoStartSwitch.isChecked());
         mOnFirstRunCompletedListener.onWelcomeCompleted();
-    }
-
-    //@Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-            @NonNull int[] grantResults) {
-
-        if (requestCode == 1 && Manifest.permission.SYSTEM_ALERT_WINDOW.equals(permissions[0]) &&
-                grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            mNextButton.setEnabled(true);
-            mPermissionsButton.setEnabled(false);
-        }
     }
 
     public interface OnWelcomeCompletedListener {

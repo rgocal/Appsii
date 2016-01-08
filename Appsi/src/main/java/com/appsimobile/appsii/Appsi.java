@@ -43,6 +43,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.util.CircularArray;
 import android.support.v4.widget.ScrollerCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -67,7 +68,6 @@ import com.appsimobile.appsii.preference.PreferencesFactory;
 import com.appsimobile.appsii.tinting.AppsiLayoutInflater;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 
 /**
  * Appsii's main service.
@@ -300,7 +300,7 @@ public class Appsi extends Service
      * The hotspot configurations that have been found in the
      * appsi database.
      */
-    private ArrayList<HotspotItem> mHotspotItems;
+    private CircularArray<HotspotItem> mHotspotItems;
 
     private LoaderManagerImpl mLoaderManager;
 
@@ -411,7 +411,7 @@ public class Appsi extends Service
 
     /**
      * Start an AsyncTask that will load the hotspot configurations.
-     * This will call {@link #onHotspotsLoaded(java.util.List)} when finished
+     * This will call {@link #onHotspotsLoaded(CircularArray)} when finished
      */
     void reloadHotspots() {
         HotspotLoader loader = new HotspotLoader(this);
@@ -439,8 +439,8 @@ public class Appsi extends Service
             HotspotPageEntry entry = intent.getParcelableExtra("entry");
             HotspotItem hotspotItem = intent.getParcelableExtra("hotspot");
             if (entry != null && hotspotItem != null) {
-                ArrayList<HotspotPageEntry> entries = new ArrayList<>(1);
-                entries.add(entry);
+                CircularArray<HotspotPageEntry> entries = new CircularArray<>(1);
+                entries.addFirst(entry);
                 openSidebar(hotspotItem, entries, 0, true);
             }
         }
@@ -528,7 +528,7 @@ public class Appsi extends Service
     }
 
     public SidebarHotspot.SwipeListener openSidebar(HotspotItem conf,
-            ArrayList<HotspotPageEntry> entries, int flags, boolean animate) {
+            CircularArray<HotspotPageEntry> entries, int flags, boolean animate) {
 
         LockableAsyncQueryHandler.lock();
         mSidebar.setSidebarOpening(true);
@@ -858,7 +858,7 @@ public class Appsi extends Service
      * Called when loading the hotspots completes. This will remove currently
      * visible hotspots, and add new ones in case the screen is not locked
      */
-    public void onHotspotsLoaded(ArrayList<HotspotItem> configurations) {
+    public void onHotspotsLoaded(CircularArray<HotspotItem> configurations) {
         mHotspotItems = configurations;
         mConfiguredPluginCount = configurations.size();
         updateNotificationStatus();
@@ -940,7 +940,7 @@ public class Appsi extends Service
     }
 
     @Override
-    public SwipeListener openSidebar(HotspotItem conf, ArrayList<HotspotPageEntry> entries,
+    public SwipeListener openSidebar(HotspotItem conf, CircularArray<HotspotPageEntry> entries,
             int flags) {
         return openSidebar(conf, entries, flags, true /* animate */);
     }
@@ -1006,7 +1006,7 @@ public class Appsi extends Service
         mHandler.removeMessages(MESSAGE_CLOSE_SIDEBAR);
     }
 
-    static class HotspotLoader extends AsyncTask<Void, Void, ArrayList<HotspotItem>> {
+    static class HotspotLoader extends AsyncTask<Void, Void, CircularArray<HotspotItem>> {
 
         private final WeakReference<Appsi> mContext;
 
@@ -1015,14 +1015,14 @@ public class Appsi extends Service
         }
 
         @Override
-        protected ArrayList<HotspotItem> doInBackground(Void... params) {
+        protected CircularArray<HotspotItem> doInBackground(Void... params) {
             Context context = mContext.get();
             if (context == null) return null;
             return com.appsimobile.appsii.module.HotspotLoader.loadHotspots(context);
         }
 
         @Override
-        protected void onPostExecute(ArrayList<HotspotItem> result) {
+        protected void onPostExecute(CircularArray<HotspotItem> result) {
             Appsi appsi = mContext.get();
             if (appsi != null) {
                 appsi.onHotspotsLoaded(result);

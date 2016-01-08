@@ -21,6 +21,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
+import android.support.v4.util.CircularArray;
 import android.support.v4.util.LongSparseArray;
 import android.util.Log;
 import android.view.Display;
@@ -34,13 +36,19 @@ import com.appsimobile.appsii.SidebarHotspot.SidebarGestureCallback;
 import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.crashlytics.android.Crashlytics;
 
-import java.util.ArrayList;
-
 public class HotspotHelperImpl extends AbstractHotspotHelper
         implements OnClickListener, View.OnLongClickListener, SidebarGestureCallback,
         SidebarHotspot.SwipeListener {
 
     final int[] mOffsetInt = new int[2];
+
+    final HotspotHelperListener mCallback;
+
+    final PopupLayer mPopupLayer;
+
+    final LayoutInflater mLayoutInflater;
+
+    final View mFullScreenWatcher;
 
     private final Context mContext;
 
@@ -48,12 +56,6 @@ public class HotspotHelperImpl extends AbstractHotspotHelper
 
     private final LongSparseArray<HotspotContainerHelper> mSidebarHotspots =
             new LongSparseArray<>();
-
-    final HotspotHelperListener mCallback;
-
-    final PopupLayer mPopupLayer;
-
-    final LayoutInflater mLayoutInflater;
 
     boolean mDraggingHotspot;
 
@@ -69,15 +71,13 @@ public class HotspotHelperImpl extends AbstractHotspotHelper
 
     int mHotspotY;
 
-    final View mFullScreenWatcher;
-
     boolean mFullScreenWatcherAttached;
 
     private boolean mVibrateOnTouch;
 
     private boolean mHotspotsActive;
 
-    private ArrayList<HotspotItem> mHotspotItems;
+    private CircularArray<HotspotItem> mHotspotItems;
 
     public HotspotHelperImpl(Context context, HotspotHelperListener callback,
             PopupLayer popupLayer) {
@@ -155,8 +155,10 @@ public class HotspotHelperImpl extends AbstractHotspotHelper
                         WindowManager.LayoutParams lp =
                                 configureHotspot(hotspotContainerHelper, conf, prefs);
                         try {
-                            PermissionUtils.throwIfNotPermitted(
-                                    mContext, Manifest.permission.SYSTEM_ALERT_WINDOW);
+                            if (!Settings.canDrawOverlays(mContext)) {
+                                throw new PermissionDeniedException(
+                                        Manifest.permission.SYSTEM_ALERT_WINDOW);
+                            }
 
                             mWindowManager.addView(hotspotContainerHelper.mHotspotParent, lp);
                         } catch (PermissionDeniedException e) {
@@ -170,6 +172,7 @@ public class HotspotHelperImpl extends AbstractHotspotHelper
             }
             addScreenWatcher();
         } catch (PermissionDeniedException e) {
+            // STOPSHIP: FIXME: this must be changed!
             PermissionUtils.showPermissionNotification(mContext, 1001,
                     Manifest.permission.SYSTEM_ALERT_WINDOW, 0);
             mHotspotsActive = false;
@@ -191,7 +194,11 @@ public class HotspotHelperImpl extends AbstractHotspotHelper
     }
 
     private void addScreenWatcher() throws PermissionDeniedException {
-        PermissionUtils.throwIfNotPermitted(mContext, Manifest.permission.SYSTEM_ALERT_WINDOW);
+        if (!Settings.canDrawOverlays(mContext)) {
+            throw new PermissionDeniedException(
+                    Manifest.permission.SYSTEM_ALERT_WINDOW);
+        }
+
         mWindowManager.addView(mFullScreenWatcher, createInsetParams());
         mFullScreenWatcherAttached = true;
     }
@@ -219,7 +226,7 @@ public class HotspotHelperImpl extends AbstractHotspotHelper
     }
 
     @Override
-    public void onHotspotsLoaded(ArrayList<HotspotItem> configurations) {
+    public void onHotspotsLoaded(CircularArray<HotspotItem> configurations) {
         mHotspotItems = configurations;
     }
 
@@ -292,7 +299,7 @@ public class HotspotHelperImpl extends AbstractHotspotHelper
             //return mCallback.openSidebar(conf, null, 0);
             return null;
         } else {
-            ArrayList<HotspotPageEntry> entries = hotspot.getHotspotPageEntries();
+            CircularArray<HotspotPageEntry> entries = hotspot.getHotspotPageEntries();
             return mCallback.openSidebar(conf, entries, Appsi.OPEN_FLAG_LIKE_NOTIFICATION_BAR);
         }
     }

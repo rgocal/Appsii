@@ -19,16 +19,16 @@
 package com.appsimobile.appsii.module.weather.loader;
 
 import android.content.res.AssetManager;
+import android.support.v4.util.CircularArray;
 import android.test.AndroidTestCase;
 
 import com.appsimobile.appsii.AssetUtils;
 import com.appsimobile.appsii.ResponseParserException;
+import com.appsimobile.util.ArrayUtils;
 
 import org.json.JSONException;
 
 import java.text.ParseException;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Created by nick on 21/01/15.
@@ -40,8 +40,8 @@ public class WeatherDataParserTest extends AndroidTestCase {
             throws ParseException, ResponseParserException, JSONException {
         AssetManager manager = getContext().getAssets();
         String json = AssetUtils.readAssetToString(manager, "weather.json", new StringBuilder());
-        List<WeatherData> result = new LinkedList<>();
-        WeatherDataParser.parseWeatherData(result, json, new String[]{"1", "2", "3"});
+        CircularArray<WeatherData> result = new CircularArray<>();
+        WeatherDataParser.parseWeatherData(result, json, ArrayUtils.asArray("1", "2", "3"));
 
         assertEquals(3, result.size());
 
@@ -84,8 +84,8 @@ public class WeatherDataParserTest extends AndroidTestCase {
             throws ParseException, ResponseParserException, JSONException {
         AssetManager manager = getContext().getAssets();
         String json = AssetUtils.readAssetToString(manager, "weather1.json", new StringBuilder());
-        List<WeatherData> result = new LinkedList<>();
-        WeatherDataParser.parseWeatherData(result, json, new String[]{"1"});
+        CircularArray<WeatherData> result = new CircularArray<>();
+        WeatherDataParser.parseWeatherData(result, json, ArrayUtils.asArray("1"));
 
         assertEquals(1, result.size());
 
@@ -129,8 +129,8 @@ public class WeatherDataParserTest extends AndroidTestCase {
         AssetManager manager = getContext().getAssets();
         String json = AssetUtils.readAssetToString(manager, "weather_with_error.json",
                 new StringBuilder());
-        List<WeatherData> result = new LinkedList<>();
-        WeatherDataParser.parseWeatherData(result, json, new String[]{"a", "b"});
+        CircularArray<WeatherData> result = new CircularArray<>();
+        WeatherDataParser.parseWeatherData(result, json, ArrayUtils.asArray("a", "b"));
 
         assertEquals(1, result.size());
 

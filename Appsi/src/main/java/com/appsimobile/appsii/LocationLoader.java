@@ -25,14 +25,13 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresPermission;
+import android.support.v4.util.CircularArray;
 import android.util.Log;
 
 import com.appsimobile.appsii.module.weather.loader.CantGetWeatherException;
 import com.appsimobile.appsii.module.weather.loader.YahooWeatherApiClient;
-import com.appsimobile.util.CollectionUtils;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
@@ -107,8 +106,8 @@ public class LocationLoader {
     }
 
     void onLocationInfoLoaded(@Nullable YahooWeatherApiClient.LocationInfo locationInfo) {
-        ArrayList<String> woeids = locationInfo == null ?
-                CollectionUtils.<String>emptyList() : locationInfo.woeids;
+        CircularArray<String> woeids = locationInfo == null ?
+                null : locationInfo.woeids;
 
         String town = locationInfo == null ? null : locationInfo.town;
         String country = locationInfo == null ? null : locationInfo.country;
@@ -116,7 +115,7 @@ public class LocationLoader {
 
         Log.i("WeatherFragment",
                 "town: " + town + " country: " + country + " woeids: " + woeids);
-        if (!woeids.isEmpty() && town != null) {
+        if (woeids != null && town != null) {
             String woeid = woeids.get(0);
             mLocationReceiver.onCurrentLocationInfoReady(woeid, country, town, timezone);
         } else {

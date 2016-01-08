@@ -33,6 +33,7 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.IntDef;
 import android.support.annotation.RequiresPermission;
+import android.support.v4.util.CircularArray;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.Html;
@@ -58,9 +59,6 @@ import com.appsimobile.appsii.module.weather.loader.YahooWeatherApiClient;
 import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.appsimobile.appsii.preference.PreferencesFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
@@ -69,7 +67,7 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
  */
 public class YahooLocationChooserDialogFragment extends DialogFragment implements
         TextWatcher, Handler.Callback,
-        LoaderManager.LoaderCallbacks<List<YahooWeatherApiClient.LocationSearchResult>>,
+        LoaderManager.LoaderCallbacks<CircularArray<YahooWeatherApiClient.LocationSearchResult>>,
         View.OnClickListener {
 
     public static final int MESSAGE_RELOAD = 0;
@@ -363,20 +361,20 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
     }
 
     @Override
-    public Loader<List<YahooWeatherApiClient.LocationSearchResult>> onCreateLoader(int id,
+    public Loader<CircularArray<YahooWeatherApiClient.LocationSearchResult>> onCreateLoader(int id,
             Bundle args) {
         final String query = args.getString("query");
         return new ResultsLoader(query, getActivity());
     }
 
     @Override
-    public void onLoadFinished(Loader<List<YahooWeatherApiClient.LocationSearchResult>> loader,
-            List<YahooWeatherApiClient.LocationSearchResult> results) {
+    public void onLoadFinished(Loader<CircularArray<YahooWeatherApiClient.LocationSearchResult>> loader,
+            CircularArray<YahooWeatherApiClient.LocationSearchResult> results) {
         mSearchResultsAdapter.changeArray(results);
     }
 
     @Override
-    public void onLoaderReset(Loader<List<YahooWeatherApiClient.LocationSearchResult>> loader) {
+    public void onLoaderReset(Loader<CircularArray<YahooWeatherApiClient.LocationSearchResult>> loader) {
         mSearchResultsAdapter.changeArray(null);
     }
 
@@ -509,11 +507,11 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
      * Loader that fetches location search results from {@link YahooWeatherApiClient}.
      */
     private static class ResultsLoader
-            extends AsyncTaskLoader<List<YahooWeatherApiClient.LocationSearchResult>> {
+            extends AsyncTaskLoader<CircularArray<YahooWeatherApiClient.LocationSearchResult>> {
 
         private final String mQuery;
 
-        private List<YahooWeatherApiClient.LocationSearchResult> mResults;
+        private CircularArray<YahooWeatherApiClient.LocationSearchResult> mResults;
 
         public ResultsLoader(String query, Context context) {
             super(context);
@@ -521,12 +519,12 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
         }
 
         @Override
-        public List<YahooWeatherApiClient.LocationSearchResult> loadInBackground() {
+        public CircularArray<YahooWeatherApiClient.LocationSearchResult> loadInBackground() {
             return YahooWeatherApiClient.findLocationsAutocomplete(mQuery);
         }
 
         @Override
-        public void deliverResult(List<YahooWeatherApiClient.LocationSearchResult> apps) {
+        public void deliverResult(CircularArray<YahooWeatherApiClient.LocationSearchResult> apps) {
             mResults = apps;
 
             if (isStarted()) {
@@ -651,15 +649,15 @@ public class YahooLocationChooserDialogFragment extends DialogFragment implement
 
     private class SearchResultsListAdapter extends BaseAdapter {
 
-        private List<YahooWeatherApiClient.LocationSearchResult> mResults;
+        private CircularArray<YahooWeatherApiClient.LocationSearchResult> mResults;
 
         SearchResultsListAdapter() {
-            mResults = new ArrayList<>();
+            mResults = new CircularArray<>();
         }
 
-        public void changeArray(List<YahooWeatherApiClient.LocationSearchResult> results) {
+        public void changeArray(CircularArray<YahooWeatherApiClient.LocationSearchResult> results) {
             if (results == null) {
-                results = new ArrayList<>();
+                results = new CircularArray<>();
             }
 
             mResults = results;

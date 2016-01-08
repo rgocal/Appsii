@@ -72,7 +72,7 @@ public abstract class AbstractFirstRunSettingsFragment
     private void onPermissionButtonPressed() {
         PermissionUtils.requestPermission(
                 this, 1,
-                Manifest.permission.AUTHENTICATE_ACCOUNTS,
+//                Manifest.permission.GET_ACCOUNTS,
                 Manifest.permission.ACCESS_COARSE_LOCATION);
     }
 
@@ -80,11 +80,11 @@ public abstract class AbstractFirstRunSettingsFragment
         mOnSettingsCompletedListener.onSettingsCompleted();
     }
 
-    //@Override
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
             @NonNull int[] grantResults) {
 
-        if (requestCode == 1 && Manifest.permission.AUTHENTICATE_ACCOUNTS.equals(permissions[0]) &&
+        if (requestCode == 1 && Manifest.permission.ACCESS_COARSE_LOCATION.equals(permissions[0]) &&
                 grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             mNextButton.setEnabled(true);
             mPermissionsButton.setEnabled(false);
@@ -140,7 +140,7 @@ public abstract class AbstractFirstRunSettingsFragment
     private void updatePermissions() {
         if (PermissionUtils.runtimePermissionsAvailable()) {
             boolean holdsPermission = PermissionUtils.holdsPermission(getActivity(),
-                    Manifest.permission.AUTHENTICATE_ACCOUNTS);
+                    Manifest.permission.ACCESS_COARSE_LOCATION);
             mNextButton.setEnabled(holdsPermission);
             mPermissionsButton.setEnabled(!holdsPermission);
         } else {

@@ -19,11 +19,10 @@ package com.appsimobile.appsii;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
+import android.support.v4.util.CircularArray;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.WindowManager;
-
-import java.util.ArrayList;
 
 /**
  * Created by nick on 13/02/15.
@@ -41,21 +40,7 @@ public abstract class AbstractHotspotHelper {
         mDp56 = (int) (context.getResources().getDisplayMetrics().density * 56);
     }
 
-    public abstract void onOrientationChanged();
-
-    public abstract void onDestroy();
-
-    public abstract void setVibrate(boolean mVibrate);
-
-    public abstract void addHotspots();
-
-    public abstract void removeHotspots();
-
-    public abstract void onHotspotsLoaded(ArrayList<HotspotItem> configurations);
-
-    public abstract int getTopOffset();
-
-    protected WindowManager.LayoutParams createInsetParams() {
+    protected static WindowManager.LayoutParams createInsetParams() {
         WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams(1, 1,
                 WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL |
@@ -68,7 +53,7 @@ public abstract class AbstractHotspotHelper {
         return layoutParams;
     }
 
-    protected WindowManager.LayoutParams updateLayoutParams(boolean left, int y,
+    protected static WindowManager.LayoutParams updateLayoutParams(boolean left, int y,
             WindowManager.LayoutParams params) {
         if (left) {
             params.gravity = Gravity.LEFT | Gravity.TOP;
@@ -78,6 +63,20 @@ public abstract class AbstractHotspotHelper {
         params.y = y;
         return params;
     }
+
+    public abstract void onOrientationChanged();
+
+    public abstract void onDestroy();
+
+    public abstract void setVibrate(boolean mVibrate);
+
+    public abstract void addHotspots();
+
+    public abstract void removeHotspots();
+
+    public abstract void onHotspotsLoaded(CircularArray<HotspotItem> configurations);
+
+    public abstract int getTopOffset();
 
     @SuppressWarnings("deprecation")
     protected WindowManager.LayoutParams createHotspotParams(HotspotItem conf,

@@ -20,6 +20,7 @@ package com.appsimobile.appsii;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.util.CircularArray;
 import android.test.InstrumentationTestCase;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -27,9 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import com.appsimobile.util.CollectionUtils;
-
-import java.util.ArrayList;
+import com.appsimobile.util.ArrayUtils;
 
 /**
  * Created by nick on 30/03/15.
@@ -47,9 +46,9 @@ public class SidebarPagerAdapterTest extends InstrumentationTestCase {
 
     public void testSetPrimaryItem() {
 
-        Pair<ArrayList<HotspotPageEntry>, MockSidebarPagerAdapter> pair = createAdapter();
+        Pair<CircularArray<HotspotPageEntry>, MockSidebarPagerAdapter> pair = createAdapter();
 
-        ArrayList<HotspotPageEntry> entries = pair.first;
+        CircularArray<HotspotPageEntry> entries = pair.first;
         MockSidebarPagerAdapter adapter = pair.second;
 
         FrameLayout container = new FrameLayout(mContext);
@@ -118,10 +117,10 @@ public class SidebarPagerAdapterTest extends InstrumentationTestCase {
 
     }
 
-    Pair<ArrayList<HotspotPageEntry>, MockSidebarPagerAdapter> createAdapter() {
+    Pair<CircularArray<HotspotPageEntry>, MockSidebarPagerAdapter> createAdapter() {
         MockSidebarPagerAdapter adapter = new MockSidebarPagerAdapter();
 
-        ArrayList<HotspotPageEntry> entries = CollectionUtils.asList(
+        CircularArray<HotspotPageEntry> entries = ArrayUtils.<HotspotPageEntry>asArray(
                 entry(),
                 entry(),
                 entry(),

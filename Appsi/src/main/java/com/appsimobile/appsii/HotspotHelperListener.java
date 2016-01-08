@@ -16,13 +16,13 @@
 
 package com.appsimobile.appsii;
 
-import com.appsimobile.appsii.SidebarHotspot.SwipeListener;
+import android.support.v4.util.CircularArray;
 
-import java.util.ArrayList;
+import com.appsimobile.appsii.SidebarHotspot.SwipeListener;
 
 public interface HotspotHelperListener {
 
-    SwipeListener openSidebar(HotspotItem conf, ArrayList<HotspotPageEntry> pages, int flags);
+    SwipeListener openSidebar(HotspotItem conf, CircularArray<HotspotPageEntry> pages, int flags);
 
     boolean canShowSidebar(HotspotItem conf);
 
