@@ -96,15 +96,23 @@ public class AppsiiUtils {
      */
     public void closeSidebar() {
         Appsi appsi = AppsiInjector.provideAppsi();
-        mAppsi.onCloseSidebar();
+        if (appsi != null) {
+            appsi.onCloseSidebar();
+        }
     }
 
     public void restartAppsi(Context context) {
-        mAppsi.restartAppsiService();
+        Appsi appsi = AppsiInjector.provideAppsi();
+        if (appsi != null) {
+            appsi.restartAppsiService();
+        }
     }
 
     public void stopAppsi(Context context) {
-        mAppsi.stopAppsiService();
+        Appsi appsi = AppsiInjector.provideAppsi();
+        if (appsi != null) {
+            appsi.stopAppsiService();
+        }
     }
 
 }
