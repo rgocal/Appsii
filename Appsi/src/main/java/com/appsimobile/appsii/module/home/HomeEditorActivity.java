@@ -55,18 +55,17 @@ import android.widget.Toast;
 
 import com.android.colorpicker.ColorPickerDialog;
 import com.android.colorpicker.ColorPickerSwatch;
-import com.appsimobile.appsii.AppsiApplication;
 import com.appsimobile.appsii.BuildConfig;
 import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.ThemingUtils;
-import com.appsimobile.appsii.appwidget.AppsiiAppWidgetHost;
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.module.home.config.HomeItemConfiguration;
-import com.appsimobile.appsii.module.home.config.HomeItemConfigurationHelper;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
-import com.appsimobile.appsii.preference.PreferencesFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * Editor for the home screen
@@ -207,6 +206,9 @@ public class HomeEditorActivity extends AppCompatActivity implements
     boolean mApplyingNewData;
 
     ViewGroup mRootView;
+
+    @Inject
+    SharedPreferences mSharedPreferences;
 
     public HomeEditorActivity() {
         mHandlerThread = new HandlerThread("db-thread");
@@ -423,9 +425,9 @@ public class HomeEditorActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppInjector.inject(this);
 
-        SharedPreferences preferences = PreferencesFactory.getPreferences(this);
-        Context context = ThemingUtils.createContextThemeWrapper(this, preferences);
+        Context context = ThemingUtils.createContextThemeWrapper(this, mSharedPreferences);
 
         setContentView(R.layout.activity_home_editor);
 
@@ -773,15 +775,10 @@ public class HomeEditorActivity extends AppCompatActivity implements
     public class ActionModeCallbackImpl implements ActionMode.Callback, View.OnClickListener,
             PopupMenu.OnMenuItemClickListener, ColorPickerSwatch.OnColorSelectedListener {
 
-        final AppWidgetHost mAppWidgetHost;
-
         final ArrayList<ContentProviderOperation> mContentProviderOperations = new ArrayList<>();
-
         final HomeAdapter.HomeAdapterEditor mEditor;
-
-
-//        View mMoveView;
-
+        @Inject
+        AppWidgetHost mAppWidgetHost;
         View mInsertView;
 
         View mDeleteView;
@@ -792,11 +789,12 @@ public class HomeEditorActivity extends AppCompatActivity implements
 
         View mNoColorView;
 
+        @Inject
+        HomeItemConfiguration mHomeItemConfiguration;
+
         public ActionModeCallbackImpl(HomeAdapter.HomeAdapterEditor editor) {
             mEditor = editor;
-            mAppWidgetHost = new AppsiiAppWidgetHost(HomeEditorActivity.this,
-                    AppsiApplication.APPWIDGET_HOST_ID);
-
+            AppInjector.inject(this);
         }
 
         @Override
@@ -938,8 +936,7 @@ public class HomeEditorActivity extends AppCompatActivity implements
             // When this cell is an app-widget right now, clean up the id,
             // and release it.
             if (homeItem.mDisplayType == HomeContract.Cells.DISPLAY_TYPE_APP_WIDGET) {
-                HomeItemConfiguration configurationHelper =
-                        HomeItemConfigurationHelper.getInstance(HomeEditorActivity.this);
+                HomeItemConfiguration configurationHelper = mHomeItemConfiguration;
 
                 // get the current id.
                 String widgetId = configurationHelper.

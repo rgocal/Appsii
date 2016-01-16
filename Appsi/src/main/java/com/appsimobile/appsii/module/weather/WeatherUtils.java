@@ -36,19 +36,28 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 /**
  * Created by Nick on 20/02/14.
  */
+@Singleton
 public class WeatherUtils {
 
     public static final int FLAG_TEMPERATURE_NO_UNIT = 1;
 
     static final Time sTime = new Time();
 
-    private WeatherUtils() {
+    final BitmapUtils mBitmapUtils;
+
+    @Inject
+    public WeatherUtils(BitmapUtils bitmapUtils) {
+        mBitmapUtils = bitmapUtils;
     }
 
-    public static SparseArray<ForecastInfo> getForecastForDays(Context context, int startJulianDay,
+
+    public SparseArray<ForecastInfo> getForecastForDays(Context context, int startJulianDay,
             String woeid) {
         ContentResolver resolver = context.getContentResolver();
         String[] projection = new String[]{
@@ -93,7 +102,7 @@ public class WeatherUtils {
         return result;
     }
 
-    public static WeatherData getWeatherData(Context context, String woeid) {
+    public WeatherData getWeatherData(Context context, String woeid) {
         ContentResolver resolver = context.getContentResolver();
         String selection = WeatherContract.WeatherColumns.COLUMN_NAME_WOEID + "= ?";
 
@@ -138,12 +147,12 @@ public class WeatherUtils {
         return null;
     }
 
-    public static String formatTemperature(Context context, int temp, String tempUnit,
+    public String formatTemperature(Context context, int temp, String tempUnit,
             String displayUnit) {
         return formatTemperature(context, temp, tempUnit, displayUnit, 0);
     }
 
-    public static String formatTemperature(Context context, int temp, String tempUnit,
+    public String formatTemperature(Context context, int temp, String tempUnit,
             String displayUnit, int flags) {
         if (!TextUtils.equals(tempUnit, displayUnit)) {
             if ("c".equals(displayUnit)) {
@@ -164,15 +173,15 @@ public class WeatherUtils {
         return context.getString(R.string.temperature_high_unit, temp, suffix);
     }
 
-    public static float toCelsius(int degrees) {
+    public float toCelsius(int degrees) {
         return (degrees - 32f) * (5f / 9.0f);
     }
 
-    public static float toFahrenheit(int degrees) {
+    public float toFahrenheit(int degrees) {
         return (9f * degrees) / 5f + 32;
     }
 
-    public static String formatWindSpeed(Context context, float speed, String tempUnit,
+    public String formatWindSpeed(Context context, float speed, String tempUnit,
             String displayUnit) {
         int displaySpeed;
         if (!TextUtils.equals(tempUnit, displayUnit)) {
@@ -191,15 +200,15 @@ public class WeatherUtils {
         return context.getString(R.string.temperature_high_unit, displaySpeed, suffix);
     }
 
-    public static float toKph(float speedMph) {
+    public float toKph(float speedMph) {
         return speedMph * 1.609344f;
     }
 
-    public static float toMph(float speeKph) {
+    public float toMph(float speeKph) {
         return speeKph / 1.609344f;
     }
 
-    public static boolean isDay(String timezone, WeatherData weatherData) {
+    public boolean isDay(String timezone, WeatherData weatherData) {
         sTime.timezone = timezone;
         sTime.normalize(false);
         sTime.setToNow();
@@ -214,7 +223,7 @@ public class WeatherUtils {
         return true;
     }
 
-    public static int getConditionCodeIconResId(int conditionCode, boolean day) {
+    public int getConditionCodeIconResId(int conditionCode, boolean day) {
         // http://developer.yahoo.com/weather/
         switch (conditionCode) {
             case 19: // dust or sand
@@ -298,7 +307,7 @@ public class WeatherUtils {
     }
 
 
-    public static int getConditionCodeTinyIconResId(int conditionCode, boolean day) {
+    public int getConditionCodeTinyIconResId(int conditionCode, boolean day) {
         // http://developer.yahoo.com/weather/
         switch (conditionCode) {
             case 19: // dust or sand
@@ -360,7 +369,7 @@ public class WeatherUtils {
         return R.drawable.ic_small_clear_day;
     }
 
-    public static String formatConditionCode(int conditionCode) {
+    public String formatConditionCode(int conditionCode) {
 
         // http://developer.yahoo.com/weather/
         switch (conditionCode) {
@@ -458,7 +467,7 @@ public class WeatherUtils {
         return "Unknown";
     }
 
-    public static File[] getCityPhotos(Context context, String woeid) {
+    public File[] getCityPhotos(Context context, String woeid) {
         File cacheDir = getWeatherPhotoCacheDir(context);
         int validCount = 0;
         for (int i = 0; i < 5; i++) {
@@ -482,8 +491,8 @@ public class WeatherUtils {
         return result;
     }
 
-    public static File getWeatherPhotoCacheDir(Context context) {
-        File path = BitmapUtils.externalFilesFolder();
+    public File getWeatherPhotoCacheDir(Context context) {
+        File path = mBitmapUtils.externalFilesFolder();
         File result = new File(path, "weather");
         if (!result.exists()) {
             result.mkdirs();
@@ -491,11 +500,11 @@ public class WeatherUtils {
         return result;
     }
 
-    public static String createPhotoFileName(String woeid, int idx) {
+    public String createPhotoFileName(String woeid, int idx) {
         return woeid + "-" + idx + ".jpg";
     }
 
-    public static void clearCityPhotos(Context context, String woeid, int startIdx) {
+    public void clearCityPhotos(Context context, String woeid, int startIdx) {
         File cacheDir = getWeatherPhotoCacheDir(context);
         for (int i = startIdx; i < 5; i++) {
             String name = createPhotoFileName(woeid, i);
@@ -504,7 +513,7 @@ public class WeatherUtils {
         }
     }
 
-    static boolean saveBitmap(Context context, Bitmap bitmap, String woeid, int idx) {
+    boolean saveBitmap(Context context, Bitmap bitmap, String woeid, int idx) {
         File photoImage = getWeatherImageFile(context, woeid, idx);
 
         boolean result;
@@ -523,7 +532,7 @@ public class WeatherUtils {
     }
 
     @NonNull
-    public static File getWeatherImageFile(Context context, String woeid, int idx) {
+    public File getWeatherImageFile(Context context, String woeid, int idx) {
         File cacheDir = getWeatherPhotoCacheDir(context);
         String name = createPhotoFileName(woeid, idx);
         return new File(cacheDir, name);
@@ -543,13 +552,13 @@ public class WeatherUtils {
 
         public String unit;
 
+        private static int intCompare(int lhs, int rhs) {
+            return lhs < rhs ? -1 : (lhs == rhs ? 0 : 1);
+        }
+
         @Override
         public int compareTo(@NonNull ForecastInfo another) {
             return intCompare(julianDay, another.julianDay);
-        }
-
-        private static int intCompare(int lhs, int rhs) {
-            return lhs < rhs ? -1 : (lhs == rhs ? 0 : 1);
         }
 
     }

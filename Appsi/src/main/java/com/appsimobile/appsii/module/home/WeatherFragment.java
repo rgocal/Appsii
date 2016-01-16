@@ -36,11 +36,13 @@ import android.widget.TextView;
 import com.appsimobile.appsii.AccountHelper;
 import com.appsimobile.appsii.ActivityUtils;
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.module.home.config.HomeItemConfiguration;
-import com.appsimobile.appsii.module.home.config.HomeItemConfigurationHelper;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
 import com.appsimobile.appsii.module.weather.loader.YahooWeatherApiClient;
 import com.appsimobile.appsii.preference.PreferenceHelper;
+
+import javax.inject.Inject;
 
 /**
  * Created by Nick on 20/02/14.
@@ -68,11 +70,16 @@ public class WeatherFragment extends Fragment
 
     public static final int TITLE_INDEX_LOCATION = 1;
 
+    @Inject
     HomeItemConfiguration mConfigurationHelper;
 
     long mCellId;
 
+    @Inject
     PreferenceHelper mPreferenceHelper;
+
+    @Inject
+    AccountHelper mAccountHelper;
 
     int mCellType;
 
@@ -85,6 +92,7 @@ public class WeatherFragment extends Fragment
     private TextView mTitleSpinner;
 
     private SwitchCompat mLocationImageSwitch;
+
 
     public static WeatherFragment createInstance(long cellId, int cellType) {
         // check validity of the cellType
@@ -112,11 +120,60 @@ public class WeatherFragment extends Fragment
         return getPlainVariantForWeatherCellType(cellType) == cellType;
     }
 
+    static boolean isWallpaperVariant(int cellType) {
+        return getWallpaperVariantForWeatherCellType(cellType) == cellType;
+    }
+
+    static boolean hasWallpaperVariant(int cellType) {
+        switch (cellType) {
+            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_SUNRISE:
+            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_SUNRISE_WALLPAPER:
+            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_WIND:
+            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_WIND_WALLPAPER:
+                return false;
+            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_TEMP:
+            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_TEMP_WALLPAPER:
+                return true;
+        }
+        throw new IllegalStateException("Unknown cell type for weather settings: " + cellType);
+    }
+
+    static int getWallpaperVariantForWeatherCellType(int cellType) {
+        switch (cellType) {
+            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_SUNRISE:
+            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_SUNRISE_WALLPAPER:
+                return HomeContract.Cells.DISPLAY_TYPE_WEATHER_SUNRISE_WALLPAPER;
+            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_TEMP:
+            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_TEMP_WALLPAPER:
+                return HomeContract.Cells.DISPLAY_TYPE_WEATHER_TEMP_WALLPAPER;
+            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_WIND:
+            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_WIND_WALLPAPER:
+                return HomeContract.Cells.DISPLAY_TYPE_WEATHER_WIND_WALLPAPER;
+
+        }
+        throw new IllegalStateException("Unknown cell type for weather settings: " + cellType);
+    }
+
+    static int getPlainVariantForWeatherCellType(int cellType) {
+        switch (cellType) {
+            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_SUNRISE:
+            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_SUNRISE_WALLPAPER:
+                return HomeContract.Cells.DISPLAY_TYPE_WEATHER_SUNRISE;
+            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_TEMP:
+            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_TEMP_WALLPAPER:
+                return HomeContract.Cells.DISPLAY_TYPE_WEATHER_TEMP;
+            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_WIND:
+            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_WIND_WALLPAPER:
+                return HomeContract.Cells.DISPLAY_TYPE_WEATHER_WIND;
+
+        }
+        throw new IllegalStateException("Unknown cell type for weather settings: " + cellType);
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mPreferenceHelper = PreferenceHelper.getInstance(getActivity());
-        mConfigurationHelper = HomeItemConfigurationHelper.getInstance(getActivity());
+        AppInjector.inject(this);
         Bundle arguments = getArguments();
         mCellId = arguments.getLong("cellId");
         mCellType = arguments.getInt("cellType");
@@ -223,24 +280,6 @@ public class WeatherFragment extends Fragment
         }
     }
 
-    static boolean isWallpaperVariant(int cellType) {
-        return getWallpaperVariantForWeatherCellType(cellType) == cellType;
-    }
-
-    static boolean hasWallpaperVariant(int cellType) {
-        switch (cellType) {
-            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_SUNRISE:
-            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_SUNRISE_WALLPAPER:
-            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_WIND:
-            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_WIND_WALLPAPER:
-                return false;
-            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_TEMP:
-            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_TEMP_WALLPAPER:
-                return true;
-        }
-        throw new IllegalStateException("Unknown cell type for weather settings: " + cellType);
-    }
-
     void setTitleTypeSpinnerValueFromPreferenceValue(String preferenceValue) {
         int resId = "condition".equals(preferenceValue) ?
                 R.string.weather_condition_title : R.string.weather_location_name;
@@ -301,22 +340,6 @@ public class WeatherFragment extends Fragment
         builder.show();
     }
 
-    static int getWallpaperVariantForWeatherCellType(int cellType) {
-        switch (cellType) {
-            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_SUNRISE:
-            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_SUNRISE_WALLPAPER:
-                return HomeContract.Cells.DISPLAY_TYPE_WEATHER_SUNRISE_WALLPAPER;
-            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_TEMP:
-            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_TEMP_WALLPAPER:
-                return HomeContract.Cells.DISPLAY_TYPE_WEATHER_TEMP_WALLPAPER;
-            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_WIND:
-            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_WIND_WALLPAPER:
-                return HomeContract.Cells.DISPLAY_TYPE_WEATHER_WIND_WALLPAPER;
-
-        }
-        throw new IllegalStateException("Unknown cell type for weather settings: " + cellType);
-    }
-
     void onWeatherUnitPicked(int index) {
         boolean isCelsius = index == UNIT_INDEX_CELSIUS;
         String value = isCelsius ? "c" : "f";
@@ -333,7 +356,7 @@ public class WeatherFragment extends Fragment
     }
 
     private void forceReloadWeatherInfo(String woeid) {
-        AccountHelper.getInstance(getActivity()).requestSync(woeid);
+        mAccountHelper.requestSync(woeid);
     }
 
     @Override
@@ -365,22 +388,6 @@ public class WeatherFragment extends Fragment
             mCellType = getPlainVariantForWeatherCellType(mCellType);
         }
         changeCellToType(mCellId, mCellType);
-    }
-
-    static int getPlainVariantForWeatherCellType(int cellType) {
-        switch (cellType) {
-            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_SUNRISE:
-            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_SUNRISE_WALLPAPER:
-                return HomeContract.Cells.DISPLAY_TYPE_WEATHER_SUNRISE;
-            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_TEMP:
-            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_TEMP_WALLPAPER:
-                return HomeContract.Cells.DISPLAY_TYPE_WEATHER_TEMP;
-            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_WIND:
-            case HomeContract.Cells.DISPLAY_TYPE_WEATHER_WIND_WALLPAPER:
-                return HomeContract.Cells.DISPLAY_TYPE_WEATHER_WIND;
-
-        }
-        throw new IllegalStateException("Unknown cell type for weather settings: " + cellType);
     }
 
     void changeCellToType(long cellId, int cellType) {

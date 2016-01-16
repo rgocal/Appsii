@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.util.Log;
@@ -32,12 +33,15 @@ import com.appsimobile.appsii.BuildConfig;
 import com.appsimobile.appsii.PermissionDeniedException;
 import com.appsimobile.appsii.RequestPermissionActivity;
 import com.appsimobile.appsii.SidebarContext;
-import com.appsimobile.appsii.preference.PreferencesFactory;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * Created by nick on 10/06/15.
  */
-public final class PermissionUtils {
+@Singleton
+public class PermissionUtils {
 
     public static final String EXTRA_PERMISSIONS = BuildConfig.APPLICATION_ID + ".PERMISSION_NAMES";
 
@@ -54,7 +58,11 @@ public final class PermissionUtils {
 
     public static final int REQUEST_CODE_PERMISSION_READ_CONTACTS = 102;
 
-    private PermissionUtils() {
+    SharedPreferences mSharedPreferences;
+
+    @Inject
+    public PermissionUtils(SharedPreferences preferences) {
+        mSharedPreferences = preferences;
     }
 
     /**
@@ -63,7 +71,7 @@ public final class PermissionUtils {
      *
      * @throws PermissionDeniedException
      */
-    public static void throwIfNotPermitted(Context context, String permissionName)
+    public void throwIfNotPermitted(Context context, String permissionName)
             throws PermissionDeniedException {
         if (!runtimePermissionsAvailable()) return;
 
@@ -77,7 +85,7 @@ public final class PermissionUtils {
      * Returns true when runtime permissions are available. This means, when running on
      * Android M
      */
-    public static boolean runtimePermissionsAvailable() {
+    public boolean runtimePermissionsAvailable() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
     }
 
@@ -85,13 +93,13 @@ public final class PermissionUtils {
      * Returns true when the app holds the given permission. Always returns true on
      * devices that do not have runtime permissions (pre-M).
      */
-    public static boolean holdsPermission(Context context, String permissionName) {
+    public boolean holdsPermission(Context context, String permissionName) {
         if (!runtimePermissionsAvailable()) return true;
         int result = context.checkSelfPermission(permissionName);
         return result == PackageManager.PERMISSION_GRANTED;
     }
 
-    public static boolean holdsAllPermissions(Context context, String... permissionNames) {
+    public boolean holdsAllPermissions(Context context, String... permissionNames) {
         if (!runtimePermissionsAvailable()) return true;
         for (String permissionName : permissionNames) {
             if (context.checkSelfPermission(permissionName) != PackageManager.PERMISSION_GRANTED) {
@@ -106,7 +114,7 @@ public final class PermissionUtils {
      * a permission that is absolutely required has been detected as granted.
      * Such as draw over other apps.
      */
-    public static void cancelPermissionNotificationIfNeeded(Context context, int notificationId) {
+    public void cancelPermissionNotificationIfNeeded(Context context, int notificationId) {
         if (!runtimePermissionsAvailable()) return;
 
     }
@@ -116,14 +124,14 @@ public final class PermissionUtils {
      * absolutely required such as draw over other apps. These are checked the first
      * time the app starts.
      */
-    public static void showPermissionNotification(Context context, int notificationId,
+    public void showPermissionNotification(Context context, int notificationId,
             String permissionName, @StringRes int permissionDescriptionResId) {
         if (!runtimePermissionsAvailable()) return;
 
         Log.w("PermissionHelper", "show permission denied: " + permissionName);
     }
 
-    public static void requestPermission(
+    public void requestPermission(
             Activity activity, int requestCode, String... permissions) {
 
         if (!runtimePermissionsAvailable()) return;
@@ -131,7 +139,7 @@ public final class PermissionUtils {
         activity.requestPermissions(permissions, requestCode);
     }
 
-    public static void requestPermission(
+    public void requestPermission(
             Fragment fragment, int requestCode, String... permissions) {
 
         if (!runtimePermissionsAvailable()) return;
@@ -146,7 +154,7 @@ public final class PermissionUtils {
      *
      * @throws NullPointerException if {@code permissions} is {@code null} or empty.
      */
-    public static Intent buildRequestPermissionsIntent(Context context, int requestCode,
+    public Intent buildRequestPermissionsIntent(Context context, int requestCode,
             @NonNull String... permissions) {
 
         if (permissions.length == 0) {
@@ -158,15 +166,20 @@ public final class PermissionUtils {
         return intent;
     }
 
-    public static boolean shouldShowPermissionError(SidebarContext context, String id) {
-        SharedPreferences preferences = PreferencesFactory.getPreferences(context);
+    public boolean shouldShowPermissionError(SidebarContext context, String id) {
         String key = "show_error" + id;
-        return preferences.getBoolean(key, true);
+        return mSharedPreferences.getBoolean(key, true);
     }
 
-    public static void setDontShowPermissionAgain(SidebarContext context, String id) {
-        SharedPreferences preferences = PreferencesFactory.getPreferences(context);
+    public void setDontShowPermissionAgain(SidebarContext context, String id) {
         String key = "show_error" + id;
-        preferences.edit().putBoolean(key, false).apply();
+        mSharedPreferences.edit().putBoolean(key, false).apply();
+    }
+
+    public boolean canDrawOverlays(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return Settings.canDrawOverlays(context);
+        }
+        return true;
     }
 }

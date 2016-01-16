@@ -33,6 +33,8 @@ import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.crashlytics.android.Crashlytics;
 
+import javax.inject.Inject;
+
 /**
  * Base class for the settings fragment. The list of checkboxes is different in
  * the community edition from those in the google edition
@@ -48,6 +50,10 @@ public abstract class AbstractFirstRunSettingsFragment
     View mPermissionsText;
 
     View mPermissionsButton;
+
+    @Inject AccountHelper mAccountHelper;
+
+    @Inject PermissionUtils mPermissionUtils;
 
     private OnSettingsCompletedListener mOnSettingsCompletedListener;
 
@@ -70,7 +76,7 @@ public abstract class AbstractFirstRunSettingsFragment
     }
 
     private void onPermissionButtonPressed() {
-        PermissionUtils.requestPermission(
+        mPermissionUtils.requestPermission(
                 this, 1,
 //                Manifest.permission.GET_ACCOUNTS,
                 Manifest.permission.ACCESS_COARSE_LOCATION);
@@ -89,7 +95,7 @@ public abstract class AbstractFirstRunSettingsFragment
             mNextButton.setEnabled(true);
             mPermissionsButton.setEnabled(false);
             try {
-                AccountHelper.getInstance(getActivity()).createAccountIfNeeded();
+                mAccountHelper.createAccountIfNeeded();
             } catch (SecurityException e) {
                 // I am not really sure what causes this; but since this normally passes
                 // without problems, I suspect something like privacy guard. Just inform
@@ -138,8 +144,8 @@ public abstract class AbstractFirstRunSettingsFragment
     }
 
     private void updatePermissions() {
-        if (PermissionUtils.runtimePermissionsAvailable()) {
-            boolean holdsPermission = PermissionUtils.holdsPermission(getActivity(),
+        if (mPermissionUtils.runtimePermissionsAvailable()) {
+            boolean holdsPermission = mPermissionUtils.holdsPermission(getActivity(),
                     Manifest.permission.ACCESS_COARSE_LOCATION);
             mNextButton.setEnabled(holdsPermission);
             mPermissionsButton.setEnabled(!holdsPermission);

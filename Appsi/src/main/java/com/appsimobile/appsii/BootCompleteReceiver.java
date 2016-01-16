@@ -20,23 +20,32 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.preference.PreferenceHelper;
+
+import javax.inject.Inject;
 
 /**
  * A receiver that handles the boot complete and user present events.
  */
 public class BootCompleteReceiver extends BroadcastReceiver {
 
-    public static void autoStartAppsi(Context context) {
-        PreferenceHelper prefs = PreferenceHelper.getInstance(context);
-        if (prefs.getAutoStart()) {
+    @Inject
+    PreferenceHelper mPreferenceHelper;
+
+    public BootCompleteReceiver() {
+        AppInjector.inject(this);
+    }
+
+    public static void autoStartAppsi(Context context, PreferenceHelper preferenceHelper) {
+        if (preferenceHelper.getAutoStart()) {
             AppsiiUtils.startAppsi(context);
         }
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        autoStartAppsi(context);
+        autoStartAppsi(context, mPreferenceHelper);
     }
 
 }

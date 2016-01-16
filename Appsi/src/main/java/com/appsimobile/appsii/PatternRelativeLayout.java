@@ -26,14 +26,17 @@ import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 
+import com.appsimobile.appsii.dagger.AppInjector;
+
 import java.lang.ref.WeakReference;
+
+import javax.inject.Inject;
 
 /**
  * Created by Nick Martens on 6/20/13.
@@ -70,12 +73,15 @@ public class PatternRelativeLayout extends RelativeLayout
     Configuration mOldConfiguration;
 
     Bitmap mActivePattern;
-
+    @Inject
+    SharedPreferences mSharedPreferences;
     private BitmapDrawable mBitmapDrawable;
-
     private boolean mTileX;
-
     private boolean mTileY;
+
+    {
+        AppInjector.inject(this);
+    }
 
     public PatternRelativeLayout(Context context) {
         super(context);
@@ -88,7 +94,6 @@ public class PatternRelativeLayout extends RelativeLayout
     public PatternRelativeLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
-
     /*
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -246,8 +251,7 @@ public class PatternRelativeLayout extends RelativeLayout
         setWillNotDraw(false);
         if (!isInEditMode()) {
             updateBitmap();
-            SharedPreferences preferences =
-                    PreferenceManager.getDefaultSharedPreferences(getContext());
+            SharedPreferences preferences = mSharedPreferences;
             preferences.registerOnSharedPreferenceChangeListener(this);
             mAlpha = getAlpha(preferences.getInt("pref_sidebar_background_transparency", 0));
             mXposition = preferences.getInt("pref_sidebar_background_x_pos", 0);
@@ -257,7 +261,7 @@ public class PatternRelativeLayout extends RelativeLayout
     }
 
     private void updateBitmap() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences preferences = mSharedPreferences;
         int height = getContext().getResources().getDisplayMetrics().heightPixels;
         int widthTmp = getContext().getResources().getDisplayMetrics().widthPixels;
 
@@ -287,8 +291,7 @@ public class PatternRelativeLayout extends RelativeLayout
             protected Bitmap doInBackground(Void... params) {
                 Context context = contextReference.get();
                 if (context == null) return null;
-                SharedPreferences preferences =
-                        PreferenceManager.getDefaultSharedPreferences(context);
+                SharedPreferences preferences = mSharedPreferences;
                 return ThemingUtils.getSidebarWallpaper(context, preferences, width, height);
             }
 
@@ -310,7 +313,7 @@ public class PatternRelativeLayout extends RelativeLayout
         mBitmapDrawable = new BitmapDrawable(getResources(), mActivePattern);
         //mPaint = new Paint();
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences preferences = mSharedPreferences;
 
         String hType = preferences.getString("pref_sidebar_background_horizontal_repeat", "none");
         String vType = preferences.getString("pref_sidebar_background_vertical_repeat", "none");

@@ -17,12 +17,14 @@
 package com.appsimobile.appsii.module.calls;
 
 import android.content.Context;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
 
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.module.AbstractContactView;
 import com.appsimobile.appsii.module.BaseContactInfo;
 import com.appsimobile.appsii.module.PopupMenuBuilder;
@@ -43,19 +45,14 @@ public class CallLogView extends AbstractContactView implements View.OnClickList
     public static final int ACTION_EDIT = 1;
 
     public static final int ACTION_ADD_CONTACT = 2;
-
+    private final String mPrivateNumberString;
     CallTypeIconsView mCallTypeIconsView;
 
-    private TextView mCallLogType;
-
 //    private TextView mCallLogNumber;
-
+TelephonyManager mTelephonyManager;
+    private TextView mCallLogType;
     private View mOverflow;
-
     private TextView mCallLogCount;
-
-    private final String mPrivateNumberString;
-
     private CallLogEntry mCallLogEntry;
 
     public CallLogView(Context context) {
@@ -71,9 +68,11 @@ public class CallLogView extends AbstractContactView implements View.OnClickList
         mPrivateNumberString = getResources().getString(R.string.private_num);
     }
 
+
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
+        mTelephonyManager = AppInjector.provideTelephonyManager();
 //        mCallLogNumber = (TextView) findViewById(R.id.call_log_number);
         mCallLogType = (TextView) findViewById(R.id.call_log_type);
         mCallTypeIconsView = (CallTypeIconsView) findViewById(R.id.call_types_view);
@@ -164,7 +163,7 @@ public class CallLogView extends AbstractContactView implements View.OnClickList
             builder.addAction(ACTION_EDIT, R.string.action_edit);
         } else {
             PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
-            String country = CallLogLoader.getCountry(v.getContext()).toUpperCase();
+            String country = CallLogLoader.getCountry(mTelephonyManager).toUpperCase();
             try {
                 Phonenumber.PhoneNumber number =
                         phoneNumberUtil.parse(mCallLogEntry.mNumber, country);

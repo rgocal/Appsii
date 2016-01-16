@@ -31,25 +31,30 @@ import android.view.View;
 
 import com.appsimobile.appsii.BitmapUtils;
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppInjector;
 
 import java.io.File;
+
+import javax.inject.Inject;
 
 /**
  * Created by nick on 01/11/14.
  */
 public class ParallaxListViewHeader extends View {
 
+    final Rect mSrcRect = new Rect();
+    final Rect mDstRect = new Rect();
+    @Inject
+    BitmapUtils mBitmapUtils;
     /**
      * The default drawable id to use for the parallax view.
      */
     private int mParallaxDrawableResId;
-
     /**
      * The name of the file the user can put on the device in a special folder,
      * that will be used as a parallax drawable if present.
      */
     private String mCustomDrawableFileName;
-
     /**
      * The loaded bitmap
      */
@@ -77,6 +82,7 @@ public class ParallaxListViewHeader extends View {
     }
 
     private void init(Context context, AttributeSet attrs, int defStyle) {
+        AppInjector.inject(this);
         TypedArray a = context.
                 obtainStyledAttributes(attrs, R.styleable.ParallaxListViewHeader, defStyle, 0);
 
@@ -96,17 +102,17 @@ public class ParallaxListViewHeader extends View {
 
     private void updateDrawable(int w, int h) {
         mBitmap = null;
-        File userFile = BitmapUtils.userImageFile(mCustomDrawableFileName);
+        File userFile = mBitmapUtils.userImageFile(mCustomDrawableFileName);
         if (userFile.exists()) {
             Log.i("ParallaxListViewHeader", "custom header file exists at: " +
                     userFile.getAbsolutePath());
 
-            mBitmap = BitmapUtils.decodeSampledBitmapFromFile(userFile, w, h);
+            mBitmap = mBitmapUtils.decodeSampledBitmapFromFile(userFile, w, h);
         }
         // fall back to the default if it was not loaded or does not exist
         if (mBitmap == null) {
-            mBitmap = BitmapUtils.decodeSampledBitmapFromResource(
-                    getResources(), mParallaxDrawableResId, w, h);
+            mBitmap = mBitmapUtils.decodeSampledBitmapFromResource(
+                    mParallaxDrawableResId, w, h);
         }
     }
 
@@ -115,10 +121,6 @@ public class ParallaxListViewHeader extends View {
         super.offsetTopAndBottom(offset);
         invalidate();
     }
-
-    final Rect mSrcRect = new Rect();
-
-    final Rect mDstRect = new Rect();
 
     @Override
     protected void onDraw(Canvas canvas) {

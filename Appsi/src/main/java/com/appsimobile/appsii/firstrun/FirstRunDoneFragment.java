@@ -30,23 +30,34 @@ import android.widget.Button;
 import com.appsimobile.appsii.AccountHelper;
 import com.appsimobile.appsii.AnalyticsManager;
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppInjector;
+
+import javax.inject.Inject;
 
 /**
  * Created by nick on 10/06/15.
  */
 public final class FirstRunDoneFragment extends Fragment implements View.OnClickListener {
 
-    private OnDoneCompletedListener mOnDoneCompletedListener;
-
     Button mNextButton;
-
     Button mJoinButton;
+    @Inject
+    AnalyticsManager mAnalyticsManager;
+    @Inject
+    AccountHelper mAccountHelper;
+    private OnDoneCompletedListener mOnDoneCompletedListener;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_first_run_done, container, false);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        AppInjector.inject(this);
     }
 
     @Override
@@ -86,14 +97,13 @@ public final class FirstRunDoneFragment extends Fragment implements View.OnClick
         Uri uri = Uri.parse("https://plus.google.com/communities/111374377186674137148");
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
         startActivity(intent);
-        AnalyticsManager analyticsManager = AnalyticsManager.getInstance();
-        analyticsManager.trackAppsiEvent(AnalyticsManager.ACTION_OPEN_GOOGLE_COMMUNITY,
+        mAnalyticsManager.trackAppsiEvent(AnalyticsManager.ACTION_OPEN_GOOGLE_COMMUNITY,
                 AnalyticsManager.CATEGORY_WELCOME);
 
     }
 
     private void onNextButtonPressed() {
-        AccountHelper.getInstance(getActivity()).configureAutoSyncAndSync();
+        mAccountHelper.configureAutoSyncAndSync();
         mOnDoneCompletedListener.onDoneCompleted();
     }
 

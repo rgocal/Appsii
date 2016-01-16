@@ -33,10 +33,13 @@ import android.widget.TextView;
 import com.appsimobile.appsii.LocationLoader;
 import com.appsimobile.appsii.LocationReceiver;
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.module.home.YahooLocationChooserDialogFragment;
 import com.appsimobile.appsii.module.weather.loader.YahooWeatherApiClient;
 import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.appsimobile.appsii.preference.PreferenceHelper;
+
+import javax.inject.Inject;
 
 /**
  * Created by nick on 10/06/15.
@@ -60,12 +63,16 @@ public final class FirstRunLocationFragment extends Fragment implements View.OnC
     RadioButton mMetricRadioButton;
 
     RadioButton mImperialRadioButton;
-
+    @Inject
+    PreferenceHelper mPreferenceHelper;
+    @Inject
+    PermissionUtils mPermissionUtils;
     private OnLocationCompletedListener mOnFirstRunCompletedListener;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppInjector.inject(this);
         FragmentManager fm = getFragmentManager();
         YahooLocationChooserDialogFragment locationDialog =
                 (YahooLocationChooserDialogFragment) fm.findFragmentByTag("location_dialog");
@@ -77,8 +84,7 @@ public final class FirstRunLocationFragment extends Fragment implements View.OnC
             mLocationResult = savedInstanceState.getParcelable("location");
             mSetToLocalSystem = savedInstanceState.getBoolean("set_to_local_system");
         } else {
-            PreferenceHelper preferenceHelper = PreferenceHelper.getInstance(getActivity());
-            mLocationResult = preferenceHelper.getDefaultUserLocation();
+            mLocationResult = mPreferenceHelper.getDefaultUserLocation();
         }
     }
 
@@ -131,7 +137,7 @@ public final class FirstRunLocationFragment extends Fragment implements View.OnC
     @Override
     public void onStart() {
         super.onStart();
-        if (mLocationResult == null && PermissionUtils.holdsPermission(
+        if (mLocationResult == null && mPermissionUtils.holdsPermission(
                 getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)) {
 
             try {
@@ -190,9 +196,8 @@ public final class FirstRunLocationFragment extends Fragment implements View.OnC
 
     private void onNextButtonPressed() {
         // save imperial/metric
-        PreferenceHelper preferenceHelper = PreferenceHelper.getInstance(getActivity());
         String unit = mMetricRadioButton.isChecked() ? "c" : "f";
-        preferenceHelper.setDefaultWeatherTemperatureUnit(unit);
+        mPreferenceHelper.setDefaultWeatherTemperatureUnit(unit);
 
         mOnFirstRunCompletedListener.onLocationCompleted();
     }
@@ -215,7 +220,7 @@ public final class FirstRunLocationFragment extends Fragment implements View.OnC
 
         // Store the location somewhere in preferences
         // so we can use it again
-        PreferenceHelper.getInstance(getActivity()).updateDefaultUserLocation(result);
+        mPreferenceHelper.updateDefaultUserLocation(result);
     }
 
     @Override

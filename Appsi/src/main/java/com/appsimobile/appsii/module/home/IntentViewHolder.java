@@ -45,6 +45,7 @@ import android.widget.Toast;
 
 import com.appsimobile.appsii.DrawableCompat;
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.module.home.config.HomeItemConfiguration;
 import com.appsimobile.appsii.module.home.config.HomeItemConfigurationHelper;
 
@@ -55,10 +56,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import javax.inject.Inject;
+
 /**
  * Created by nick on 29/01/15.
  */
-class IntentViewHolder extends BaseViewHolder implements View.OnClickListener,
+public class IntentViewHolder extends BaseViewHolder implements View.OnClickListener,
         HomeItemConfigurationHelper.ConfigurationListener, PopupMenu.OnMenuItemClickListener {
 
     static final String INTENT_TYPE_ACTIVITY = "app";
@@ -70,19 +73,12 @@ class IntentViewHolder extends BaseViewHolder implements View.OnClickListener,
     static final String INTENT_TYPE_BROADCAST = "broadcast";
 
     static final String INTENT_TYPE_SERVICE = "service";
-
-    final PackageManager mPackageManager;
-
-    private final int mPrimaryColor;
-
-    private final int mWidgetColor;
-
-    final HomeItemConfiguration mConfigurationHelper;
-
     final TextView mTextView;
-
     final ImageView mAppImage;
-
+    private final int mPrimaryColor;
+    private final int mWidgetColor;
+    @Inject
+    HomeItemConfiguration mConfigurationHelper;
     @Nullable
     String mAction;
 
@@ -107,11 +103,13 @@ class IntentViewHolder extends BaseViewHolder implements View.OnClickListener,
     @Nullable
     String mIntentType;
 
+    @Inject
+    PackageManager mPackageManager;
+
     public IntentViewHolder(HomeViewWrapper view) {
         super(view);
-        mPackageManager = view.getContext().getPackageManager();
+        AppInjector.inject(this);
 
-        mConfigurationHelper = HomeItemConfigurationHelper.getInstance(view.getContext());
         mAppImage = (ImageView) view.findViewById(R.id.app_image);
         mTextView = (TextView) view.findViewById(R.id.primary_text);
         mOverflow.setOnClickListener(this);

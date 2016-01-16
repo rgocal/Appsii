@@ -17,47 +17,55 @@
 package com.appsimobile.appsii.appwidget;
 
 import android.appwidget.AppWidgetProviderInfo;
-import android.content.Context;
 import android.graphics.Bitmap;
 
 import com.appsimobile.appsii.compat.AppWidgetManagerCompat;
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 /**
  * Utility class to load certain things easily from the widgets.
  * <p/>
  * Created by nick on 19/02/15.
  */
+@Singleton
 public final class AppWidgetUtils {
 
-    static WidgetPreviewLoader sWidgetPreviewLoader;
+    final WidgetPreviewLoader mWidgetPreviewLoader;
 
-    private AppWidgetUtils() {
+    final AppWidgetManagerCompat mAppWidgetManagerCompat;
+
+    final AppWidgetIconCache mAppWidgetIconCache;
+
+    @Inject
+    public AppWidgetUtils(WidgetPreviewLoader widgetPreviewLoader,
+            AppWidgetManagerCompat appWidgetManagerCompat, AppWidgetIconCache appWidgetIconCache) {
+        mWidgetPreviewLoader = widgetPreviewLoader;
+        mAppWidgetManagerCompat = appWidgetManagerCompat;
+        mAppWidgetIconCache = appWidgetIconCache;
     }
 
     /**
      * Loads all app-widget provider infos.
      */
-    public static List<AppWidgetProviderInfo> loadAppWidgetProviderInfos(Context context) {
-        return AppWidgetManagerCompat.getInstance(context).getAllProviders();
+    public List<AppWidgetProviderInfo> loadAppWidgetProviderInfos() {
+        return mAppWidgetManagerCompat.getAllProviders();
     }
 
     /**
      * Loads the title of the given widget.
      */
-    public static String getWidgetTitle(Context context, AppWidgetProviderInfo info) {
-        return AppWidgetManagerCompat.getInstance(context).loadLabel(info);
+    public String getWidgetTitle(AppWidgetProviderInfo info) {
+        return mAppWidgetManagerCompat.loadLabel(info);
     }
 
 
-    public static Bitmap getWidgetPreviewBitmap(
-            Context context, AppWidgetProviderInfo info, Bitmap reuse) {
+    public Bitmap getWidgetPreviewBitmap(AppWidgetProviderInfo info, Bitmap reuse) {
 
-        if (sWidgetPreviewLoader == null) {
-            sWidgetPreviewLoader = new WidgetPreviewLoader(context, new IconCache(context));
-        }
-        return sWidgetPreviewLoader.generateWidgetPreview(info, reuse);
+        return mWidgetPreviewLoader.generateWidgetPreview(info, reuse);
 
     }
 

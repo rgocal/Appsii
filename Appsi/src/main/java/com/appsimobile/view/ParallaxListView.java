@@ -30,6 +30,9 @@ import android.widget.ListView;
 
 import com.appsimobile.appsii.BitmapUtils;
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppInjector;
+
+import javax.inject.Inject;
 
 /**
  * Created by nick on 21/09/14.
@@ -38,7 +41,8 @@ public class ParallaxListView extends ListView {
 
     @DrawableRes
     private final int mParallaxDrawableResId;
-
+    @Inject
+    BitmapUtils mBitmapUtils;
     private Bitmap mParallaxBitmap;
 
     public ParallaxListView(Context context) {
@@ -48,10 +52,12 @@ public class ParallaxListView extends ListView {
 
     public ParallaxListView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
+        init();
     }
 
     public ParallaxListView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        init();
 
         TypedArray a = context.
                 obtainStyledAttributes(attrs, R.styleable.ParallaxListViewHeader, defStyle, 0);
@@ -63,6 +69,10 @@ public class ParallaxListView extends ListView {
 
     }
 
+    private void init() {
+        AppInjector.inject(this);
+    }
+
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
@@ -70,8 +80,7 @@ public class ParallaxListView extends ListView {
         w3 *= 2;
         setPadding(getPaddingLeft(), (int) w3, getPaddingRight(), getPaddingBottom());
 
-        mParallaxBitmap = BitmapUtils.decodeSampledBitmapFromResource(getResources(),
-                mParallaxDrawableResId,
+        mParallaxBitmap = mBitmapUtils.decodeSampledBitmapFromResource(mParallaxDrawableResId,
                 w,
                 (int) w3);
     }

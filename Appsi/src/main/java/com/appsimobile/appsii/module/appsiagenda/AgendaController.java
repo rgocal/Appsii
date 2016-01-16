@@ -58,11 +58,11 @@ import com.appsimobile.appsii.LoaderManager;
 import com.appsimobile.appsii.PageController;
 import com.appsimobile.appsii.PermissionDeniedException;
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppsiInjector;
 import com.appsimobile.appsii.module.PermissionHelper;
 import com.appsimobile.appsii.module.SpacingItemDecoration;
 import com.appsimobile.appsii.module.ToolbarScrollListener;
 import com.appsimobile.appsii.permissions.PermissionUtils;
-import com.appsimobile.appsii.preference.PreferencesFactory;
 import com.appsimobile.util.CollectionUtils;
 import com.appsimobile.util.TimeUtils;
 import com.crashlytics.android.Crashlytics;
@@ -74,6 +74,8 @@ import java.util.Formatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+
+import javax.inject.Inject;
 
 /**
  * Created by nick on 25/05/14.
@@ -209,7 +211,11 @@ public class AgendaController extends PageController
     /**
      * The shared-preferences we can get the configuration from
      */
-    private SharedPreferences mPreferences;
+    @Inject
+    SharedPreferences mPreferences;
+
+    @Inject
+    PermissionUtils mPermissionUtils;
 
     private SimpleMonthAdapter2 mSimpleMonthAdapter;
 
@@ -272,8 +278,8 @@ public class AgendaController extends PageController
         MenuInflater menuInflater = new MenuInflater(getContext());
         menuInflater.inflate(R.menu.page_agenda, menu);
 
-        RecyclerView.ItemAnimator animator = new AgendaItemAnimator();
-        mAgendaRecycler.setItemAnimator(animator);
+//        RecyclerView.ItemAnimator animator = new AgendaItemAnimator();
+//        mAgendaRecycler.setItemAnimator(animator);
         mAgendaRecycler.setAdapter(mAgendaAdapter);
 
         MenuItem menuItemAdd = menu.findItem(R.id.action_new_calendar_event);
@@ -377,7 +383,8 @@ public class AgendaController extends PageController
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mPreferences = PreferencesFactory.getPreferences(getContext());
+        AppsiInjector.inject(this);
+
         mUseExpandableAdapter = mPreferences.getBoolean(PREF_USE_EXPANDED_ADAPTER, false);
 
         mAgendaAdapter = createAgendaAdapter();
@@ -824,7 +831,7 @@ public class AgendaController extends PageController
 
     @Override
     public void onAccepted(PermissionHelper permissionHelper) {
-        Intent intent = PermissionUtils.
+        Intent intent = mPermissionUtils.
                 buildRequestPermissionsIntent(getContext(),
                         PermissionUtils.REQUEST_CODE_PERMISSION_READ_CALENDAR,
                         Manifest.permission.READ_CALENDAR);

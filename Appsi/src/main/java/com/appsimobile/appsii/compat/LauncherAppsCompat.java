@@ -43,7 +43,7 @@ public abstract class LauncherAppsCompat {
     protected LauncherAppsCompat() {
     }
 
-    public static LauncherAppsCompat getInstance(Context context) {
+    public static LauncherAppsCompat createInstance(Context context) {
         synchronized (sInstanceLock) {
             LauncherAppsCompat instance = sInstanceMap.get(context);
             if (instance == null) {

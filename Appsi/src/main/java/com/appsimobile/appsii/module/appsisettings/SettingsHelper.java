@@ -33,7 +33,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SettingsConstants {
+public class SettingsHelper {
 
     public static final boolean API19 =
             android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
@@ -48,31 +48,37 @@ public class SettingsConstants {
     public static final String DATA_USAGE_ACTION = "_DATA_USAGE_";
 
     static final int bv = Build.VERSION.SDK_INT;
-
-    private final Section[] mSections;
-
-    private final List<SectionItem> mPickerItems;
-
     final int mAirplaneToggleDrawableResourceId;
-
     final int mBluetoothToggleDrawableResourceId;
-
     final int mDataToggleDrawableResourceId;
-
     final int mWirelessToggleDrawableResourceId;
-
     final int mSoundToggleDrawableResourceId;
-
-    List<SectionItem> mAdditionalPickerItems;
-
+    private final Section[] mSections;
+    private final List<SectionItem> mPickerItems;
     private final Context mContext;
+    List<SectionItem> mAdditionalPickerItems;
+    ConnectivityManager mConnectivityManager;
 
-    public SettingsConstants(Context context, Section[] sections,
+    TelephonyManager mTelephonyManager;
+
+    AudioManager mAudioManager;
+
+    WifiManager mWifiManager;
+
+    public SettingsHelper(Context context, Section[] sections,
             int airplaneToggleDrawableResourceId,
             int bluetoothToggleDrawableResourceId,
             int dataToggleDrawableResourceId,
             int wirelessToggleDrawableResourceId,
-            int soundToggleDrawableResourceId) {
+            int soundToggleDrawableResourceId,
+            ConnectivityManager connectivityManager,
+            TelephonyManager telephonyManager,
+            AudioManager audioManager,
+            WifiManager wifiManager) {
+        mConnectivityManager = connectivityManager;
+        mTelephonyManager = telephonyManager;
+        mAudioManager = audioManager;
+        mWifiManager = wifiManager;
         mContext = context;
         boolean devEnabled = isDevEnabled();
         mPickerItems = new ArrayList<>();
@@ -267,7 +273,7 @@ public class SettingsConstants {
     }
 
     public boolean isSoundEnabled() {
-        AudioManager manager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+        AudioManager manager = mAudioManager;
 
         int ringermode = manager.getRingerMode();
         if (ringermode == AudioManager.RINGER_MODE_SILENT ||
@@ -278,19 +284,19 @@ public class SettingsConstants {
     }
 
     public void setSoundEnabled(boolean enable) {
-        AudioManager manager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+        AudioManager manager = mAudioManager;
         manager.setRingerMode(
                 enable ? AudioManager.RINGER_MODE_NORMAL : AudioManager.RINGER_MODE_VIBRATE);
 
     }
 
     public boolean isWiFiEnabled() {
-        WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiManager = mWifiManager;
         return wifiManager.isWifiEnabled();
     }
 
     public void setWiFiEnabled(boolean enable) {
-        WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiManager = mWifiManager;
         wifiManager.setWifiEnabled(enable);
     }
 
@@ -328,8 +334,7 @@ public class SettingsConstants {
                 Object iTelephonyStub;
                 Class<?> iTelephonyClass;
 
-                TelephonyManager telephonyManager = (TelephonyManager) context
-                        .getSystemService(Context.TELEPHONY_SERVICE);
+                TelephonyManager telephonyManager = mTelephonyManager;
 
                 telephonyManagerClass = Class.forName(telephonyManager.getClass().getName());
                 Method getITelephonyMethod =
@@ -350,8 +355,7 @@ public class SettingsConstants {
 
             } else {
                 //log.i("App running on Ginger bread+");
-                final ConnectivityManager conman = (ConnectivityManager) context.getSystemService(
-                        Context.CONNECTIVITY_SERVICE);
+                final ConnectivityManager conman = mConnectivityManager;
                 final Class<?> conmanClass = Class.forName(conman.getClass().getName());
                 final Field iConnectivityManagerField = conmanClass.getDeclaredField("mService");
                 iConnectivityManagerField.setAccessible(true);
@@ -366,7 +370,7 @@ public class SettingsConstants {
             }
             return true;
         } catch (Exception e) {
-            Log.e("SettingsConstants", "error turning on/off data", e);
+            Log.e("SettingsHelper", "error turning on/off data", e);
             return false;
         }
 
@@ -381,8 +385,7 @@ public class SettingsConstants {
                 Object iTelephonyStub;
                 Class<?> class_ITelephony;
 
-                TelephonyManager telephonyManager =
-                        (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+                TelephonyManager telephonyManager = mTelephonyManager;
 
                 class_telephonyManager = telephonyManager.getClass();
                 Method getITelephonyMethod =
@@ -398,8 +401,7 @@ public class SettingsConstants {
 
             } else {
                 //log.i("App running on Ginger bread+");
-                final ConnectivityManager conman = (ConnectivityManager) mContext.getSystemService(
-                        Context.CONNECTIVITY_SERVICE);
+                final ConnectivityManager conman = mConnectivityManager;
                 final Class<?> conmanClass = Class.forName(conman.getClass().getName());
                 final Field iConnectivityManagerField = conmanClass.getDeclaredField("mService");
                 iConnectivityManagerField.setAccessible(true);
@@ -413,7 +415,7 @@ public class SettingsConstants {
                 return result.booleanValue();
             }
         } catch (Exception e) {
-            Log.w("SettingsConstants", "error getting data status", e);
+            Log.w("SettingsHelper", "error getting data status", e);
             return false;
         }
 
@@ -434,13 +436,10 @@ public class SettingsConstants {
 
     public static class SectionItem {
 
-        volatile boolean mShown = true;
-
         final String mActivityAction;
-
         final int mTitleResourceId;
-
         final int mIconResourceId;
+        volatile boolean mShown = true;
 
         public SectionItem(String action, int title, int icon) {
             mActivityAction = action;
@@ -452,40 +451,51 @@ public class SettingsConstants {
     public static class Builder {
 
 
-        private final Section[] mSections;
-
         final int mAirplaneToggleDrawableResourceId;
-
         final int mBluetoothToggleDrawableResourceId;
-
         final int mDataToggleDrawableResourceId;
-
         final int mWirelessToggleDrawableResourceId;
-
         final int mSoundToggleDrawableResourceId;
+        final ConnectivityManager mConnectivityManager;
+        final TelephonyManager mTelephonyManager;
+        final AudioManager mAudioManager;
+        final WifiManager mWifiManager;
+        private final Section[] mSections;
 
         public Builder(Section[] sections,
                 int airplaneToggleDrawableResourceId,
                 int bluetoothToggleDrawableResourceId,
                 int dataToggleDrawableResourceId,
                 int wirelessToggleDrawableResourceId,
-                int soundToggleDrawableResourceId) {
+                int soundToggleDrawableResourceId,
+                ConnectivityManager connectivityManager,
+                TelephonyManager telephonyManager,
+                AudioManager audioManager,
+                WifiManager wifiManager) {
             mSections = sections;
             mAirplaneToggleDrawableResourceId = airplaneToggleDrawableResourceId;
             mBluetoothToggleDrawableResourceId = bluetoothToggleDrawableResourceId;
             mDataToggleDrawableResourceId = dataToggleDrawableResourceId;
             mWirelessToggleDrawableResourceId = wirelessToggleDrawableResourceId;
             mSoundToggleDrawableResourceId = soundToggleDrawableResourceId;
+            mConnectivityManager = connectivityManager;
+            mTelephonyManager = telephonyManager;
+            mAudioManager = audioManager;
+            mWifiManager = wifiManager;
         }
 
-        public SettingsConstants build(Context context) {
-            return new SettingsConstants(context,
+        public SettingsHelper build(Context context) {
+            return new SettingsHelper(context,
                     mSections,
                     mAirplaneToggleDrawableResourceId,
                     mBluetoothToggleDrawableResourceId,
                     mDataToggleDrawableResourceId,
                     mWirelessToggleDrawableResourceId,
-                    mSoundToggleDrawableResourceId);
+                    mSoundToggleDrawableResourceId,
+                    mConnectivityManager,
+                    mTelephonyManager,
+                    mAudioManager,
+                    mWifiManager);
         }
     }
 

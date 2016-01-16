@@ -32,8 +32,7 @@ public class UserManagerCompatVL extends UserManagerCompatV17 {
 
     private final PackageManager mPm;
 
-    UserManagerCompatVL(Context context) {
-        super(context);
+    public UserManagerCompatVL(Context context) {
         mPm = context.getPackageManager();
     }
 

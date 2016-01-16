@@ -52,26 +52,25 @@ public class AppSearchLoader extends AsyncTaskLoader<List<AppEntry>> {
     final String mQuery;
 
     final PackageManager mPackageManager;
-
+    final LauncherAppsCompat mLauncherAppsCompat;
     private final ShortcutNameComparator mShortcutNameComparator;
-
     private final Map<ComponentName, CharSequence> mLabelCache;
-
     List<AppEntry> mApps;
-
     PackageIntentReceiver mPackageObserver;
 
-    public AppSearchLoader(Context context, String query) {
+    public AppSearchLoader(Context context, LauncherAppsCompat launcherAppsCompat, String query) {
         super(context);
 
         mLabelCache = sLabelCache;
+        mLauncherAppsCompat = launcherAppsCompat;
 
         // Retrieve the package manager for later use; note we don't
         // use 'context' directly but instead the save global application
         // context returned by getContext().
         mPackageManager = getContext().getPackageManager();
 
-        mShortcutNameComparator = new ShortcutNameComparator(context, mLabelCache);
+        mShortcutNameComparator =
+                new ShortcutNameComparator(context, mLabelCache, launcherAppsCompat);
         mQuery = query.toLowerCase();
     }
 
@@ -104,7 +103,7 @@ public class AppSearchLoader extends AsyncTaskLoader<List<AppEntry>> {
     public List<AppEntry> loadInBackground() {
 
 
-        LauncherAppsCompat lap = LauncherAppsCompat.getInstance(getContext());
+        LauncherAppsCompat lap = mLauncherAppsCompat;
         List<LauncherActivityInfoCompat> apps = getLauncherInfosSafely(lap);
 
         // Fail if we don't have any apps

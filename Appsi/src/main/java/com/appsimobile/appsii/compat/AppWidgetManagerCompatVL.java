@@ -19,6 +19,7 @@ package com.appsimobile.appsii.compat;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.appwidget.AppWidgetHost;
+import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProviderInfo;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -38,22 +39,23 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.appsimobile.appsii.R;
-import com.appsimobile.appsii.appwidget.IconCache;
+import com.appsimobile.appsii.appwidget.AppWidgetIconCache;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-class AppWidgetManagerCompatVL extends AppWidgetManagerCompat {
+public class AppWidgetManagerCompatVL extends AppWidgetManagerCompat {
 
     private final UserManager mUserManager;
 
     private final PackageManager mPm;
 
-    AppWidgetManagerCompatVL(Context context) {
-        super(context);
-        mPm = context.getPackageManager();
-        mUserManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
+    public AppWidgetManagerCompatVL(Context context, AppWidgetManager awm, PackageManager pm,
+            UserManager um) {
+        super(context, awm);
+        mPm = pm;
+        mUserManager = um;
     }
 
     @Override
@@ -101,7 +103,7 @@ class AppWidgetManagerCompatVL extends AppWidgetManagerCompat {
     }
 
     @Override
-    public Drawable loadIcon(AppWidgetProviderInfo info, IconCache cache) {
+    public Drawable loadIcon(AppWidgetProviderInfo info, AppWidgetIconCache cache) {
         return info.loadIcon(mContext, cache.getFullResIconDpi());
     }
 

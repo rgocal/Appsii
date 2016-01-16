@@ -28,12 +28,15 @@ import android.support.annotation.NonNull;
 import android.text.format.Time;
 
 import com.appsimobile.appsii.PermissionDeniedException;
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.appsimobile.util.ConvertedCursorLoader;
 import com.appsimobile.util.TimeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * Created by nick on 22/09/14.
@@ -54,14 +57,15 @@ public class AgendaLoader extends ConvertedCursorLoader<AgendaEventsResult> {
     private static final String DEFAULT_SORT_ORDER = "begin ASC";
 
     int mLastLoadedDay = TimeUtils.getJulianDay();
-
+    @Inject
+    PermissionUtils mPermissionUtils;
     private BroadcastReceiver mDayChangeReceiver;
-
     private BroadcastReceiver mPermissionGrantedReceiver;
 
     public AgendaLoader(Context context, DatePickerController controller) {
 
         super(context);
+        AppInjector.inject(this);
 
         Time time = new Time(Time.TIMEZONE_UTC);
         time.set(1, 0, controller.getMinYear());
@@ -87,7 +91,7 @@ public class AgendaLoader extends ConvertedCursorLoader<AgendaEventsResult> {
 
     @Override
     protected void checkPermissions() throws PermissionDeniedException {
-        PermissionUtils.throwIfNotPermitted(getContext(), Manifest.permission.READ_CALENDAR);
+        mPermissionUtils.throwIfNotPermitted(getContext(), Manifest.permission.READ_CALENDAR);
     }
 
     @Override

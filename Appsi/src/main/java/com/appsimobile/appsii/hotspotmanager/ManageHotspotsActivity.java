@@ -39,10 +39,12 @@ import com.appsimobile.appsii.ActivityUtils;
 import com.appsimobile.appsii.GotItDismissListener;
 import com.appsimobile.appsii.HotspotItem;
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
-import com.appsimobile.appsii.preference.PreferencesFactory;
 
 import java.util.ArrayList;
+
+import javax.inject.Inject;
 
 /**
  * The main view of this feature. This shows a list of the hot-spots and
@@ -64,12 +66,14 @@ public class ManageHotspotsActivity extends AppCompatActivity
      * A handler to perform the updates with
      */
     AsyncQueryHandlerImpl mAsyncQueryHandler;
-
+    @Inject
+    SharedPreferences mSharedPreferences;
     private RecyclerView mRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppInjector.inject(this);
         ActivityUtils.setContentViewWithFab(this, R.layout.activity_manage_hotspots);
 
         View addPanelButton = ActivityUtils.setupFab(this, R.id.add_panel_button);
@@ -77,7 +81,7 @@ public class ManageHotspotsActivity extends AppCompatActivity
         ActivityUtils.setupToolbar(this, R.id.toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mHotspotAdapter = new HotspotAdapter(this, this);
+        mHotspotAdapter = new HotspotAdapter(this, mSharedPreferences);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.list);
 
@@ -191,9 +195,9 @@ public class ManageHotspotsActivity extends AppCompatActivity
 
         boolean mGotItDismissed;
 
-        HotspotAdapter(Context context, HotspotActionListener actionListener) {
+        HotspotAdapter(HotspotActionListener actionListener, SharedPreferences preferences) {
             mActionListener = actionListener;
-            mPreferences = PreferencesFactory.getPreferences(context);
+            mPreferences = preferences;
             mGotItDismissed = mPreferences.getBoolean("hotspots_got_it_dismissed", false);
         }
 

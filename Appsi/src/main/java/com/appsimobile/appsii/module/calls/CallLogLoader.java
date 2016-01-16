@@ -38,6 +38,7 @@ import android.text.format.Time;
 import android.util.Log;
 
 import com.appsimobile.appsii.PermissionDeniedException;
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.module.BaseContactInfo;
 import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.google.i18n.phonenumbers.NumberParseException;
@@ -48,6 +49,8 @@ import com.google.i18n.phonenumbers.geocoding.PhoneNumberOfflineGeocoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import javax.inject.Inject;
 
 import static android.provider.ContactsContract.CommonDataKinds;
 
@@ -63,23 +66,23 @@ public class CallLogLoader extends AsyncTaskLoader<CallLogResult> {
     public static final String PAYPHONE_NUMBER = "-3";
 
     static final boolean LOGD = false;
-
-    CallLogResult mCallLogEntries;
-
-    ContentObserver mCallLogObserver;
-
     final PhoneNumberUtil mPhoneNumberUtil = PhoneNumberUtil.getInstance();
-
+    CallLogResult mCallLogEntries;
+    ContentObserver mCallLogObserver;
     BroadcastReceiver mPermissionGrantedReceiver;
 
+    @Inject
+    PermissionUtils mPermissionUtils;
+
+    @Inject
+    TelephonyManager mTelephonyManager;
 
     public CallLogLoader(Context context) {
         super(context);
     }
 
-    public static String getCountry(Context context) {
-        TelephonyManager tm =
-                (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+    public static String getCountry(TelephonyManager telephonyManager) {
+        TelephonyManager tm = telephonyManager;
         if (tm.getSimState() == TelephonyManager.SIM_STATE_ABSENT) {
             return Locale.getDefault().getCountry();
         }
@@ -130,12 +133,12 @@ public class CallLogLoader extends AsyncTaskLoader<CallLogResult> {
     public CallLogResult loadInBackground() {
         // Retrieve all known applications.
 
-        if (!PermissionUtils.holdsPermission(getContext(), Manifest.permission.READ_CONTACTS)) {
+        if (!mPermissionUtils.holdsPermission(getContext(), Manifest.permission.READ_CONTACTS)) {
             return new CallLogResult(
                     new PermissionDeniedException(Manifest.permission.READ_CONTACTS));
         }
 
-        if (!PermissionUtils.holdsPermission(getContext(), Manifest.permission.READ_CALL_LOG)) {
+        if (!mPermissionUtils.holdsPermission(getContext(), Manifest.permission.READ_CALL_LOG)) {
             return new CallLogResult(
                     new PermissionDeniedException(Manifest.permission.READ_CALL_LOG));
         }
@@ -168,7 +171,7 @@ public class CallLogLoader extends AsyncTaskLoader<CallLogResult> {
             // Create corresponding array of entries and load their labels.
             List<CallLogEntry> entries = new ArrayList<>(9);
 
-            String country = getCountry(context).toUpperCase();
+            String country = getCountry(mTelephonyManager).toUpperCase();
 
             // We need to remember three things, to be able to group the calls
             // 1. the last number, repetitive calls to and from the same number
@@ -406,6 +409,7 @@ public class CallLogLoader extends AsyncTaskLoader<CallLogResult> {
      */
     @Override
     protected void onStartLoading() {
+        AppInjector.inject(this);
         if (mCallLogEntries != null) {
             // If we currently have a result available, deliver it
             // immediately.

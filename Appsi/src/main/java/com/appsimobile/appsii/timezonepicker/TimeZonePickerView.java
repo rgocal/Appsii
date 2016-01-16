@@ -31,6 +31,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppInjector;
 
 public class TimeZonePickerView extends LinearLayout implements TextWatcher, OnItemClickListener,
         OnClickListener {
@@ -44,15 +45,15 @@ public class TimeZonePickerView extends LinearLayout implements TextWatcher, OnI
     private final AutoCompleteTextView mAutoCompleteTextView;
 
     private final TimeZoneFilterTypeAdapter mFilterAdapter;
-
+    InputMethodManager mInputMethodManager;
     private boolean mHideFilterSearchOnStart = false;
-
     private boolean mFirstTime = true;
 
     public TimeZonePickerView(Context context, AttributeSet attrs,
             String timeZone, long timeMillis, OnTimeZoneSetListener l,
             boolean hideFilterSearch) {
         super(context, attrs);
+        mInputMethodManager = AppInjector.provideInputMethodManager();
         mContext = context;
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(
                 Context.LAYOUT_INFLATER_SERVICE);
@@ -149,8 +150,7 @@ public class TimeZonePickerView extends LinearLayout implements TextWatcher, OnI
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         // Hide the keyboard since the user explicitly selected an item.
-        InputMethodManager manager =
-                (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager manager = mInputMethodManager;
         manager.hideSoftInputFromWindow(mAutoCompleteTextView.getWindowToken(), 0);
         // An onClickListener for the view item because I haven't figured out a
         // way to update the AutoCompleteTextView without causing an infinite loop.

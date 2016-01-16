@@ -24,6 +24,8 @@ import android.view.Display;
 import android.view.Gravity;
 import android.view.WindowManager;
 
+import javax.inject.Inject;
+
 /**
  * Created by nick on 13/02/15.
  */
@@ -32,7 +34,8 @@ public abstract class AbstractHotspotHelper {
     final int mDp56;
 
     private final Context mContext;
-
+    @Inject
+    WindowManager mWindowManager;
     private int mHeight;
 
     public AbstractHotspotHelper(Context context) {
@@ -70,7 +73,7 @@ public abstract class AbstractHotspotHelper {
 
     public abstract void setVibrate(boolean mVibrate);
 
-    public abstract void addHotspots();
+    public abstract void addHotspots() throws PermissionDeniedException;
 
     public abstract void removeHotspots();
 
@@ -82,8 +85,7 @@ public abstract class AbstractHotspotHelper {
     protected WindowManager.LayoutParams createHotspotParams(HotspotItem conf,
             SharedPreferences prefs) {
 
-        WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
-        Display display = wm.getDefaultDisplay();
+        Display display = mWindowManager.getDefaultDisplay();
         mHeight = display.getHeight();
 
 

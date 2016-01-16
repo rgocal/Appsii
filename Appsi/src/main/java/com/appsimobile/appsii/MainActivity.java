@@ -31,8 +31,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.firstrun.FirstRunFragment;
-import com.appsimobile.appsii.preference.PreferencesFactory;
+
+import javax.inject.Inject;
 
 
 public class MainActivity extends AppCompatActivity
@@ -46,17 +48,19 @@ public class MainActivity extends AppCompatActivity
 
     boolean mFirstRun;
 
-    private SharedPreferences mPreferences;
+    @Inject
+    SharedPreferences mPreferences;
 
     @SuppressWarnings("deprecation")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        AppInjector.inject(this);
+
         ActivityUtils.setContentView(this, R.layout.activity_main);
         ActivityUtils.setupToolbar(this, R.id.toolbar);
 
-        mPreferences = PreferencesFactory.getPreferences(this);
         // For now always show in debug builds.
         boolean firstRun = mPreferences.getBoolean(PREF_FIRST_RUN, true);
         mFirstRun = firstRun;

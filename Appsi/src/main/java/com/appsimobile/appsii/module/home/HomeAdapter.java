@@ -65,7 +65,6 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.appsimobile.appsii.AnalyticsManager;
-import com.appsimobile.appsii.AppsiApplication;
 import com.appsimobile.appsii.BitmapUtils;
 import com.appsimobile.appsii.DrawableCompat;
 import com.appsimobile.appsii.DrawableStartTintPainter;
@@ -75,6 +74,7 @@ import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.annotation.VisibleForTesting;
 import com.appsimobile.appsii.appwidget.AppWidgetUtils;
 import com.appsimobile.appsii.appwidget.AppsiiAppWidgetHost;
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.module.home.appwidget.WidgetChooserActivity;
 import com.appsimobile.appsii.module.home.config.HomeItemConfiguration;
 import com.appsimobile.appsii.module.home.config.HomeItemConfigurationHelper;
@@ -90,6 +90,8 @@ import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.List;
 import java.util.TimeZone;
+
+import javax.inject.Inject;
 
 /**
  * The adapter used on the Home-Page and in the HomeEditorActivity.
@@ -137,42 +139,44 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
      * The id of the home-page we are bound to (or editing for)
      */
     final long mHomeId;
-
-    /**
-     * The app-widget-host. Can be null in case mAppWidgetsEnabled is false.
-     */
-    @Nullable
-    final AppsiiAppWidgetHost mAppWidgetHost;
-
-    /**
-     * The app-widget manager. Used by widget view-holders to load the
-     * AppWidgetInfo for the bound app-widget. In the disable variant it
-     * is used to load the image.
-     */
-    final AppWidgetManager mAppWidgetManager;
-
     /**
      * A helper that auto-advances the views that need to be auto-advanced
      */
     final AutoAdvanceHelper mAutoAdvanceHelper = new AutoAdvanceHelper();
-
     /**
      * True in case app widgets must be enabled. false otherwise. Setting this
      * to false, will use a different view-holder that only loads the preview
      * image instead of the normal widget view.
      */
     final boolean mAppWidgetsEnabled;
-
     /**
      * The base height of the widgets. This is set to 72dp in the constructor
      */
     final int mBaseHeight;
-
     /**
      * The height to increase the widget height with, for each step.
      */
     final int mHeightPerStep;
-
+    /**
+     * The app-widget-host. Can be null in case mAppWidgetsEnabled is false.
+     */
+    @Inject
+    AppsiiAppWidgetHost mAppWidgetHost;
+    /**
+     * The app-widget manager. Used by widget view-holders to load the
+     * AppWidgetInfo for the bound app-widget. In the disable variant it
+     * is used to load the image.
+     */
+    @Inject
+    AppWidgetManager mAppWidgetManager;
+    @Inject
+    HomeItemConfiguration mHomeItemConfiguration;
+    @Inject
+    PermissionUtils mPermissionUtils;
+    @Inject
+    WeatherUtils mWeatherUtils;
+    @Inject
+    AppWidgetUtils mAppWidgetUtils;
     long mUnsetId = -1L;
 
     /**
@@ -182,6 +186,9 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
     boolean mStarted;
 
     PermissionErrorListener mPermissionErrorListener;
+
+    @Inject
+    AnalyticsManager mAnalyticsManager;
 
     public HomeAdapter(Context context, long homeId) {
         this(context, new DefaultViewWrapperFactory(), homeId, true);
@@ -200,13 +207,7 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
         mHomeSpanSizeLookup = new HomeSpanSizeLookup(context);
 
         setHasStableIds(true);
-
-        if (mAppWidgetsEnabled) {
-            mAppWidgetHost = new AppsiiAppWidgetHost(context, AppsiApplication.APPWIDGET_HOST_ID);
-        } else {
-            mAppWidgetHost = null;
-        }
-        mAppWidgetManager = AppWidgetManager.getInstance(context);
+        AppInjector.inject(this);
     }
 
     long nextUnsetId() {
@@ -307,13 +308,13 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
     private AbsHomeViewHolder createClockViewHolder(ViewGroup parent, int height) {
         View view = mLayoutInflater.inflate(R.layout.home_item_analog_clock, parent, false);
         HomeViewWrapper wrapped = wrapView(mContext, view, height);
-        return new ClockViewHolder(wrapped);
+        return new ClockViewHolder(wrapped, mHomeItemConfiguration);
     }
 
     private AbsHomeViewHolder createBluetoothViewHolder(ViewGroup parent, int height) {
         View view = mLayoutInflater.inflate(R.layout.home_item_bluetooth_toggle, parent, false);
         HomeViewWrapper wrapped = wrapView(mContext, view, height);
-        return new BluetoothViewHolder(wrapped);
+        return new BluetoothViewHolder(wrapped, mHomeItemConfiguration);
     }
 
     private AbsHomeViewHolder createIntentTypeViewHolder(ViewGroup parent, int height) {
@@ -341,7 +342,7 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
     private AbsHomeViewHolder createDisabledAppWidgetViewHolder(ViewGroup parent, int height) {
         View view = mLayoutInflater.inflate(R.layout.home_item_appwidget_disabled, parent, false);
         HomeViewWrapper wrapped = wrapView(mContext, view, height);
-        return new DisabledAppWidgetViewHolder(wrapped, mAppWidgetManager);
+        return new DisabledAppWidgetViewHolder(wrapped, mAppWidgetManager, mAppWidgetUtils);
     }
 
     private AbsHomeViewHolder createDummyViewHolder(int height) {
@@ -483,7 +484,7 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
     }
 
     public void setStarted(boolean started) {
-        if (mAppWidgetHost != null) {
+        if (mAppWidgetHost != null && mAppWidgetsEnabled) {
             if (mStarted != started) {
                 mStarted = started;
 
@@ -496,13 +497,16 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
                 }
             }
         }
-        if (!started) {
-            sAppWidgetViewCache.clear();
+
+        if (mAppWidgetsEnabled) {
+            if (!started) {
+                sAppWidgetViewCache.clear();
+            }
         }
     }
 
     public HomeItem getHomeItemForAppWidgetId(int appWidgetId) {
-        HomeItemConfiguration helper = HomeItemConfigurationHelper.getInstance(mContext);
+        HomeItemConfiguration helper = mHomeItemConfiguration;
         long cellId = helper.
                 findCellWithPropertyValue("app_widget_id", String.valueOf(appWidgetId));
 
@@ -598,9 +602,9 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
 
         final TextView mTextView;
 
-        public ClockViewHolder(HomeViewWrapper view) {
+        public ClockViewHolder(HomeViewWrapper view, HomeItemConfiguration conf) {
             super(view);
-            mConfigurationHelper = HomeItemConfigurationHelper.getInstance(view.getContext());
+            mConfigurationHelper = conf;
             mAnalogClock = (AnalogClock) view.findViewById(R.id.analog_clock);
             mTextView = (TextView) view.findViewById(R.id.primary_text);
             mOverflow.setOnClickListener(this);
@@ -705,10 +709,10 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
 
         private final BluetoothAdapter mBluetoothAdapter;
 
-        public BluetoothViewHolder(HomeViewWrapper view) {
+        public BluetoothViewHolder(HomeViewWrapper view, HomeItemConfiguration conf) {
             super(view);
             mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            mConfigurationHelper = HomeItemConfigurationHelper.getInstance(view.getContext());
+            mConfigurationHelper = conf;
             mImageView = (ImageView) view.findViewById(R.id.bluetooth_image);
             mBluetoothDrawable = mImageView.getDrawable();
             mTextView = (TextView) view.findViewById(R.id.primary_text);
@@ -825,8 +829,11 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
 
         final TextView mTemperatureView;
 
+        final WeatherUtils mWeatherUtils;
+
         public AbsWeatherTemperatureViewHolder(HomeViewWrapper view, boolean showsWallpaper) {
             super(view, showsWallpaper);
+            mWeatherUtils = AppInjector.provideWeatherUtils();
             mWeatherConditionView = (ImageView) view.findViewById(R.id.weather_condition_image);
             mTextView = (TextView) view.findViewById(R.id.primary_text);
             mTemperatureView = (TextView) view.findViewById(R.id.temperature);
@@ -855,14 +862,14 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
             }
 
 
-            boolean isDay = WeatherUtils.isDay(timezone, weatherData);
+            boolean isDay = mWeatherUtils.isDay(timezone, weatherData);
 
             String unit = weatherData.unit;
             String defaultUnit = mPreferenceHelper.getDefaultWeatherTemperatureUnit();
             String displayUnit = mConfigurationHelper.getProperty(cellId,
                     WeatherFragment.PREFERENCE_WEATHER_UNIT, defaultUnit);
 
-            String temperature = WeatherUtils.formatTemperature(itemView.getContext(),
+            String temperature = mWeatherUtils.formatTemperature(itemView.getContext(),
                     weatherData.nowTemperature, unit, displayUnit,
                     WeatherUtils.FLAG_TEMPERATURE_NO_UNIT);
 
@@ -900,7 +907,7 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
                 String temperature) {
 
             int iconResId =
-                    WeatherUtils.getConditionCodeIconResId(weatherData.nowConditionCode, isDay);
+                    mWeatherUtils.getConditionCodeIconResId(weatherData.nowConditionCode, isDay);
 
             mWeatherConditionView.setImageResource(iconResId);
             setupTitle(mTextView, weatherData, cellId);
@@ -930,7 +937,8 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
             // TODO: implement properly
 
             int iconResId =
-                    WeatherUtils.getConditionCodeTinyIconResId(weatherData.nowConditionCode, isDay);
+                    mWeatherUtils
+                            .getConditionCodeTinyIconResId(weatherData.nowConditionCode, isDay);
 
             mTextView.setCompoundDrawablesRelativeWithIntrinsicBounds(iconResId, 0, 0, 0);
             setupTitle(mTextView, weatherData, cellId);
@@ -1049,8 +1057,10 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
 
         int mAppWidgetId;
 
+        AppWidgetUtils mAppWidgetUtils;
+
         public DisabledAppWidgetViewHolder(HomeViewWrapper view,
-                AppWidgetManager appWidgetManager) {
+                AppWidgetManager appWidgetManager, AppWidgetUtils appWidgetUtils) {
             super(view);
             mWidgetPreview = (ImageView) view.findViewById(R.id.widget_preview);
             mNoWidgetTextView = (TextView) view.findViewById(R.id.no_widget_selected_text);
@@ -1070,8 +1080,7 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
                 mNoWidgetTextView.setVisibility(View.GONE);
                 AppWidgetProviderInfo appWidgetInfo = mAppWidgetManager.getAppWidgetInfo(
                         mAppWidgetId);
-                Bitmap image = AppWidgetUtils.
-                        getWidgetPreviewBitmap(itemView.getContext(), appWidgetInfo, null);
+                Bitmap image = mAppWidgetUtils.getWidgetPreviewBitmap(appWidgetInfo, null);
                 mWidgetPreview.setImageBitmap(image);
             }
         }
@@ -1133,12 +1142,21 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
             mTouchSlop = ViewConfiguration.get(view.getContext()).getScaledTouchSlop();
         }
 
+        static void updateWidgetSizeRanges(AppWidgetHostView widgetView, int w, int h) {
+            Context context = widgetView.getContext();
+            float density = context.getResources().getDisplayMetrics().density;
+            widgetView.updateAppWidgetSize(null,
+                    (int) (w / density),
+                    (int) (h / density),
+                    (int) (w / density),
+                    (int) (h / density));
+        }
+
         public void postCreate() {
             mAppWidgetHost.registerHostStatusListener(this);
             mChooseWidgetButton.setOnClickListener(this);
             mErrorLoadingWidgetButton.setOnClickListener(this);
         }
-
 
         @Override
         public void onStartedListening() {
@@ -1180,16 +1198,6 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
                 mContainer.animate().alpha(1).withEndAction(null);
             }
             return true;
-        }
-
-        static void updateWidgetSizeRanges(AppWidgetHostView widgetView, int w, int h) {
-            Context context = widgetView.getContext();
-            float density = context.getResources().getDisplayMetrics().density;
-            widgetView.updateAppWidgetSize(null,
-                    (int) (w / density),
-                    (int) (h / density),
-                    (int) (w / density),
-                    (int) (h / density));
         }
 
         private AppWidgetHostView safelyCreateView(
@@ -1349,7 +1357,7 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
         void applyWeatherData(String unit, String windSpeed, WeatherData weatherData) {
             // properly convert the speed if needed
             if (!"c".equals(unit)) {
-                int speed = Math.round(WeatherUtils.toKph(weatherData.windSpeed));
+                int speed = Math.round(mWeatherUtils.toKph(weatherData.windSpeed));
                 mLargeWindmillDrawable.setWindSpeedKmh(speed);
                 mSmallWindmillDrawable.setWindSpeedKmh(speed);
             } else {
@@ -1375,7 +1383,7 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
         void applyWeatherData(String unit, String windSpeed, WeatherData weatherData) {
             // properly convert the speed if needed
             if (!"c".equals(unit)) {
-                int speed = Math.round(WeatherUtils.toKph(weatherData.windSpeed));
+                int speed = Math.round(mWeatherUtils.toKph(weatherData.windSpeed));
                 mLargeWindmillDrawable.setWindSpeedKmh(speed);
                 mSmallWindmillDrawable.setWindSpeedKmh(speed);
             } else {
@@ -1463,7 +1471,7 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
 
             setupTitle(mTextView, weatherData, cellId);
             String unit = weatherData.unit;
-            String windSpeed = WeatherUtils.formatWindSpeed(
+            String windSpeed = mWeatherUtils.formatWindSpeed(
                     itemView.getContext(), weatherData.windSpeed, unit, displayUnit);
 
             applyWeatherData(unit, windSpeed, weatherData);
@@ -1516,6 +1524,31 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
             setIsRecyclable(false);
         }
 
+        @Override
+        protected void configurePaintJob(PaintJob.Builder paintJob) {
+            paintJob.paintWithSwatch(PaintJob.SWATCH_DARK_VIBRANT,
+                    ViewPainters.argb(128, R.id.primary_text),
+                    ViewPainters.text(R.id.primary_text, R.id.sunset, R.id.sunrise),
+                    new DrawablePainter(R.id.weather_sun)
+            );
+        }
+
+        @Override
+        void applyWeatherData(Context context, long cellId, int minuteNow,
+                int sunriseMinuteOfDay, int sunsetMinuteOfDay, WeatherData weatherData) {
+            setupTitle(mTextView, weatherData, cellId);
+
+            // set the values on the drawable
+            mSunriseDrawable.setTime(sunriseMinuteOfDay, sunsetMinuteOfDay, minuteNow);
+
+            String time = formatAsTime(context, sunriseMinuteOfDay);
+            mSunriseView.setText(time);
+
+            time = formatAsTime(context, sunsetMinuteOfDay);
+            mSunsetView.setText(time);
+
+        }
+
         static class DrawablePainter extends PaintJob.BaseViewPainter {
 
             protected DrawablePainter(int... viewIds) {
@@ -1548,32 +1581,6 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
             protected int getCurrentColorFromView(View view) {
                 return 0;
             }
-        }
-
-        @Override
-        protected void configurePaintJob(PaintJob.Builder paintJob) {
-            paintJob.paintWithSwatch(PaintJob.SWATCH_DARK_VIBRANT,
-                    ViewPainters.argb(128, R.id.primary_text),
-                    ViewPainters.text(R.id.primary_text, R.id.sunset, R.id.sunrise),
-                    new DrawablePainter(R.id.weather_sun)
-            );
-        }
-
-
-        @Override
-        void applyWeatherData(Context context, long cellId, int minuteNow,
-                int sunriseMinuteOfDay, int sunsetMinuteOfDay, WeatherData weatherData) {
-            setupTitle(mTextView, weatherData, cellId);
-
-            // set the values on the drawable
-            mSunriseDrawable.setTime(sunriseMinuteOfDay, sunsetMinuteOfDay, minuteNow);
-
-            String time = formatAsTime(context, sunriseMinuteOfDay);
-            mSunriseView.setText(time);
-
-            time = formatAsTime(context, sunsetMinuteOfDay);
-            mSunsetView.setText(time);
-
         }
     }
 
@@ -1931,78 +1938,6 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
 
         }
 
-        class ContactBitmapLoader extends AsyncTask<Context, Void, Bitmap> {
-
-            private final String mLookupKey;
-
-            private final String mContactId;
-
-            public ContactBitmapLoader(String lookupKey, String contactId) {
-                mLookupKey = lookupKey;
-                mContactId = contactId;
-            }
-
-            @Override
-            protected Bitmap doInBackground(Context... params) {
-                Context context = params[0];
-                if (mLookupKey != null && mContactId != null) {
-                    long id = Long.parseLong(mContactId);
-                    Contact contact = RawContactsLoader.
-                            loadContact(context, id, mLookupKey);
-
-                    if (contact != null && contact.mBitmap != null) {
-                        int w = contact.mBitmap.getWidth();
-                        int h = contact.mBitmap.getWidth();
-
-                        float wscale = mViewWidth / (float) w;
-                        float hscale = mViewWidth / (float) h;
-
-                        float scale = Math.max(wscale, hscale);
-
-                        int destH = (int) (h * scale);
-                        int destW = (int) (w * scale);
-
-                        // can happen when the view was detached earlier
-                        if (destH == 0 || destW == 0) return null;
-
-                        try {
-                            return Bitmap.createScaledBitmap(contact.mBitmap, destW, destH, true);
-                        } catch (OutOfMemoryError e) {
-                            Crashlytics.logException(e);
-                            return contact.mBitmap;
-                        }
-                    }
-                }
-
-                Bitmap result;
-                try {
-                    Uri contactUri = ContactsContract.Profile.CONTENT_URI;
-                    result = BitmapUtils.
-                            decodeContactImage(mContext, contactUri, mViewWidth, mViewHeight);
-
-                    if (result == null) {
-                        Uri lookupUri = getProfileContactUri();
-                        if (lookupUri != null) {
-                            result = BitmapUtils.decodeContactImage(
-                                    mContext, lookupUri, mViewWidth, mViewHeight);
-                        }
-                    }
-                } catch (PermissionDeniedException e) {
-                    // this is already checked before we actually
-                    // start and create the loader. So if it happens
-                    // just return null.
-                    return null;
-                }
-
-                return result;
-            }
-
-            @Override
-            protected void onPostExecute(Bitmap bitmap) {
-                applyUserImage(bitmap);
-            }
-        }
-
         @Override
         void updateConfiguration() {
             loadUserImageIfNeeded();
@@ -2028,7 +1963,7 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
         }
 
         private void loadUserImageIfNeededImpl() throws PermissionDeniedException {
-            PermissionUtils.throwIfNotPermitted(mContext, Manifest.permission.READ_CONTACTS);
+            mPermissionUtils.throwIfNotPermitted(mContext, Manifest.permission.READ_CONTACTS);
             if (mImageLoader != null) {
                 mImageLoader.cancel(true);
             }
@@ -2037,7 +1972,8 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
             final String lookupKey =
                     mConfigurationHelper.getProperty(mHomeItem.mId, "lookupKey", null);
 
-            mImageLoader = new ContactBitmapLoader(lookupKey, contactId);
+            BitmapUtils bitmapUtils = AppInjector.provideBitmapUtils();
+            mImageLoader = new ContactBitmapLoader(lookupKey, contactId, bitmapUtils);
             mImageLoader.execute(itemView.getContext());
         }
 
@@ -2093,7 +2029,7 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
                     Long cid = Long.parseLong(contactId);
                     Uri contactLookupUri = ContactsContract.Contacts.getLookupUri(cid, lookupKey);
                     Intent intent = new Intent(Intent.ACTION_VIEW, contactLookupUri);
-                    AnalyticsManager analyticsManager = AnalyticsManager.getInstance(context);
+                    AnalyticsManager analyticsManager = mAnalyticsManager;
                     analyticsManager.trackAppsiEvent(AnalyticsManager.ACTION_OPEN_HOME_ITEM,
                             AnalyticsManager.CATEGORY_PEOPLE);
                     context.startActivity(intent);
@@ -2114,6 +2050,80 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
                 return true;
             }
             return false;
+        }
+
+        class ContactBitmapLoader extends AsyncTask<Context, Void, Bitmap> {
+
+            final BitmapUtils mBitmapUtils;
+            private final String mLookupKey;
+            private final String mContactId;
+
+            public ContactBitmapLoader(String lookupKey, String contactId,
+                    BitmapUtils bitmapUtils) {
+                mLookupKey = lookupKey;
+                mContactId = contactId;
+                mBitmapUtils = bitmapUtils;
+            }
+
+            @Override
+            protected Bitmap doInBackground(Context... params) {
+                Context context = params[0];
+                if (mLookupKey != null && mContactId != null) {
+                    long id = Long.parseLong(mContactId);
+                    Contact contact = RawContactsLoader.
+                            loadContact(context, id, mLookupKey);
+
+                    if (contact != null && contact.mBitmap != null) {
+                        int w = contact.mBitmap.getWidth();
+                        int h = contact.mBitmap.getWidth();
+
+                        float wscale = mViewWidth / (float) w;
+                        float hscale = mViewWidth / (float) h;
+
+                        float scale = Math.max(wscale, hscale);
+
+                        int destH = (int) (h * scale);
+                        int destW = (int) (w * scale);
+
+                        // can happen when the view was detached earlier
+                        if (destH == 0 || destW == 0) return null;
+
+                        try {
+                            return Bitmap.createScaledBitmap(contact.mBitmap, destW, destH, true);
+                        } catch (OutOfMemoryError e) {
+                            Crashlytics.logException(e);
+                            return contact.mBitmap;
+                        }
+                    }
+                }
+
+                Bitmap result;
+                try {
+                    Uri contactUri = ContactsContract.Profile.CONTENT_URI;
+                    result = mBitmapUtils
+                            .decodeContactImage(contactUri, mViewWidth, mViewHeight);
+
+                    if (result == null) {
+                        Uri lookupUri = getProfileContactUri();
+                        if (lookupUri != null) {
+                            result = mBitmapUtils.decodeContactImage(
+                                    lookupUri, mViewWidth, mViewHeight);
+                        }
+                    }
+                } catch (PermissionDeniedException e) {
+                    // this is already checked before we actually
+                    // start and create the loader. So if it happens
+                    // just return null.
+                    return null;
+                }
+
+                return result;
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap bitmap) {
+                applyUserImage(bitmap);
+            }
         }
 
 

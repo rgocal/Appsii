@@ -48,23 +48,22 @@ public class AppPageLoader extends AsyncTaskLoader<AppPageData> {
     final InterestingConfigChanges mLastConfig = new InterestingConfigChanges();
 
     final Context mContext;
-
-    private final ShortcutNameComparator mShortcutNameComparator;
-
-    private final Map<ComponentName, CharSequence> mLabelCache;
-
     final PackageManager mPackageManager;
-
+    private final ShortcutNameComparator mShortcutNameComparator;
+    private final Map<ComponentName, CharSequence> mLabelCache;
     AppPageData mApps;
 
     PackageIntentReceiver mPackageObserver;
 
     ForceLoadContentObserver mForceLoadContentObserver;
 
-    public AppPageLoader(Context context) {
+    LauncherAppsCompat mLauncherAppsCompat;
+
+    public AppPageLoader(Context context, LauncherAppsCompat launcherAppsCompat) {
         super(context);
 
         mContext = context;
+        mLauncherAppsCompat = launcherAppsCompat;
 
         mLabelCache = sLabelCache;
 
@@ -73,7 +72,8 @@ public class AppPageLoader extends AsyncTaskLoader<AppPageData> {
         // context returned by getContext().
         mPackageManager = getContext().getPackageManager();
 
-        mShortcutNameComparator = new ShortcutNameComparator(context, mLabelCache);
+        mShortcutNameComparator =
+                new ShortcutNameComparator(context, mLabelCache, mLauncherAppsCompat);
     }
 
     /**
@@ -147,7 +147,7 @@ public class AppPageLoader extends AsyncTaskLoader<AppPageData> {
     private List<ResolveInfoAppEntry> loadAllApps() {
         List<ResolveInfoAppEntry> result = new ArrayList<>();
 
-        LauncherAppsCompat lap = LauncherAppsCompat.getInstance(mContext);
+        LauncherAppsCompat lap = mLauncherAppsCompat;
         List<LauncherActivityInfoCompat> apps =
                 lap.getActivityList(null, UserHandleCompat.myUserHandle());
 

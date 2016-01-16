@@ -16,52 +16,10 @@
 
 package com.appsimobile.appsii.preference;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.provider.Settings;
-
-import com.appsimobile.appsii.BuildConfig;
-import com.appsimobile.appsii.annotation.VisibleForTesting;
-import com.google.android.vending.licensing.AESObfuscator;
-
 /**
  * Created by nick on 09/01/15.
  */
 public class PreferencesFactory {
 
-    private static final byte[] SALT =
-            "http://developer.android.com/google/play/billing/billing_reference.html".getBytes();
-
-    private static volatile SharedPreferences sPreferences;
-
-    private static volatile ObfuscatedPreferences sObfuscatedPreferences;
-
-    @VisibleForTesting
-    public static void setPreferences(SharedPreferences preferences) {
-        sPreferences = preferences;
-    }
-
-    public static SharedPreferences getPreferences(Context context) {
-        if (sPreferences == null) {
-            sPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        }
-        return sPreferences;
-    }
-
-    public static ObfuscatedPreferences getObfuscatedPreferences(Context context) {
-        if (sObfuscatedPreferences == null) {
-            sObfuscatedPreferences = obfuscator(getPreferences(context));
-
-        }
-        return sObfuscatedPreferences;
-    }
-
-    private static ObfuscatedPreferences obfuscator(SharedPreferences preferences) {
-        AESObfuscator obfuscator = new AESObfuscator(SALT,
-                BuildConfig.APPLICATION_ID, Settings.Secure.ANDROID_ID);
-
-        return new ObfuscatedPreferences(preferences, obfuscator);
-    }
 
 }

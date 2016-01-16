@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.permissions.PermissionUtils;
 
 /**
@@ -29,13 +30,19 @@ import com.appsimobile.appsii.permissions.PermissionUtils;
  */
 public class RequestPermissionActivity extends Activity {
 
+    PermissionUtils mPermissionUtils;
+
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppInjector.inject(this);
+
         Intent intent = getIntent();
         String[] permissions = intent.getStringArrayExtra(PermissionUtils.EXTRA_PERMISSIONS);
         int requestCode = intent.getIntExtra(PermissionUtils.EXTRA_REQUEST_CODE, 0);
-        PermissionUtils.requestPermission(this, requestCode, permissions);
+        mPermissionUtils.requestPermission(this, requestCode, permissions);
     }
 
     //@Override

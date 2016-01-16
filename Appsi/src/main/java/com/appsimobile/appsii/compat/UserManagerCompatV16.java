@@ -23,7 +23,7 @@ import java.util.List;
 
 public class UserManagerCompatV16 extends UserManagerCompat {
 
-    UserManagerCompatV16() {
+    public UserManagerCompatV16() {
     }
 
     public List<UserHandleCompat> getUserProfiles() {

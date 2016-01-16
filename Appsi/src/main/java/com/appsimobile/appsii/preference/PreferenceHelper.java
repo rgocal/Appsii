@@ -35,27 +35,17 @@ public class PreferenceHelper {
 
     private final SharedPreferences mSharedPreferences;
 
-    private PreferenceHelper(Context context) {
+    public PreferenceHelper(Context context, SharedPreferences preferences) {
         mContext = context.getApplicationContext();
-        mSharedPreferences = PreferencesFactory.getPreferences(mContext);
-    }
-
-    public static PreferenceHelper getInstance(Context context) {
-        synchronized (INSTANCE_MUTEX) {
-            if (sInstance == null) {
-                sInstance = new PreferenceHelper(context);
-            }
-
-            return sInstance;
-        }
-    }
-
-    public void setAutoStart(boolean autoStart) {
-        mSharedPreferences.edit().putBoolean("pref_autostart", autoStart).apply();
+        mSharedPreferences = preferences;
     }
 
     public boolean getAutoStart() {
         return mSharedPreferences.getBoolean("pref_autostart", true);
+    }
+
+    public void setAutoStart(boolean autoStart) {
+        mSharedPreferences.edit().putBoolean("pref_autostart", autoStart).apply();
     }
 
     public String getDefaultWeatherTemperatureUnit() {

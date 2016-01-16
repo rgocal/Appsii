@@ -20,24 +20,26 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppsiInjector;
 import com.appsimobile.appsii.module.home.config.HomeItemConfiguration;
 import com.appsimobile.appsii.module.home.config.HomeItemConfigurationHelper;
+
+import javax.inject.Inject;
 
 /**
  * Created by nick on 29/01/15.
  */
-abstract class BaseViewHolder extends AbsHomeViewHolder implements
+public abstract class BaseViewHolder extends AbsHomeViewHolder implements
         HomeItemConfigurationHelper.ConfigurationListener {
 
-    HomeItem mHomeItem;
-
-    final HomeItemConfiguration mConfigurationHelper;
-
     final View mOverflow;
+    HomeItem mHomeItem;
+    @Inject
+    HomeItemConfiguration mConfigurationHelper;
 
     public BaseViewHolder(HomeViewWrapper view) {
         super(view);
-        mConfigurationHelper = HomeItemConfigurationHelper.getInstance(view.getContext());
+        AppsiInjector.inject(this);
         mOverflow = view.findViewById(R.id.overflow);
     }
 

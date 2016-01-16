@@ -26,7 +26,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -36,6 +35,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.icontheme.iconpack.AbstractIconPack;
 import com.appsimobile.appsii.icontheme.iconpack.IconPack;
 import com.appsimobile.appsii.icontheme.iconpack.IconPackFactory;
@@ -44,6 +44,8 @@ import com.appsimobile.appsii.icontheme.iconpack.VoidIconPack;
 import com.appsimobile.appsii.theme.CustomThemeActivity;
 
 import java.util.ArrayList;
+
+import javax.inject.Inject;
 
 /**
  * Created by Nick Martens on 6/21/13.
@@ -205,15 +207,12 @@ public class LookAndFeelActivity extends AppCompatActivity {
     public static class LookAndFeelPreferencesFragment extends PreferenceFragment
             implements Preference.OnPreferenceClickListener {
 
-        Context mContext;
-
-        Preference mThemeListPreference;
-
         private final IconPack mNoIconPack = new VoidIconPack();
-
+        Context mContext;
+        Preference mThemeListPreference;
+        @Inject
+        SharedPreferences mPreferences;
         private Preference mIconThemePreference;
-
-        private SharedPreferences mPreferences;
 
         private static void sendNotify(Context context, Uri uri) {
             context.getContentResolver().notifyChange(uri, null);
@@ -222,6 +221,7 @@ public class LookAndFeelActivity extends AppCompatActivity {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
+            AppInjector.inject(this);
 
             mContext = getActivity();
 
@@ -234,9 +234,6 @@ public class LookAndFeelActivity extends AppCompatActivity {
             if (mIconThemePreference != null) {
                 mIconThemePreference.setOnPreferenceClickListener(this);
             }
-
-            mPreferences =
-                    PreferenceManager.getDefaultSharedPreferences(getActivity());
 
             String iconThemeUriString = mPreferences.getString("pref_icon_theme", null);
             Uri uri = iconThemeUriString == null ? null : Uri.parse(iconThemeUriString);
@@ -295,9 +292,7 @@ public class LookAndFeelActivity extends AppCompatActivity {
             Uri uri = iconPack.mUri;
             mIconThemePreference.setSummary(iconPack.mName);
             String stringUri = uri == null ? null : uri.toString();
-            SharedPreferences preferences =
-                    PreferenceManager.getDefaultSharedPreferences(getActivity());
-            SharedPreferences.Editor editor = preferences.edit();
+            SharedPreferences.Editor editor = mPreferences.edit();
             if (stringUri == null) {
                 editor.remove("pref_icon_theme");
             } else {

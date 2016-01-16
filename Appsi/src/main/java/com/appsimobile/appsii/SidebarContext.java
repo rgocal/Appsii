@@ -16,6 +16,7 @@
 
 package com.appsimobile.appsii;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.ContextWrapper;
 
@@ -24,28 +25,43 @@ import android.content.ContextWrapper;
  */
 public class SidebarContext extends ContextWrapper {
 
-    final AnalyticsManager mAnalyticsManager = AnalyticsManager.getInstance();
-
+    private final LoaderManager mLoaderManager;
     public boolean mIsFullScreen;
-
-    private LoaderManager mLoaderManager;
-
+    AnalyticsManager mAnalyticsManager;
     private int mContentWidth;
 
-    public SidebarContext(Context base) {
+    public SidebarContext(Context base, AnalyticsManager analyticsManager, LoaderManager loaderManager) {
         super(base);
+        mAnalyticsManager = analyticsManager;
+        mLoaderManager = loaderManager;
     }
 
     public static void track(Context context, String action, String category, String label) {
         ((SidebarContext) context).track(action, category, label);
     }
 
-    public void track(String action, String category, String label) {
-        mAnalyticsManager.trackAppsiEvent(action, category, label);
-    }
-
     public static void track(Context context, String action, String category) {
         ((SidebarContext) context).track(action, category);
+    }
+
+    public Application getApplication() {
+        Context context = getApplicationContext();
+        while (context != null && !Application.class.isInstance(context)) {
+            if (context instanceof ContextWrapper) {
+                context = ((ContextWrapper) context).getBaseContext();
+            } else {
+                break;
+            }
+        }
+
+        if (context instanceof Application) {
+            return (Application) context;
+        }
+        return null;
+    }
+
+    public void track(String action, String category, String label) {
+        mAnalyticsManager.trackAppsiEvent(action, category, label);
     }
 
     public void track(String action, String category) {
@@ -58,10 +74,6 @@ public class SidebarContext extends ContextWrapper {
 
     public LoaderManager getLoaderManager() {
         return mLoaderManager;
-    }
-
-    public void setLoaderManager(LoaderManager loaderManager) {
-        mLoaderManager = loaderManager;
     }
 
     public int getContentWidth() {

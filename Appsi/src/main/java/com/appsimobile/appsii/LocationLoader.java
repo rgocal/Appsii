@@ -28,6 +28,7 @@ import android.support.annotation.RequiresPermission;
 import android.support.v4.util.CircularArray;
 import android.util.Log;
 
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.module.weather.loader.CantGetWeatherException;
 import com.appsimobile.appsii.module.weather.loader.YahooWeatherApiClient;
 
@@ -57,11 +58,11 @@ public class LocationLoader {
 
     public LocationLoader(LocationReceiver locationReceiver) {
         mLocationReceiver = locationReceiver;
+        mLocationManager = AppInjector.provideLocationManager();
     }
 
     @RequiresPermission(anyOf = {ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION})
     public boolean requestLocationUpdate(Context context) throws SecurityException {
-        mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
         if (!mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             return false;

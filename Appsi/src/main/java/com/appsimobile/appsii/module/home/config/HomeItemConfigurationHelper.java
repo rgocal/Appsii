@@ -35,75 +35,28 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 /**
  * A helper facility to ease the process of loading and saving configurations for multiple
  * small views.
  * Created by nick on 21/01/15.
  */
+@Singleton
 public class HomeItemConfigurationHelper extends AbstractHomeItemConfiguration {
-
-    private static HomeItemConfigurationFactory sFactory = new HomeItemConfigurationFactoryImpl();
-
-    private static HomeItemConfiguration sInstance;
-
-    // Confined to main thread
-    QueryHandlerImpl mQueryHandler;
 
     @GuardedBy("this")
     private final LongSparseArray<ConfigurationProperty> mConfigurationProperties;
+    // Confined to main thread
+    QueryHandlerImpl mQueryHandler;
+    HomeItemConfigurationLoader mHomeItemConfigurationLoader;
 
-    protected HomeItemConfigurationHelper(Context context) {
+    @Inject
+    public HomeItemConfigurationHelper(Context context, HomeItemConfigurationLoader loader) {
         super(context);
-        mConfigurationProperties = loadConfigurations(context);
-    }
-
-    @VisibleForTesting
-    public static void setFactory(HomeItemConfigurationFactory factory) {
-        HomeItemConfigurationHelper.sFactory = factory;
-    }
-
-    public static synchronized HomeItemConfiguration getInstance(Context context) {
-        if (sInstance == null) {
-            sInstance = sFactory.createInstance(context);
-        }
-        return sInstance;
-    }
-
-    @VisibleForTesting
-    LongSparseArray<ConfigurationProperty> loadConfigurations(Context context) {
-        ContentResolver resolver = context.getContentResolver();
-        String[] projection = new String[]{
-                HomeContract.Configuration._CELL_ID,
-                HomeContract.Configuration.KEY,
-                HomeContract.Configuration.VALUE,
-        };
-
-        Cursor cursor = resolver.query(HomeContract.Configuration.CONTENT_URI,
-                projection,
-                null,
-                null,
-                null);
-
-        if (cursor == null) return null;
-
-        LongSparseArray<ConfigurationProperty> result = new LongSparseArray<>();
-        try {
-            while (cursor.moveToNext()) {
-
-                long cellId = cursor.getLong(0);
-
-                ConfigurationProperty info = result.get(cellId);
-                if (info == null) {
-                    info = createProperty(result, cellId);
-                }
-                String key = cursor.getString(1);
-                String value = cursor.getString(2);
-                info.put(key, value);
-            }
-        } finally {
-            cursor.close();
-        }
-        return result;
+        mHomeItemConfigurationLoader = loader;
+        mConfigurationProperties = mHomeItemConfigurationLoader.loadConfigurations(context);
     }
 
     void ensureQueryHandler() {
@@ -203,11 +156,50 @@ public class HomeItemConfigurationHelper extends AbstractHomeItemConfiguration {
         notifyPropertyDeleted(cellId, key);
     }
 
-    static final class HomeItemConfigurationFactoryImpl implements HomeItemConfigurationFactory {
+    @Singleton
+    public static class HomeItemConfigurationLoader {
 
-        @Override
-        public HomeItemConfiguration createInstance(Context context) {
-            return new HomeItemConfigurationHelper(context);
+        ContentResolver mContentResolver;
+
+        @Inject
+        HomeItemConfigurationLoader(ContentResolver contentResolver) {
+            mContentResolver = contentResolver;
+        }
+
+        @VisibleForTesting
+        public LongSparseArray<ConfigurationProperty> loadConfigurations(Context context) {
+            String[] projection = new String[]{
+                    HomeContract.Configuration._CELL_ID,
+                    HomeContract.Configuration.KEY,
+                    HomeContract.Configuration.VALUE,
+            };
+
+            Cursor cursor = mContentResolver.query(HomeContract.Configuration.CONTENT_URI,
+                    projection,
+                    null,
+                    null,
+                    null);
+
+            if (cursor == null) return null;
+
+            LongSparseArray<ConfigurationProperty> result = new LongSparseArray<>();
+            try {
+                while (cursor.moveToNext()) {
+
+                    long cellId = cursor.getLong(0);
+
+                    ConfigurationProperty info = result.get(cellId);
+                    if (info == null) {
+                        info = createProperty(result, cellId);
+                    }
+                    String key = cursor.getString(1);
+                    String value = cursor.getString(2);
+                    info.put(key, value);
+                }
+            } finally {
+                cursor.close();
+            }
+            return result;
         }
     }
 

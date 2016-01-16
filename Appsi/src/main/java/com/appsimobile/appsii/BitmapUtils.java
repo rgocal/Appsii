@@ -17,6 +17,7 @@
 package com.appsimobile.appsii;
 
 import android.Manifest;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -37,19 +38,38 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.inject.Inject;
+
 /**
  * Created by nick on 14/04/15.
  */
 public class BitmapUtils {
 
-    public static Bitmap decodeSampledBitmapFromResource(Resources res, @DrawableRes int resId,
+    PermissionUtils mPermissionUtils;
+
+    Resources mResources;
+
+    Context mContext;
+
+    ContentResolver mContentResolver;
+
+    @Inject
+    BitmapUtils(Context context, PermissionUtils permissionUtils, Resources res,
+            ContentResolver resolver) {
+        mPermissionUtils = permissionUtils;
+        mResources = res;
+        mContext = context;
+        mContentResolver = resolver;
+    }
+
+    public Bitmap decodeSampledBitmapFromResource(@DrawableRes int resId,
             int reqWidth, int reqHeight) {
 
         try {
             // First decode with inJustDecodeBounds=true to check dimensions
             final BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
-            BitmapFactory.decodeResource(res, resId, options);
+            BitmapFactory.decodeResource(mResources, resId, options);
 
             // Calculate inSampleSize
             options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
@@ -57,7 +77,7 @@ public class BitmapUtils {
 
             // Decode bitmap with inSampleSize set
             options.inJustDecodeBounds = false;
-            Bitmap bitmap = BitmapFactory.decodeResource(res, resId, options);
+            Bitmap bitmap = BitmapFactory.decodeResource(mResources, resId, options);
             return ThumbnailUtils.extractThumbnail(bitmap, reqWidth, reqHeight);
         } catch (OutOfMemoryError e) {
             Crashlytics.logException(e);
@@ -66,7 +86,7 @@ public class BitmapUtils {
         }
     }
 
-    public static int calculateInSampleSize(
+    public int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image
         final int height = options.outHeight;
@@ -89,7 +109,7 @@ public class BitmapUtils {
         return inSampleSize;
     }
 
-    public static Bitmap decodeSampledBitmapFromFile(File path,
+    public Bitmap decodeSampledBitmapFromFile(File path,
             int reqWidth, int reqHeight) {
 
         try {
@@ -125,15 +145,15 @@ public class BitmapUtils {
         }
     }
 
-    public static Bitmap decodeContactImage(Context context, Uri contactUri, int reqWidth,
+    public Bitmap decodeContactImage(Uri contactUri, int reqWidth,
             int reqHeight) throws PermissionDeniedException {
 
         try {
-            PermissionUtils.throwIfNotPermitted(context, Manifest.permission.READ_CONTACTS);
+            mPermissionUtils.throwIfNotPermitted(mContext, Manifest.permission.READ_CONTACTS);
 
             InputStream avatarDataStream =
                     ContactsContract.Contacts.openContactPhotoInputStream(
-                            context.getContentResolver(),
+                            mContentResolver,
                             contactUri, true);
 
             if (avatarDataStream == null) return null;
@@ -146,7 +166,7 @@ public class BitmapUtils {
 
             avatarDataStream =
                     ContactsContract.Contacts.openContactPhotoInputStream(
-                            context.getContentResolver(),
+                            mContentResolver,
                             contactUri, true);
             if (avatarDataStream == null) return null;
 
@@ -170,12 +190,12 @@ public class BitmapUtils {
         }
     }
 
-    public static File userImageFile(String customDrawableFileName) {
+    public File userImageFile(String customDrawableFileName) {
         File parentFolder = externalFilesFolder();
         return new File(parentFolder, customDrawableFileName);
     }
 
-    public static File externalFilesFolder() {
+    public File externalFilesFolder() {
         File result = new File(Environment.getExternalStorageDirectory(), "appsii");
 //        File result = new File("/sdcard/appsii");
         if (!result.exists()) {

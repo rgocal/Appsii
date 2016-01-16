@@ -24,7 +24,6 @@ import android.content.Loader;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -41,6 +40,7 @@ import com.appsimobile.appsii.LoaderManager;
 import com.appsimobile.appsii.PageController;
 import com.appsimobile.appsii.PermissionDeniedException;
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppsiInjector;
 import com.appsimobile.appsii.module.AppsiPreferences;
 import com.appsimobile.appsii.module.PermissionHelper;
 import com.appsimobile.appsii.module.ToolbarScrollListener;
@@ -49,6 +49,8 @@ import com.appsimobile.util.TimeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * Created by nick on 25/05/14.
@@ -65,13 +67,12 @@ public class CallLogController extends PageController
     ViewGroup mPermissionOverlay;
 
     boolean mPendingPermissionError;
-
+    @Inject
+    SharedPreferences mSharedPreferences;
+    @Inject
+    PermissionUtils mPermissionUtils;
     private RecyclerView mCallLogList;
-
-    private SharedPreferences mSharedPreferences;
-
     private CallLogAdapter mCallLogAdapter;
-
     private Toolbar mToolbar;
 
     public CallLogController(Context context, String title) {
@@ -137,7 +138,8 @@ public class CallLogController extends PageController
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        AppsiInjector.inject(this);
+
         mCallLogAdapter = new CallLogAdapter(getContext());
         mCallLogAdapter.setOnItemClickListener(this);
         getLoaderManager().initLoader(CALL_LOG_LOADER_ID, null, this);
@@ -232,7 +234,7 @@ public class CallLogController extends PageController
 
     @Override
     public void onAccepted(PermissionHelper permissionHelper) {
-        Intent intent = PermissionUtils.
+        Intent intent = mPermissionUtils.
                 buildRequestPermissionsIntent(getContext(),
                         PermissionUtils.REQUEST_CODE_PERMISSION_READ_CALL_LOG,
                         permissionHelper.getPermissions());

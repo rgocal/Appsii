@@ -31,8 +31,11 @@ import android.widget.Switch;
 
 import com.appsimobile.appsii.BuildConfig;
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.appsimobile.appsii.preference.PreferenceHelper;
+
+import javax.inject.Inject;
 
 /**
  * Created by nick on 10/06/15.
@@ -48,8 +51,17 @@ public final class FirstRunWelcomeFragment extends Fragment implements View.OnCl
     Button mNextButton;
 
     Switch mAutoStartSwitch;
-
+    @Inject
+    PreferenceHelper mPreferenceHelper;
+    @Inject
+    PermissionUtils mPermissionUtils;
     private OnWelcomeCompletedListener mOnFirstRunCompletedListener;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        AppInjector.inject(this);
+    }
 
     @Nullable
     @Override
@@ -80,7 +92,7 @@ public final class FirstRunWelcomeFragment extends Fragment implements View.OnCl
     }
 
     private void updatePermissions() {
-        if (PermissionUtils.runtimePermissionsAvailable()) {
+        if (mPermissionUtils.runtimePermissionsAvailable()) {
             boolean holdsPermission = Settings.canDrawOverlays(getActivity());
             mNextButton.setEnabled(holdsPermission);
             mPermissionsButton.setEnabled(!holdsPermission);
@@ -116,8 +128,7 @@ public final class FirstRunWelcomeFragment extends Fragment implements View.OnCl
     }
 
     private void onNextButtonPressed() {
-        PreferenceHelper preferenceHelper = PreferenceHelper.getInstance(getActivity());
-        preferenceHelper.setAutoStart(mAutoStartSwitch.isChecked());
+        mPreferenceHelper.setAutoStart(mAutoStartSwitch.isChecked());
         mOnFirstRunCompletedListener.onWelcomeCompleted();
     }
 

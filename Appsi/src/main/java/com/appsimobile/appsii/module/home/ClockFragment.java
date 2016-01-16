@@ -32,12 +32,14 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.module.home.config.HomeItemConfiguration;
-import com.appsimobile.appsii.module.home.config.HomeItemConfigurationHelper;
 import com.appsimobile.appsii.timezonepicker.TimeZoneInfo;
 import com.appsimobile.appsii.timezonepicker.TimeZonePickerDialog;
 
 import java.util.TimeZone;
+
+import javax.inject.Inject;
 
 
 /**
@@ -50,6 +52,7 @@ public class ClockFragment extends Fragment implements View.OnClickListener,
 
     EditText mTitleText;
 
+    @Inject
     HomeItemConfiguration mConfigurationHelper;
 
     long mCellId;
@@ -71,7 +74,7 @@ public class ClockFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mConfigurationHelper = HomeItemConfigurationHelper.getInstance(getActivity());
+        AppInjector.inject(this);
         Bundle arguments = getArguments();
         mCellId = arguments.getLong("cellId");
 

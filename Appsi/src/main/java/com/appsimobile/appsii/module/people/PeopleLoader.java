@@ -34,6 +34,8 @@ import com.appsimobile.util.ConvertedCursorLoader;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 /**
  * Created by nick on 22/09/14.
  */
@@ -45,12 +47,13 @@ public class PeopleLoader extends ConvertedCursorLoader<PeopleLoaderResult> {
      */
     private static final String DEFAULT_SORT_ORDER =
             ContactsContract.Contacts.DISPLAY_NAME + " COLLATE LOCALIZED ASC";
-
+    PermissionUtils mPermissionUtils;
     private BroadcastReceiver mPermissionGrantedReceiver;
 
-    public PeopleLoader(Context context) {
-
+    @Inject
+    public PeopleLoader(Context context, PermissionUtils permissionUtils) {
         super(context);
+        mPermissionUtils = permissionUtils;
 
         Uri uri = ContactsContract.Contacts.CONTENT_URI.buildUpon()
                 .appendQueryParameter(ContactsContract.DIRECTORY_PARAM_KEY,
@@ -69,7 +72,7 @@ public class PeopleLoader extends ConvertedCursorLoader<PeopleLoaderResult> {
 
     @Override
     protected void checkPermissions() throws PermissionDeniedException {
-        PermissionUtils.throwIfNotPermitted(getContext(), Manifest.permission.READ_CONTACTS);
+        mPermissionUtils.throwIfNotPermitted(getContext(), Manifest.permission.READ_CONTACTS);
     }
 
     @Override

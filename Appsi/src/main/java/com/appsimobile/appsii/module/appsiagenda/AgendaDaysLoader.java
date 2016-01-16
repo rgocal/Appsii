@@ -29,6 +29,7 @@ import android.text.format.Time;
 import android.util.SparseBooleanArray;
 
 import com.appsimobile.appsii.PermissionDeniedException;
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.appsimobile.util.ConvertedCursorLoader;
 import com.appsimobile.util.TimeUtils;
@@ -41,14 +42,15 @@ public class AgendaDaysLoader extends ConvertedCursorLoader<AgendaDaysResult> {
     private static final String EVENT_DAYS_SELECTION = CalendarContract.Events.VISIBLE + "=1";
 
     int mLastLoadedDay = TimeUtils.getJulianDay();
-
+    PermissionUtils mPermissionUtils;
     private BroadcastReceiver mDayChangeReceiver;
-
     private BroadcastReceiver mPermissionGrantedReceiver;
 
     public AgendaDaysLoader(Context context, DatePickerController controller) {
 
         super(context);
+
+        AppInjector.inject(this);
 
         Time time = new Time(Time.TIMEZONE_UTC);
         time.set(1, 0, controller.getMinYear());
@@ -76,7 +78,7 @@ public class AgendaDaysLoader extends ConvertedCursorLoader<AgendaDaysResult> {
 
     @Override
     protected void checkPermissions() throws PermissionDeniedException {
-        PermissionUtils.throwIfNotPermitted(getContext(), Manifest.permission.READ_CALENDAR);
+        mPermissionUtils.throwIfNotPermitted(getContext(), Manifest.permission.READ_CALENDAR);
     }
 
     @Override

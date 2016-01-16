@@ -45,9 +45,12 @@ public class AppRunningLoader extends AsyncTaskLoader<List<AppEntry>> {
 
     PackageIntentReceiver mPackageObserver;
 
-    public AppRunningLoader(Context context) {
+    ActivityManager mActivityManager;
+
+    public AppRunningLoader(Context context, ActivityManager activityManager) {
         super(context);
 
+        mActivityManager = activityManager;
         // Retrieve the package manager for later use; note we don't
         // use 'context' directly but instead the save global application
         // context returned by getContext().
@@ -74,10 +77,7 @@ public class AppRunningLoader extends AsyncTaskLoader<List<AppEntry>> {
     @Override
     public List<AppEntry> loadInBackground() {
 
-        ActivityManager activityManager =
-                (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
-
-        List<RunningAppProcessInfo> apps = activityManager.getRunningAppProcesses();
+        List<RunningAppProcessInfo> apps = mActivityManager.getRunningAppProcesses();
 
         if (apps == null) return null;
 

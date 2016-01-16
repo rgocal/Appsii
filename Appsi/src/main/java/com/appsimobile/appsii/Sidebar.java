@@ -21,7 +21,6 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.util.CircularArray;
 import android.support.v4.view.ViewPager;
@@ -31,6 +30,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+
+import com.appsimobile.appsii.dagger.AppsiInjector;
+
+import javax.inject.Inject;
 
 /**
  * This class is the basic implementation of the sidebar. It communicates various
@@ -88,20 +91,16 @@ public class Sidebar extends RelativeLayout
     View mCancelClosingOverlayAlwaysCloseButton;
 
     View mCancelClosingOverlayNeverCloseButton;
-
+    @Inject
+    SidebarContext mAppsiContext;
+    @Inject
+    SharedPreferences mSharedPreferences;
     private ViewPager mAppsiViewPager;
-
     private SidebarPagerAdapter mAdapter;
-
-    private SidebarContext mAppsiContext;
 
     public Sidebar(Context context) {
         super(context);
         init();
-    }
-
-    private void init() {
-        mAppsiContext = new SidebarContext(getContext());
     }
 
     public Sidebar(Context context, AttributeSet attrs) {
@@ -114,6 +113,19 @@ public class Sidebar extends RelativeLayout
         init();
     }
 
+    private static int indexOfId(CircularArray<HotspotPageEntry> entries, long defaultPage) {
+        if (defaultPage == -1L) return -1;
+        for (int i = 0; i < entries.size(); i++) {
+            HotspotPageEntry e = entries.get(i);
+            if (e.mPageId == defaultPage) return i;
+        }
+        return -1;
+    }
+
+    private void init() {
+        AppsiInjector.inject(this);
+    }
+
     public void onTrimMemory(int level) {
         if (mAdapter != null) {
             mAdapter.onTrimMemory(level);
@@ -122,14 +134,6 @@ public class Sidebar extends RelativeLayout
 
     public void setOnCancelCloseListener(OnCancelCloseListener onCancelCloseListener) {
         mOnCancelCloseListener = onCancelCloseListener;
-    }
-
-    void setLoaderManager(LoaderManager loaderManager) {
-        mAppsiContext.setLoaderManager(loaderManager);
-
-        mAdapter = new SidebarPagerAdapter(mAppsiContext);
-        mAppsiViewPager.setAdapter(mAdapter);
-        mAdapter.setFlagListener(this);
     }
 
     @Override
@@ -196,6 +200,11 @@ public class Sidebar extends RelativeLayout
         // special SidebarContext that provides access to the actionbar.
         mAppsiViewPager = (ViewPager) findViewById(R.id.appsi_view_pager);
         mAppsiViewPager.addOnPageChangeListener(mOnPageChangeListener);
+
+        mAdapter = new SidebarPagerAdapter(mAppsiContext);
+        mAppsiViewPager.setAdapter(mAdapter);
+        mAdapter.setFlagListener(this);
+
 
         mSidebarBackgroundView = findViewById(R.id.sidebar_back);
         mLeftShadow = findViewById(R.id.sidebar_left_shadow);
@@ -336,7 +345,7 @@ public class Sidebar extends RelativeLayout
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         if (!isInEditMode()) {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+            SharedPreferences prefs = mSharedPreferences;
             prefs.registerOnSharedPreferenceChangeListener(this);
             setupPagingAnimation(prefs);
             mAdapter.onAttachedToWindow();
@@ -347,7 +356,7 @@ public class Sidebar extends RelativeLayout
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         mCancelClosingOverlay.setVisibility(GONE);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences prefs = mSharedPreferences;
         prefs.unregisterOnSharedPreferenceChangeListener(this);
         mAdapter.onDetachedFromWindow();
     }
@@ -358,15 +367,6 @@ public class Sidebar extends RelativeLayout
         if (idx != -1L) {
             mAppsiViewPager.setCurrentItem(idx, false);
         }
-    }
-
-    private static int indexOfId(CircularArray<HotspotPageEntry> entries, long defaultPage) {
-        if (defaultPage == -1L) return -1;
-        for (int i = 0; i < entries.size(); i++) {
-            HotspotPageEntry e = entries.get(i);
-            if (e.mPageId == defaultPage) return i;
-        }
-        return -1;
     }
 
     @Override

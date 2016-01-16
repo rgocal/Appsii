@@ -16,15 +16,16 @@
 
 package com.appsimobile.appsii.compat;
 
-import android.content.Context;
 import android.os.UserManager;
+
+import com.appsimobile.appsii.dagger.AppInjector;
 
 public class UserManagerCompatV17 extends UserManagerCompatV16 {
 
     protected final UserManager mUserManager;
 
-    UserManagerCompatV17(Context context) {
-        mUserManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
+    public UserManagerCompatV17() {
+        mUserManager = AppInjector.provideUserManager();
     }
 
     public long getSerialNumberForUser(UserHandleCompat user) {

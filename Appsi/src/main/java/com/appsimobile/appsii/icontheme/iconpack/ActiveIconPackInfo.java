@@ -23,8 +23,9 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 import android.util.Log;
+
+import com.appsimobile.appsii.dagger.AppInjector;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -39,19 +40,19 @@ public class ActiveIconPackInfo {
     public static final String APP_ICON_AUTHORITY = "com.appsimobile.appsii.appsplugin.icon";
 
     private static ActiveIconPackInfo sInstance;
-
+    private final Context mContext;
     private IconPack mActiveIconPack;
 
-    private final Context mContext;
 
     public ActiveIconPackInfo(Context applicationContext) {
         mContext = applicationContext;
+
     }
 
     public static synchronized ActiveIconPackInfo getInstance(Context context) {
         if (sInstance == null) {
             sInstance = new ActiveIconPackInfo(context.getApplicationContext());
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+            SharedPreferences preferences = AppInjector.provideSharedPreferences();
             String stringUri = preferences.getString("pref_icon_theme", null);
             if (stringUri != null) {
                 Uri uri = Uri.parse(stringUri);

@@ -33,9 +33,11 @@ import android.view.ViewOutlineProvider;
 import android.widget.ImageView;
 
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.module.BaseContactInfo;
 import com.appsimobile.appsii.module.home.config.HomeItemConfiguration;
-import com.appsimobile.appsii.module.home.config.HomeItemConfigurationHelper;
+
+import javax.inject.Inject;
 
 /**
  * A fragment that allows the user to load a profile image to show in the fragment.
@@ -45,6 +47,7 @@ import com.appsimobile.appsii.module.home.config.HomeItemConfigurationHelper;
 public class ProfileImageFragment extends Fragment implements View.OnClickListener,
         ContactPickerDialog.ContactPickedListener {
 
+    @Inject
     HomeItemConfiguration mConfigurationHelper;
 
     long mCellId;
@@ -71,7 +74,7 @@ public class ProfileImageFragment extends Fragment implements View.OnClickListen
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mConfigurationHelper = HomeItemConfigurationHelper.getInstance(getActivity());
+        AppInjector.inject(this);
         Bundle arguments = getArguments();
         mCellId = arguments.getLong("cellId");
         mLookupKey = mConfigurationHelper.getProperty(mCellId, "lookupKey", null);

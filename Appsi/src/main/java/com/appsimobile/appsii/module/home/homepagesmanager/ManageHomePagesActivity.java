@@ -38,13 +38,15 @@ import android.view.ViewGroup;
 import com.appsimobile.appsii.ActivityUtils;
 import com.appsimobile.appsii.GotItDismissListener;
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.module.home.HomeEditorActivity;
 import com.appsimobile.appsii.module.home.HomeItemTitleEditDialog;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
-import com.appsimobile.appsii.preference.PreferencesFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * An activity showing a list of home pages that can be managed through
@@ -71,13 +73,18 @@ public class ManageHomePagesActivity extends AppCompatActivity
      */
     AsyncQueryHandlerImpl mAsyncQueryHandler;
 
+    @Inject
+    SharedPreferences mPreferences;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppInjector.inject(this);
+
         ActivityUtils.setContentViewWithFab(this, R.layout.activity_manage_home_pages);
         ActivityUtils.setupToolbar(this, R.id.toolbar);
 
-        mHomeAdapter = new HomeAdapter(this, this);
+        mHomeAdapter = new HomeAdapter(this, this, mPreferences);
         getLoaderManager().initLoader(0, null, this);
         mAsyncQueryHandler = new AsyncQueryHandlerImpl(this, getContentResolver());
         HomeItemTitleEditDialog dialog =
@@ -166,9 +173,9 @@ public class ManageHomePagesActivity extends AppCompatActivity
 
         boolean mGotItDismissed;
 
-        HomeAdapter(Context context, HomeViewHolder.HomeViewActionListener actionListener) {
+        HomeAdapter(Context context, HomeViewHolder.HomeViewActionListener actionListener, SharedPreferences preferences) {
             mActionListener = actionListener;
-            mPreferences = PreferencesFactory.getPreferences(context);
+            mPreferences = preferences;
             mGotItDismissed = mPreferences.getBoolean("home_got_it_dismissed", false);
         }
 

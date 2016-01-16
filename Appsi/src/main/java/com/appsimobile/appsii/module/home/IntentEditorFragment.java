@@ -52,14 +52,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.module.home.config.HomeItemConfiguration;
-import com.appsimobile.appsii.module.home.config.HomeItemConfigurationHelper;
-import com.appsimobile.appsii.preference.PreferencesFactory;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import javax.inject.Inject;
 
 /**
  * Created by nick on 24/01/15.
@@ -72,7 +73,11 @@ public class IntentEditorFragment extends Fragment implements View.OnClickListen
 
     static final int REQUEST_CODE_PICK_ACTIVITY = 101;
 
+    @Inject
     HomeItemConfiguration mConfigurationHelper;
+
+    @Inject
+    SharedPreferences mSharedPreferences;
 
     long mCellId;
 
@@ -389,7 +394,7 @@ public class IntentEditorFragment extends Fragment implements View.OnClickListen
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mConfigurationHelper = HomeItemConfigurationHelper.getInstance(getActivity());
+        AppInjector.inject(this);
         Bundle arguments = getArguments();
         mCellId = arguments.getLong("cellId");
 
@@ -564,7 +569,7 @@ public class IntentEditorFragment extends Fragment implements View.OnClickListen
     }
 
     private void showOverlayIfNeeded() {
-        SharedPreferences preferences = PreferencesFactory.getPreferences(getActivity());
+        SharedPreferences preferences = mSharedPreferences;
         boolean shownInfo = preferences.getBoolean("shown_intent_editor_info", false);
         if (!shownInfo) {
             ViewStub overlay = (ViewStub) getView().findViewById(R.id.overlay);
@@ -598,7 +603,7 @@ public class IntentEditorFragment extends Fragment implements View.OnClickListen
     }
 
     void dismissOverlay(View view) {
-        SharedPreferences preferences = PreferencesFactory.getPreferences(getActivity());
+        SharedPreferences preferences = mSharedPreferences;
         preferences.edit().putBoolean("shown_intent_editor_info", true).apply();
         view.setVisibility(View.GONE);
     }

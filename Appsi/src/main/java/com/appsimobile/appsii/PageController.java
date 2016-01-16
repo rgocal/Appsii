@@ -479,8 +479,6 @@ public abstract class PageController implements ViewTreeObserver.OnGlobalLayoutL
 
         final LoaderManager.LoaderCallbacks<T> mLoaderCallbacks;
 
-        final SparseArray<Bundle> mLoadersToCreate = new SparseArray<>();
-
         Pair<Loader<T>, T> mResult;
 
         public CallbackWrapper(LoaderManager.LoaderCallbacks<T> cb) {

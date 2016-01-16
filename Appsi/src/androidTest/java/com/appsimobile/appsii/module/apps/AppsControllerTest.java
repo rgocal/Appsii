@@ -18,129 +18,93 @@
 
 package com.appsimobile.appsii.module.apps;
 
+import android.app.Instrumentation;
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
-import android.test.InstrumentationTestCase;
-import android.view.ContextThemeWrapper;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.FrameLayout;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.rule.ServiceTestRule;
+import android.support.test.runner.AndroidJUnit4;
 
 import com.appsimobile.appsii.Appsi;
-import com.appsimobile.appsii.LoaderManager;
-import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.MockAppsiApplication;
+import com.appsimobile.appsii.MockAppsiComponent;
 import com.appsimobile.appsii.SidebarContext;
+import com.appsimobile.appsii.dagger.AppInjector;
+import com.appsimobile.appsii.dagger.AppsiInjector;
+import com.appsimobile.appsii.permissions.PermissionUtils;
+
+import junit.framework.Assert;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicReference;
+
+import javax.inject.Inject;
+
+import static org.mockito.Matchers.any;
 
 /**
  * Created by nick on 09/03/15.
  */
-public class AppsControllerTest extends InstrumentationTestCase {
+@RunWith(AndroidJUnit4.class)
+public class AppsControllerTest {
+
+    @Rule
+    public final ServiceTestRule mServiceRule = new ServiceTestRule();
 
     Appsi mAppsi;
 
-    AppsController mAppsController;
+    @Inject
+    SidebarContext mSidebarContext;
 
-    View mAppsControllerView;
+    @Inject
+    AppsAdapter mAppsAdapter;
 
-    Context mContext;
+    @Inject
+    PermissionUtils mPermissionUtils;
 
-    private Handler mHandler;
+    @Inject
+    SharedPreferences mSharedPreferences;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setup() throws Exception {
+        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        MockAppsiApplication app =
+                (MockAppsiApplication) instrumentation.getTargetContext().getApplicationContext();
 
+        mPermissionUtils = AppInjector.getApplicationComponent().providePermissionUtils();
+        Mockito.when(mPermissionUtils.canDrawOverlays(any(Context.class))).thenReturn(true);
 
-        Looper looper = Looper.getMainLooper();
+        mServiceRule.startService(new Intent(app, Appsi.class));
 
-        final CountDownLatch latch = new CountDownLatch(1);
+        MockAppsiComponent ac = (MockAppsiComponent) AppsiInjector.getAppsiComponent();
+        ac.inject(this);
+        mAppsi = AppsiInjector.provideAppsi();
+        Mockito.reset(mSidebarContext);
 
-        mHandler = new Handler(looper);
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                Context context = getInstrumentation().getTargetContext();
-                context = new ContextThemeWrapper(context,
-                        R.style.Appsi_Sidebar_Material_Teal);
-                mContext = context;
-
-                LayoutInflater inflater = LayoutInflater.from(context);
-                SidebarContext sb = new SidebarContext(context) {
-                    @Override
-                    public void track(String action, String category, String label) {
-                    }
-
-                    @Override
-                    public void track(String action, String category) {
-                    }
-
-                    @Override
-                    public void trackPageView(String page) {
-                    }
-                };
-                sb.setLoaderManager(LoaderManager.createInstance(mAppsi, false));
-
-
-                FrameLayout parent = new FrameLayout(sb);
-
-                mAppsController = new AppsController(sb, "Apps");
-                mAppsController.performCreate(null);
-                mAppsControllerView = mAppsController.performCreateView(inflater, parent);
-                mAppsController.performViewCreated(mAppsControllerView);
-                mAppsController.onSidebarAttached();
-
-                mAppsController.performOnAttach();
-
-                parent.measure(
-                        View.MeasureSpec.makeMeasureSpec(1200, View.MeasureSpec.EXACTLY),
-                        View.MeasureSpec.makeMeasureSpec(2400, View.MeasureSpec.EXACTLY));
-                parent.layout(0, 0, 1200, 2400);
-
-                mAppsController.performStart();
-                mAppsController.performRestoreInstanceState();
-                mAppsController.performResume();
-
-                mAppsController.onFirstLayout();
-                mAppsController.onUserVisible();
-
-                latch.countDown();
-            }
-        });
-
-        latch.await();
 
     }
 
+    @Test
     public void testNullApps() throws InterruptedException {
-        final CountDownLatch latch = new CountDownLatch(1);
-        final AtomicReference<AppsAdapter> adapterRef = new AtomicReference<>();
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                AppTag allAppsTag = new AppTag(
-                        0, "all", 0, false, true, 3, AppsContract.TagColumns.TAG_TYPE_ALL);
-                AppTag recentAppsTag = new AppTag(
-                        1, "recent", 1, false, true, 3, AppsContract.TagColumns.TAG_TYPE_RECENT);
 
-                AppPageData data = new AppPageData(null, new ArrayList<HistoryItem>(),
-                        Arrays.asList(allAppsTag, recentAppsTag));
+        AppTag allAppsTag = new AppTag(
+                0, "all", 0, false, true, 3, AppsContract.TagColumns.TAG_TYPE_ALL);
+        AppTag recentAppsTag = new AppTag(
+                1, "recent", 1, false, true, 3, AppsContract.TagColumns.TAG_TYPE_RECENT);
 
-                AppPageLoader loader = new AppPageLoader(mContext);
-                loader.registerListener(AppsController.APPS_LOADER_ID, null);
-                mAppsController.onLoadFinished(loader, data);
-                adapterRef.set(mAppsController.mAppsAdapter);
-                latch.countDown();
-            }
-        });
-        latch.await();
-        AppsAdapter appsAdapter = adapterRef.get();
-        assertEquals(3, appsAdapter.getItemCount());
+        AppPageData data = new AppPageData(null, new ArrayList<HistoryItem>(),
+                Arrays.asList(allAppsTag, recentAppsTag));
+
+        mAppsAdapter.setAppPageData(data);
+
+        Assert.assertEquals(3, mAppsAdapter.getItemCount());
     }
 
 

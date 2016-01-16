@@ -24,11 +24,12 @@ import android.graphics.drawable.Drawable;
 import com.appsimobile.appsii.compat.LauncherAppsCompat;
 import com.appsimobile.appsii.compat.UserHandleCompat;
 import com.appsimobile.appsii.compat.UserManagerCompat;
+import com.appsimobile.appsii.dagger.AppInjector;
 
 /**
  * Cache of application icons.  Icons can be made from any thread.
  */
-public class IconCache {
+public class AppWidgetIconCache {
 
     private final Context mContext;
 
@@ -40,13 +41,12 @@ public class IconCache {
 
     private final int mIconDpi;
 
-    public IconCache(Context context) {
-        ActivityManager activityManager =
-                (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+    public AppWidgetIconCache(Context context, UserManagerCompat umc, LauncherAppsCompat lac) {
+        ActivityManager activityManager = AppInjector.provideActivityManager();
         mContext = context;
         mPackageManager = context.getPackageManager();
-        mUserManager = UserManagerCompat.getInstance(mContext);
-        mLauncherApps = LauncherAppsCompat.getInstance(mContext);
+        mUserManager = umc;
+        mLauncherApps = lac;
         mIconDpi = activityManager.getLauncherLargeIconDensity();
         // need to set mIconDpi before getting default icon
         UserHandleCompat myUser = UserHandleCompat.myUserHandle();

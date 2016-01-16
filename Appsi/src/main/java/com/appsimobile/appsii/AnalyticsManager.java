@@ -17,8 +17,6 @@
 package com.appsimobile.appsii;
 
 import android.content.Context;
-import android.os.Looper;
-import android.support.annotation.NonNull;
 
 import com.appsimobile.appsii.iab.Purchase;
 import com.appsimobile.appsii.iab.SkuDetails;
@@ -28,6 +26,8 @@ import com.google.android.gms.analytics.Logger;
 import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.analytics.ecommerce.Product;
 import com.google.android.gms.analytics.ecommerce.ProductAction;
+
+import javax.inject.Inject;
 
 /**
  * Created by nick on 05/04/15.
@@ -107,27 +107,10 @@ public class AnalyticsManager {
 
     Tracker mTracker;
 
+    @Inject
     public AnalyticsManager(Context context) {
         mContext = context.getApplicationContext();
         getTracker();
-    }
-
-    @NonNull
-    public static AnalyticsManager getInstance() {
-        if (Looper.getMainLooper() != Looper.myLooper()) {
-            throw new IllegalStateException("Bad thread!");
-        }
-        return sInstance;
-    }
-
-    public static AnalyticsManager getInstance(Context context) {
-        if (Looper.getMainLooper() != Looper.myLooper()) {
-            throw new IllegalStateException("Bad thread!");
-        }
-        if (sInstance == null) {
-            sInstance = new AnalyticsManager(context);
-        }
-        return sInstance;
     }
 
     public Tracker getTracker() {

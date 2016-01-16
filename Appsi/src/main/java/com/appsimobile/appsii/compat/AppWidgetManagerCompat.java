@@ -25,37 +25,18 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
-import com.appsimobile.appsii.appwidget.IconCache;
-import com.appsimobile.appsii.appwidget.Utilities;
+import com.appsimobile.appsii.appwidget.AppWidgetIconCache;
 
 import java.util.List;
 
 public abstract class AppWidgetManagerCompat {
 
-    private static final Object sInstanceLock = new Object();
-
-    private static AppWidgetManagerCompat sInstance;
-
-    final AppWidgetManager mAppWidgetManager;
-
     final Context mContext;
+    AppWidgetManager mAppWidgetManager;
 
-    AppWidgetManagerCompat(Context context) {
+    AppWidgetManagerCompat(Context context, AppWidgetManager appWidgetManager) {
         mContext = context;
-        mAppWidgetManager = AppWidgetManager.getInstance(context);
-    }
-
-    public static AppWidgetManagerCompat getInstance(Context context) {
-        synchronized (sInstanceLock) {
-            if (sInstance == null) {
-                if (Utilities.isLmpOrAbove()) {
-                    sInstance = new AppWidgetManagerCompatVL(context.getApplicationContext());
-                } else {
-                    sInstance = new AppWidgetManagerCompatV16(context.getApplicationContext());
-                }
-            }
-            return sInstance;
-        }
+        mAppWidgetManager = appWidgetManager;
     }
 
     public AppWidgetProviderInfo getAppWidgetInfo(int appWidgetId) {
@@ -76,7 +57,7 @@ public abstract class AppWidgetManagerCompat {
 
     public abstract Drawable loadPreview(AppWidgetProviderInfo info);
 
-    public abstract Drawable loadIcon(AppWidgetProviderInfo info, IconCache cache);
+    public abstract Drawable loadIcon(AppWidgetProviderInfo info, AppWidgetIconCache cache);
 
     public abstract Bitmap getBadgeBitmap(AppWidgetProviderInfo info, Bitmap bitmap);
 

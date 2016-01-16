@@ -22,6 +22,7 @@ import android.content.Context;
 import android.util.Pair;
 import android.util.SparseArray;
 
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.module.weather.loader.WeatherData;
 import com.appsimobile.util.TimeUtils;
 
@@ -39,11 +40,14 @@ public class WeatherDataLoader extends
 
     ForceLoadContentObserver mForceLoadContentObserver;
 
+    WeatherUtils mWeatherUtils;
+
     public WeatherDataLoader(Context context, String woeid) {
         super(context);
 
         mContext = context;
         mWoeid = woeid;
+        mWeatherUtils = AppInjector.provideWeatherUtils();
     }
 
     /**
@@ -65,10 +69,10 @@ public class WeatherDataLoader extends
      */
     @Override
     public Pair<WeatherData, SparseArray<WeatherUtils.ForecastInfo>> loadInBackground() {
-        WeatherData weatherData = WeatherUtils.getWeatherData(mContext, mWoeid);
+        WeatherData weatherData = mWeatherUtils.getWeatherData(mContext, mWoeid);
         int today = TimeUtils.getJulianDay();
         SparseArray<WeatherUtils.ForecastInfo> forecast =
-                WeatherUtils.getForecastForDays(mContext, today, mWoeid);
+                mWeatherUtils.getForecastForDays(mContext, today, mWoeid);
 
         return new Pair<>(weatherData, forecast);
     }

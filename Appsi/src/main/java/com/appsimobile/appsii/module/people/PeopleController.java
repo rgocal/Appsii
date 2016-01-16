@@ -23,7 +23,6 @@ import android.content.Loader;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -36,6 +35,7 @@ import com.appsimobile.appsii.LoaderManager;
 import com.appsimobile.appsii.PageController;
 import com.appsimobile.appsii.PermissionDeniedException;
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppsiInjector;
 import com.appsimobile.appsii.module.AppsiPreferences;
 import com.appsimobile.appsii.module.BaseContactInfo;
 import com.appsimobile.appsii.module.PeopleCache;
@@ -43,6 +43,8 @@ import com.appsimobile.appsii.module.PermissionHelper;
 import com.appsimobile.appsii.module.ToolbarScrollListener;
 import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.google.android.gms.common.annotation.KeepName;
+
+import javax.inject.Inject;
 
 /**
  * Created by nick on 25/05/14.
@@ -55,24 +57,20 @@ public class PeopleController extends PageController
     private static final int PEOPLE_LOADER = 7001;
 
     String mCurFilter;
-
-    private RecyclerView mPeopleGrid;
-
-    private SharedPreferences mSharedPreferences;
-
-    private PeopleAdapter mPeopleAdapter;
-
-    private Toolbar mToolbar;
-
-    private LetterItemDecoration mLetterItemDecoration;
-
+    @Inject
+    SharedPreferences mSharedPreferences;
     boolean mPendingPermissionError;
+    ViewGroup mPermissionOverlay;
+    @Inject
+    PermissionUtils mPermissionUtils;
+    private RecyclerView mPeopleGrid;
+    private PeopleAdapter mPeopleAdapter;
+    private Toolbar mToolbar;
+    private LetterItemDecoration mLetterItemDecoration;
 
     public PeopleController(Context context, String title) {
         super(context, title);
     }
-
-    ViewGroup mPermissionOverlay;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -129,7 +127,7 @@ public class PeopleController extends PageController
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        AppsiInjector.inject(this);
         mPeopleAdapter = new PeopleAdapter(this, getContext());
         mPeopleAdapter.setOnItemClickListener(this);
         getLoaderManager().initLoader(PEOPLE_LOADER, null, this);
@@ -186,7 +184,7 @@ public class PeopleController extends PageController
 
     @Override
     public Loader<PeopleLoaderResult> onCreateLoader(int id, Bundle args) {
-        return new PeopleLoader(getContext());
+        return AppsiInjector.providePeopleLoader();
     }
     @Override
     public void onLoadFinished(Loader<PeopleLoaderResult> loader, PeopleLoaderResult data) {
@@ -204,8 +202,8 @@ public class PeopleController extends PageController
 
     @Override
     public void onAccepted(PermissionHelper permissionHelper) {
-        Intent intent = PermissionUtils.
-                buildRequestPermissionsIntent(getContext(),
+        Intent intent = mPermissionUtils
+                .buildRequestPermissionsIntent(getContext(),
                         PermissionUtils.REQUEST_CODE_PERMISSION_READ_CONTACTS,
                         permissionHelper.getPermissions());
 

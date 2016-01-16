@@ -17,7 +17,11 @@
 package com.appsimobile.appsii.module.appsisettings;
 
 import android.content.Intent;
+import android.media.AudioManager;
+import android.net.ConnectivityManager;
+import android.net.wifi.WifiManager;
 import android.provider.Settings;
+import android.telephony.TelephonyManager;
 
 import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.compat.MapCompat;
@@ -186,7 +190,7 @@ public class SettingsDefinition {
 
     private static final int ABOUT_SETTINGS_ICON = R.drawable.ic_settings_about;
 
-    private static final SettingsConstants.Section[] SECTIONS;
+    private static final SettingsHelper.Section[] SECTIONS;
 
     private static final Map<String, Integer> ICON_LOOKUP = MapCompat.createMap();
 
@@ -308,69 +312,77 @@ public class SettingsDefinition {
         ICON_LOOKUP.put(ACTION_NFC_PAYMENT_SETTINGS, ACTION_NFC_PAYMENT_SETTINGS_ICON);
         ICON_LOOKUP.put(ACTION_NFC_SETTINGS, ACTION_NFC_SETTINGS_ICON);
 
-        SECTIONS = new SettingsConstants.Section[]{
+        SECTIONS = new SettingsHelper.Section[]{
 
-                new SettingsConstants.Section(WIRELESS_AND_NETWORKS,
-                        new SettingsConstants.SectionItem[]{
-                                new SettingsConstants.SectionItem(WIFI_SETTINGS,
+                new SettingsHelper.Section(WIRELESS_AND_NETWORKS,
+                        new SettingsHelper.SectionItem[]{
+                                new SettingsHelper.SectionItem(WIFI_SETTINGS,
                                         WIFI_SETTINGS_TITLE, WIFI_SETTINGS_ICON),
-                                new SettingsConstants.SectionItem(BLUETOOTH_SETTINGS,
+                                new SettingsHelper.SectionItem(BLUETOOTH_SETTINGS,
                                         BLUETOOTH_SETTINGS_TITLE, BLUETOOTH_SETTINGS_ICON),
-                                new SettingsConstants.SectionItem(DATA_USAGE_SETTINGS,
+                                new SettingsHelper.SectionItem(DATA_USAGE_SETTINGS,
                                         DATA_USAGE_SETTINGS_TITLE, DATA_USAGE_SETTINGS_ICON),
                         /* new SectionItem(OPERATOR_SETTINGS, OPERATOR_TITLE, OPERATOR_ICON), */
-                                new SettingsConstants.SectionItem(MORE_SETTINGS,
+                                new SettingsHelper.SectionItem(MORE_SETTINGS,
                                         MORE_SETTINGS_TITLE, MORE_SETTINGS_ICON),
                         }),
-                new SettingsConstants.Section(DEVICE, new SettingsConstants.SectionItem[]{
-                        new SettingsConstants.SectionItem(SOUND_SETTINGS, SOUND_SETTINGS_TITLE,
+                new SettingsHelper.Section(DEVICE, new SettingsHelper.SectionItem[]{
+                        new SettingsHelper.SectionItem(SOUND_SETTINGS, SOUND_SETTINGS_TITLE,
                                 SOUND_SETTINGS_ICON),
-                        new SettingsConstants.SectionItem(DISPLAY_SETTINGS, DISPLAY_SETTINGS_TITLE,
+                        new SettingsHelper.SectionItem(DISPLAY_SETTINGS, DISPLAY_SETTINGS_TITLE,
                                 DISPLAY_SETTINGS_ICON),
-                        new SettingsConstants.SectionItem(STORAGE_SETTINGS, STORAGE_SETTINGS_TITLE,
+                        new SettingsHelper.SectionItem(STORAGE_SETTINGS, STORAGE_SETTINGS_TITLE,
                                 STORAGE_SETTINGS_ICON),
-                        new SettingsConstants.SectionItem(BATTERY_SETTINGS, BATTERY_SETTINGS_TITLE,
+                        new SettingsHelper.SectionItem(BATTERY_SETTINGS, BATTERY_SETTINGS_TITLE,
                                 BATTERY_SETTINGS_ICON),
-                        new SettingsConstants.SectionItem(APPLICATION_SETTINGS,
+                        new SettingsHelper.SectionItem(APPLICATION_SETTINGS,
                                 APPLICATION_SETTINGS_TITLE, APPLICATION_SETTINGS_ICON),
                         /*new SectionItem(MANAGE_USER_SETTINGS, MANAGE_USERS_SETTINGS_TITLE,
                         MANAGE_USERS_SETTINGS_ICON),*/
                 }),
-                new SettingsConstants.Section(PERSONAL, new SettingsConstants.SectionItem[]{
-                        new SettingsConstants.SectionItem(LOCATION_SETTINGS,
+                new SettingsHelper.Section(PERSONAL, new SettingsHelper.SectionItem[]{
+                        new SettingsHelper.SectionItem(LOCATION_SETTINGS,
                                 LOCATION_SETTINGS_TITLE, LOCATION_SETTINGS_ICON),
-                        new SettingsConstants.SectionItem(SECURITY_SETTINGS,
+                        new SettingsHelper.SectionItem(SECURITY_SETTINGS,
                                 SECURITY_SETTINGS_TITLE, SECURITY_SETTINGS_ICON),
-                        new SettingsConstants.SectionItem(LANGUAGE_SETTINGS,
+                        new SettingsHelper.SectionItem(LANGUAGE_SETTINGS,
                                 LANGUAGE_SETTINGS_TITLE, LANGUAGE_SETTINGS_ICON),
-                        new SettingsConstants.SectionItem(BACKUP_SETTINGS, BACKUP_SETTINGS_TITLE,
+                        new SettingsHelper.SectionItem(BACKUP_SETTINGS, BACKUP_SETTINGS_TITLE,
                                 BACKUP_SETTINGS_ICON),
-                }), new SettingsConstants.Section(ACCOUNTS, new SettingsConstants.SectionItem[]{
-                new SettingsConstants.SectionItem(MANAGE_USER_SETTINGS, ACCOUNT_SETTINGS_TITLE,
+                }), new SettingsHelper.Section(ACCOUNTS, new SettingsHelper.SectionItem[]{
+                new SettingsHelper.SectionItem(MANAGE_USER_SETTINGS, ACCOUNT_SETTINGS_TITLE,
                         MANAGE_USERS_SETTINGS_ICON),
         }),
-                new SettingsConstants.Section(SYSTEM, new SettingsConstants.SectionItem[]{
-                        new SettingsConstants.SectionItem(DATE_TIME_SETTINGS,
+                new SettingsHelper.Section(SYSTEM, new SettingsHelper.SectionItem[]{
+                        new SettingsHelper.SectionItem(DATE_TIME_SETTINGS,
                                 DATE_TIME_SETTINGS_TITLE, DATE_TIME_SETTINGS_ICON),
-                        new SettingsConstants.SectionItem(ACCESSIBILITY_SETTINGS,
+                        new SettingsHelper.SectionItem(ACCESSIBILITY_SETTINGS,
                                 ACCESSIBILITY_SETTINGS_TITLE, ACCESSIBILITY_SETTINGS_ICON),
-                        new SettingsConstants.SectionItem(PRINT_SETTINGS, PRINT_SETTINGS_TITLE,
+                        new SettingsHelper.SectionItem(PRINT_SETTINGS, PRINT_SETTINGS_TITLE,
                                 PRINT_SETTINGS_ICON),
-                        new SettingsConstants.SectionItem(DEVELOPMENT_SETTINGS,
+                        new SettingsHelper.SectionItem(DEVELOPMENT_SETTINGS,
                                 DEVELOPMENT_SETTINGS_TITLE, DEVELOPMENT_SETTINGS_ICON),
-                        new SettingsConstants.SectionItem(ABOUT_SETTINGS, ABOUT_SETTINGS_TITLE,
+                        new SettingsHelper.SectionItem(ABOUT_SETTINGS, ABOUT_SETTINGS_TITLE,
                                 ABOUT_SETTINGS_ICON),
                 }),
         };
     }
 
-    public static SettingsConstants.Builder createSettingsConstants() {
-        return new SettingsConstants.Builder(SECTIONS,
+    public static SettingsHelper.Builder createSettingsConstants(
+            ConnectivityManager connectivityManager,
+            TelephonyManager telephonyManager,
+            AudioManager audioManager,
+            WifiManager wifiManager) {
+        return new SettingsHelper.Builder(SECTIONS,
                 R.drawable.ic_airplane_mode,
                 R.drawable.ic_settings_bluetooth2,
                 R.drawable.ic_settings_data,
                 R.drawable.ic_settings_wireless,
-                R.drawable.ic_settings_sound
+                R.drawable.ic_settings_sound,
+                connectivityManager,
+                telephonyManager,
+                audioManager,
+                wifiManager
         );
     }
 

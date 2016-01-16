@@ -52,6 +52,7 @@ import com.appsimobile.appsii.PageController;
 import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.compat.LauncherAppsCompat;
 import com.appsimobile.appsii.compat.UserHandleCompat;
+import com.appsimobile.appsii.dagger.AppsiInjector;
 import com.appsimobile.appsii.module.BaseContactInfo;
 import com.appsimobile.appsii.module.PeopleQuery;
 import com.appsimobile.appsii.module.apps.AppEntry;
@@ -61,6 +62,8 @@ import com.appsimobile.appsii.preference.PreferenceHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * Created by nick on 25/05/14.
@@ -130,6 +133,15 @@ public class SearchController extends PageController
 
     View mSuggestionsAnchor;
 
+    @Inject
+    PreferenceHelper mPreferenceHelper;
+
+    @Inject
+    InputMethodManager mInputMethodManager;
+
+    @Inject
+    LauncherAppsCompat mLauncherAppsCompat;
+
     public SearchController(Context context, String title) {
         super(context, title);
     }
@@ -178,8 +190,7 @@ public class SearchController extends PageController
         // calculate the width of the sidebar
         int contentWidth = getContentWidth();
         if (contentWidth == 0) {
-            PreferenceHelper preferenceHelper = PreferenceHelper.getInstance(getContext());
-            float pct = preferenceHelper.getSidebarWidth() / 100f;
+            float pct = mPreferenceHelper.getSidebarWidth() / 100f;
             contentWidth = (int) (res.getConfiguration().smallestScreenWidthDp * density * pct);
         }
 
@@ -274,8 +285,7 @@ public class SearchController extends PageController
     @Override
     protected void onUserInvisible() {
         super.onUserInvisible();
-        InputMethodManager imm = (InputMethodManager) getContext().getSystemService(
-                Context.INPUT_METHOD_SERVICE);
+        InputMethodManager imm = mInputMethodManager;
         imm.hideSoftInputFromWindow(mSearchView.getWindowToken(), 0);
 
     }
@@ -283,6 +293,7 @@ public class SearchController extends PageController
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppsiInjector.inject(this);
         mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(getContext());
         mSpeechRecognizer.setRecognitionListener(new RecognitionListenerImpl());
 
@@ -313,8 +324,7 @@ public class SearchController extends PageController
     void focusSearchView() {
         if (mSearchView != null && isUserVisible()) {
             mSearchView.requestFocus();
-            InputMethodManager imm = (InputMethodManager) getContext().getSystemService(
-                    Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = mInputMethodManager;
             imm.showSoftInput(mSearchView, InputMethodManager.SHOW_IMPLICIT);
 
         }
@@ -330,7 +340,7 @@ public class SearchController extends PageController
 
     @Override
     public void onAppClicked(AppEntry app) {
-        LauncherAppsCompat launcherApps = LauncherAppsCompat.getInstance(getContext());
+        LauncherAppsCompat launcherApps = mLauncherAppsCompat;
         launcherApps.startActivityForProfile(app.getComponentName(),
                 UserHandleCompat.myUserHandle(),
                 null,
@@ -550,6 +560,10 @@ public class SearchController extends PageController
             this.overScrollMode = ViewCompat.getOverScrollMode(view);
         }
 
+        public static int makeUnspecifiedSpec() {
+            return View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+        }
+
         public void setOverScrollMode(int overScrollMode) {
             if (overScrollMode < ViewCompat.OVER_SCROLL_ALWAYS ||
                     overScrollMode > ViewCompat.OVER_SCROLL_NEVER) {
@@ -674,10 +688,6 @@ public class SearchController extends PageController
             }
         }
 
-        public static int makeUnspecifiedSpec() {
-            return View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-        }
-
         private void initChildDimensions(int width, int height, boolean vertical) {
             if (childDimensions[CHILD_WIDTH] != 0 || childDimensions[CHILD_HEIGHT] != 0) {
                 // already initialized, skipping
@@ -800,7 +810,7 @@ public class SearchController extends PageController
 
         @Override
         public Loader<List<AppEntry>> onCreateLoader(int id, Bundle args) {
-            return new AppSearchLoader(getContext(), mQuery);
+            return new AppSearchLoader(getContext(), mLauncherAppsCompat, mQuery);
 
         }
 

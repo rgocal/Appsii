@@ -25,9 +25,11 @@ import android.content.SharedPreferences;
 import android.content.SyncResult;
 import android.os.Bundle;
 
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.module.home.WeatherFragment;
 import com.appsimobile.appsii.preference.PreferenceHelper;
-import com.appsimobile.appsii.preference.PreferencesFactory;
+
+import javax.inject.Inject;
 
 /**
  * Handle the transfer of data between a server and an
@@ -39,11 +41,18 @@ public class WeatherSyncAdapter extends AbstractThreadedSyncAdapter {
     // Define a variable to contain a content resolver instance
     final ContentResolver mContentResolver;
 
+    @Inject
+    PreferenceHelper mPreferenceHelper;
+
+    @Inject
+    SharedPreferences mSharedPreferences;
+
     /**
      * Set up the sync adapter
      */
     public WeatherSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
+        AppInjector.inject(this);
         /*
          * If your app uses a content resolver, get an instance of it
          * from the incoming Context
@@ -61,6 +70,7 @@ public class WeatherSyncAdapter extends AbstractThreadedSyncAdapter {
             boolean autoInitialize,
             boolean allowParallelSyncs) {
         super(context, autoInitialize, allowParallelSyncs);
+        AppInjector.inject(this);
         /*
          * If your app uses a content resolver, get an instance of it
          * from the incoming Context
@@ -79,10 +89,10 @@ public class WeatherSyncAdapter extends AbstractThreadedSyncAdapter {
                 extras == null ? null : extras.getString(WeatherLoadingService.EXTRA_UNIT);
 
         if (defaultUnit == null) {
-            PreferenceHelper preferenceHelper = PreferenceHelper.getInstance(getContext());
+            PreferenceHelper preferenceHelper = mPreferenceHelper;
             String systemDefault = preferenceHelper.getDefaultWeatherTemperatureUnit();
 
-            SharedPreferences prefs = PreferencesFactory.getPreferences(getContext());
+            SharedPreferences prefs = mSharedPreferences;
             defaultUnit = prefs.getString(WeatherFragment.PREFERENCE_WEATHER_UNIT, systemDefault);
         }
 

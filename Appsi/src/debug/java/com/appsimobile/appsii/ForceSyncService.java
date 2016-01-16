@@ -22,16 +22,28 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
+import com.appsimobile.appsii.dagger.AppInjector;
+
+import javax.inject.Inject;
+
 /**
  * Created by nick on 23/04/15.
  * adb shell am startservice com.appsimobile.appsii/.ForceSyncService
  */
 public class ForceSyncService extends Service {
 
+    @Inject
+    AccountHelper mAccountHelper;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        AppInjector.inject(this);
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        AccountHelper accountHelper = AccountHelper.getInstance(this);
-        accountHelper.configureAutoSyncAndSync();
+        mAccountHelper.configureAutoSyncAndSync();
 //        accountHelper.requestSync();
         return START_NOT_STICKY;
     }

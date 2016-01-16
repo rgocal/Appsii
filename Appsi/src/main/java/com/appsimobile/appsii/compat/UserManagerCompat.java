@@ -16,27 +16,13 @@
 
 package com.appsimobile.appsii.compat;
 
-import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
-
-import com.appsimobile.appsii.appwidget.Utilities;
 
 import java.util.List;
 
 public abstract class UserManagerCompat {
 
     protected UserManagerCompat() {
-    }
-
-    public static UserManagerCompat getInstance(Context context) {
-        if (Utilities.isLmpOrAbove()) {
-            return new UserManagerCompatVL(context);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            return new UserManagerCompatV17(context);
-        } else {
-            return new UserManagerCompatV16();
-        }
     }
 
     public abstract List<UserHandleCompat> getUserProfiles();

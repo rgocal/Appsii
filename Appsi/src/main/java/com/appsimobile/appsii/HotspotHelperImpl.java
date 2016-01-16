@@ -20,7 +20,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.preference.PreferenceManager;
+import android.os.Build;
 import android.provider.Settings;
 import android.support.v4.util.CircularArray;
 import android.support.v4.util.LongSparseArray;
@@ -36,59 +36,52 @@ import com.appsimobile.appsii.SidebarHotspot.SidebarGestureCallback;
 import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.crashlytics.android.Crashlytics;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class HotspotHelperImpl extends AbstractHotspotHelper
         implements OnClickListener, View.OnLongClickListener, SidebarGestureCallback,
         SidebarHotspot.SwipeListener {
 
+    private static final String TAG = "HotspotHelperImpl";
+
     final int[] mOffsetInt = new int[2];
-
-    final HotspotHelperListener mCallback;
-
     final PopupLayer mPopupLayer;
-
     final LayoutInflater mLayoutInflater;
-
     final View mFullScreenWatcher;
-
+    final WindowManager mWindowManager;
+    final PermissionUtils mPermissionUtils;
+    final SharedPreferences mSharedPreferences;
     private final Context mContext;
-
-    private final WindowManager mWindowManager;
-
     private final LongSparseArray<HotspotContainerHelper> mSidebarHotspots =
             new LongSparseArray<>();
-
+    HotspotHelperListener mCallback;
     boolean mDraggingHotspot;
-
     int mDragLocalX;
-
     int mRawStartDragY;
-
     int mDragLocalY;
-
     boolean mIsLeftHotspot;
-
     int mHotspotX;
-
     int mHotspotY;
-
     boolean mFullScreenWatcherAttached;
-
     private boolean mVibrateOnTouch;
-
     private boolean mHotspotsActive;
-
     private CircularArray<HotspotItem> mHotspotItems;
 
-    public HotspotHelperImpl(Context context, HotspotHelperListener callback,
-            PopupLayer popupLayer) {
+    @Inject
+    public HotspotHelperImpl(Context context, SharedPreferences sharedPreferences, PermissionUtils permissionUtils,
+            WindowManager windowManager, PopupLayer popupLayer
+            ) {
         super(context);
+
+        mWindowManager = windowManager;
+        mSharedPreferences = sharedPreferences;
+        mPermissionUtils = permissionUtils;
         mLayoutInflater = LayoutInflater.from(context);
         mPopupLayer = popupLayer;
         mContext = context;
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-        mVibrateOnTouch = prefs.getBoolean("pref_sidebar_haptic_feedback", false);
-        mWindowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
-        mCallback = callback;
+        mVibrateOnTouch = mSharedPreferences.getBoolean("pref_sidebar_haptic_feedback", false);
         mFullScreenWatcher = new View(context) {
             {
                 setFitsSystemWindows(true);
@@ -106,6 +99,10 @@ public class HotspotHelperImpl extends AbstractHotspotHelper
     public static boolean isPageGesture(Uri uri) {
         if (uri == null) return false;
         return true;
+    }
+
+    public void setCallback(HotspotHelperListener callback) {
+        mCallback = callback;
     }
 
     @Override
@@ -131,13 +128,14 @@ public class HotspotHelperImpl extends AbstractHotspotHelper
     }
 
     @Override
-    public void addHotspots() {
+    public void addHotspots() throws PermissionDeniedException {
+        Log.d(TAG, "addHotspots() called with: " + "");
         try {
             removeHotspots();
             mHotspotsActive = true;
             if (mHotspotItems != null) {
                 int count = mHotspotItems.size();
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+                SharedPreferences prefs = mSharedPreferences;
                 for (int i = 0; i < count; i++) {
                     HotspotItem conf = mHotspotItems.get(i);
 
@@ -155,7 +153,9 @@ public class HotspotHelperImpl extends AbstractHotspotHelper
                         WindowManager.LayoutParams lp =
                                 configureHotspot(hotspotContainerHelper, conf, prefs);
                         try {
-                            if (!Settings.canDrawOverlays(mContext)) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                                    !Settings.canDrawOverlays(mContext)) {
+
                                 throw new PermissionDeniedException(
                                         Manifest.permission.SYSTEM_ALERT_WINDOW);
                             }
@@ -172,11 +172,7 @@ public class HotspotHelperImpl extends AbstractHotspotHelper
             }
             addScreenWatcher();
         } catch (PermissionDeniedException e) {
-            // STOPSHIP: FIXME: this must be changed!
-            PermissionUtils.showPermissionNotification(mContext, 1001,
-                    Manifest.permission.SYSTEM_ALERT_WINDOW, 0);
             mHotspotsActive = false;
-            AppsiiUtils.stopAppsi(mContext);
         }
     }
 
@@ -194,7 +190,7 @@ public class HotspotHelperImpl extends AbstractHotspotHelper
     }
 
     private void addScreenWatcher() throws PermissionDeniedException {
-        if (!Settings.canDrawOverlays(mContext)) {
+        if (!mPermissionUtils.canDrawOverlays(mContext)) {
             throw new PermissionDeniedException(
                     Manifest.permission.SYSTEM_ALERT_WINDOW);
         }
@@ -249,7 +245,7 @@ public class HotspotHelperImpl extends AbstractHotspotHelper
 
         if (mHotspotItems != null) {
             int count = mHotspotItems.size();
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+            SharedPreferences prefs = mSharedPreferences;
             for (int i = 0; i < count; i++) {
                 HotspotItem conf = mHotspotItems.get(i);
 

@@ -37,6 +37,8 @@ import java.lang.ref.SoftReference;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
+import javax.inject.Inject;
+
 public class WidgetPreviewLoader {
 
     private static final float WIDGET_PREVIEW_ICON_PADDING_PERCENTAGE = 0.25f;
@@ -44,27 +46,21 @@ public class WidgetPreviewLoader {
     final Context mContext;
 
     final Canvas mCanvas = new Canvas();
-
+    final int mAppIconSize;
     private final AppWidgetManagerCompat mManager;
-
-    private final IconCache mIconCache;
-
+    private final AppWidgetIconCache mAppWidgetIconCache;
     private final RectCache mCachedAppWidgetPreviewSrcRect = new RectCache();
-
     private final RectCache mCachedAppWidgetPreviewDestRect = new RectCache();
-
     private final PaintCache mCachedAppWidgetPreviewPaint = new PaintCache();
-
     private final PaintCache mDefaultAppWidgetPreviewPaint = new PaintCache();
-
     private final MainThreadExecutor mMainThreadExecutor = new MainThreadExecutor();
 
-    final int mAppIconSize;
-
-    public WidgetPreviewLoader(Context context, IconCache iconCache) {
+    @Inject
+    public WidgetPreviewLoader(Context context, AppWidgetIconCache appWidgetIconCache,
+            AppWidgetManagerCompat appWidgetManagerCompat) {
         mContext = context.getApplicationContext();
-        mIconCache = iconCache;
-        mManager = AppWidgetManagerCompat.getInstance(context);
+        mAppWidgetIconCache = appWidgetIconCache;
+        mManager = appWidgetManagerCompat;
         mAppIconSize = (int) (80 * context.getResources().getDisplayMetrics().density);
     }
 
@@ -156,7 +152,7 @@ public class WidgetPreviewLoader {
             float iconScale = Math.min((float) smallestSide
                     / (mAppIconSize + 2 * minOffset), 1f);
             try {
-                Drawable icon = mManager.loadIcon(info, mIconCache);
+                Drawable icon = mManager.loadIcon(info, mAppWidgetIconCache);
                 if (icon != null) {
                     int hoffset = (int) ((previewDrawableWidth - mAppIconSize * iconScale) / 2);
                     int yoffset = (int) ((previewDrawableHeight - mAppIconSize * iconScale) / 2);

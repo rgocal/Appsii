@@ -17,7 +17,6 @@
 package com.appsimobile.appsii.plugins;
 
 import android.app.ActivityManager;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v4.util.LruCache;
 
@@ -25,6 +24,8 @@ import com.appsimobile.appsii.compat.MapCompat;
 
 import java.lang.ref.WeakReference;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 public class IconCache {
 
@@ -39,9 +40,9 @@ public class IconCache {
 
     private final int mCacheSize;
 
-    private IconCache(Context context) {
-        final int memClass = ((ActivityManager) context.getSystemService(
-                Context.ACTIVITY_SERVICE)).getMemoryClass();
+    @Inject
+    public IconCache(ActivityManager activityManager) {
+        final int memClass = activityManager.getMemoryClass();
         int sizeInBytes = memClass * 1024 * 1024;
         int desiredSize = sizeInBytes / 20;
         // for 50 mb devices this will be 2.5 mb
@@ -53,13 +54,6 @@ public class IconCache {
                 return bitmap.getRowBytes() * bitmap.getHeight();
             }
         };
-    }
-
-    public static synchronized IconCache getInstance(Context context) {
-        if (sInstance == null) {
-            sInstance = new IconCache(context.getApplicationContext());
-        }
-        return sInstance;
     }
 
     public void onClose() {

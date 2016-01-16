@@ -29,6 +29,7 @@ import android.os.UserHandle;
 import android.support.v4.util.SimpleArrayMap;
 
 import com.appsimobile.appsii.AppsiiUtils;
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.crashlytics.android.Crashlytics;
 
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class LauncherAppsCompatVL extends LauncherAppsCompat {
 
     LauncherAppsCompatVL(Context context) {
         super();
-        mLauncherApps = (LauncherApps) context.getSystemService(Context.LAUNCHER_APPS_SERVICE);
+        mLauncherApps = AppInjector.provideLauncherApps();
         mContext = context;
     }
 

@@ -46,15 +46,14 @@ import android.view.WindowManager;
 import com.android.volley.VolleyError;
 import com.appsimobile.appsii.BitmapUtils;
 import com.appsimobile.appsii.BuildConfig;
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.module.home.WeatherFragment;
 import com.appsimobile.appsii.module.home.config.HomeItemConfiguration;
-import com.appsimobile.appsii.module.home.config.HomeItemConfigurationHelper;
 import com.appsimobile.appsii.module.weather.loader.CantGetWeatherException;
 import com.appsimobile.appsii.module.weather.loader.WeatherData;
 import com.appsimobile.appsii.module.weather.loader.YahooWeatherApiClient;
 import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.appsimobile.appsii.preference.PreferenceHelper;
-import com.appsimobile.appsii.preference.PreferencesFactory;
 import com.appsimobile.util.ArrayUtils;
 
 import org.json.JSONObject;
@@ -75,6 +74,8 @@ import java.util.TimeZone;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+
+import javax.inject.Inject;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
@@ -101,14 +102,28 @@ public class WeatherLoadingService {
 
     public static final String ACTION_WEATHER_UPDATED =
             BuildConfig.APPLICATION_ID + ".weather_updated";
-
-    final HomeItemConfiguration mConfigurationHelper;
-
     final Context mContext;
+    @Inject
+    HomeItemConfiguration mConfigurationHelper;
+    @Inject
+    SharedPreferences mPreferences;
+    @Inject
+    PreferenceHelper mPreferenceHelper;
+    @Inject
+    ConnectivityManager mConnectivityManager;
+    @Inject
+    LocationManager mLocationManager;
+    @Inject
+    PermissionUtils mPermissionUtils;
+    @Inject
+    BitmapUtils mBitmapUtils;
+    @Inject
+    WindowManager mWindowManager;
+    WeatherUtils mWeatherUtils;
 
     public WeatherLoadingService(Context context) {
         mContext = context.getApplicationContext();
-        mConfigurationHelper = HomeItemConfigurationHelper.getInstance(mContext);
+        AppInjector.inject(this);
 
     }
 
@@ -122,8 +137,7 @@ public class WeatherLoadingService {
      * <p/>
      * Returns true when now is a good time to update the weatherdata.
      */
-    public static boolean hasTimeoutExpired(Context context) {
-        SharedPreferences preferences = PreferencesFactory.getPreferences(context);
+    public static boolean hasTimeoutExpired(SharedPreferences preferences) {
 
         long lastUpdate = preferences.getLong(PREFERENCE_LAST_UPDATED_MILLIS, 0);
 
@@ -133,17 +147,166 @@ public class WeatherLoadingService {
         return minutesPassed > 45;
     }
 
+    static void bailOut(String reason) {
+        Log.i("WeatherLoadingService", "not updating weather for reason: " + reason);
+    }
+
+    /**
+     * Downloads the header images for the given woeid and weather-data. Failure is considered
+     * non-fatal.
+     *
+     * @throws VolleyError
+     */
+    public static void downloadWeatherImages(Context context, BitmapUtils bitmapUtils,
+            String woeid, WeatherData weatherData, String timezone) throws VolleyError {
+
+        WindowManager windowManager = AppInjector.provideWindowManager();
+
+        // first we need to determine if it is day or night.
+        // TODO: this needs the timezone
+
+
+        if (timezone == null) {
+            timezone = TimeZone.getDefault().getID();
+        }
+
+        WeatherUtils weatherUtils = AppInjector.provideWeatherUtils();
+        boolean isDay = weatherUtils.isDay(timezone, weatherData);
+        ImageDownloadHelper downloadHelper = ImageDownloadHelper.getInstance(context);
+
+        // call into the download-helper this will return a json object with
+        // city photos matching the current weather condition.
+        JSONObject photos = downloadHelper.searchCityWeatherPhotos(
+                woeid, weatherData.nowConditionCode, isDay);
+
+        // Now we need the screen dimension to know which photos have a usable size.
+        int dimen = getMaxScreenDimension(windowManager);
+
+        // determine the photos that can be used.
+        List<ImageDownloadHelper.PhotoInfo> result = new ArrayList<>();
+        ImageDownloadHelper.getEligiblePhotosFromResponse(photos, result, dimen);
+
+        // when no usable photos have been found try photos at the city level with
+        // no weather condition info.
+        if (result.isEmpty()) {
+            photos = downloadHelper.searchCityImage(woeid);
+            ImageDownloadHelper.getEligiblePhotosFromResponse(photos, result, dimen);
+            // when still no photo was found, clear the existing photos and return
+            if (result.isEmpty()) {
+                weatherUtils.clearCityPhotos(context, woeid, 0);
+                return;
+            }
+        }
+
+        // Now determine the amount of photos we should download
+        int N = Math.min(MAX_PHOTO_COUNT, result.size());
+        // idx keeps the index of the actually downloaded photo count
+        int idx = 0;
+        // note the idx < N instead of i < N.
+        // this loop must continue until the amount is satisfied.
+        for (int i = 0; idx < N; i++) {
+            // quit when the end of the list is reached
+            if (i >= result.size()) break;
+
+            // try to download the photo details from the webservice.
+            ImageDownloadHelper.PhotoInfo info = result.get(i);
+            JSONObject photoInfo = downloadHelper.loadPhotoInfo(context, info.id);
+            if (photoInfo != null) {
+
+                // we need to know if the photo is rotated. If so, we need to apply this
+                // rotation after download.
+                int rotation = ImageDownloadHelper.getRotationFromJson(photoInfo);
+                if (downloadFile(context, info, woeid, idx)) {
+                    // Apply rotation when non zero
+                    if (rotation != 0) {
+                        File cacheDir = weatherUtils.getWeatherPhotoCacheDir(context);
+                        String fileName = weatherUtils.createPhotoFileName(woeid, idx);
+                        File photoImage = new File(cacheDir, fileName);
+                        Bitmap bitmap =
+                                bitmapUtils.decodeSampledBitmapFromFile(photoImage, dimen, dimen);
+                        if (bitmap == null) {
+                            Log.wtf("WeatherLoadingService", "error decoding bitmap");
+                            continue;
+                        }
+
+                        Matrix matrix = new Matrix();
+                        matrix.postRotate(rotation);
+                        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
+                                bitmap.getHeight(),
+                                matrix, false);
+                        weatherUtils.saveBitmap(context, bitmap, woeid, idx);
+                    }
+                    // success, handle the next one.
+                    idx++;
+                }
+            }
+        }
+        // remove photos at higher indexes than the amount downloaded.
+        weatherUtils.clearCityPhotos(context, woeid, idx + 1);
+
+    }
+
+    private static int getMaxScreenDimension(WindowManager windowManager) {
+        Point point = new Point();
+        windowManager.getDefaultDisplay().getSize(point);
+        int dimen = Math.max(point.x, point.y);
+        dimen = (dimen * 3) / 4;
+        return dimen;
+    }
+
+    private static boolean downloadFile(Context context,
+            ImageDownloadHelper.PhotoInfo photoInfo, String woeid, int idx) {
+
+        WeatherUtils weatherUtils = AppInjector.provideWeatherUtils();
+
+        File cacheDir = weatherUtils.getWeatherPhotoCacheDir(context);
+        String fileName = weatherUtils.createPhotoFileName(woeid, idx);
+        File photoImage = new File(cacheDir, fileName);
+        try {
+            URL url = new URL(photoInfo.url);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setConnectTimeout(30000);
+            InputStream in = new BufferedInputStream(connection.getInputStream());
+            try {
+                OutputStream out = new BufferedOutputStream(new FileOutputStream(photoImage));
+
+                int totalRead = 0;
+                try {
+                    byte[] bytes = new byte[64 * 1024];
+                    int read;
+                    while ((read = in.read(bytes)) != -1) {
+                        out.write(bytes, 0, read);
+                        totalRead += read;
+                    }
+                    out.flush();
+                } finally {
+                    out.close();
+                }
+                if (BuildConfig.DEBUG) {
+                    Log.d("WeatherLoadingService",
+                            "received " + totalRead + " bytes for: " + photoInfo.url);
+                }
+            } finally {
+                in.close();
+            }
+            return true;
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            return false;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     // if e.g. the location was changed, this is a forced update.
     void doSync(String defaultUnit, String extraWoeid, SyncResult result) {
 
         if (defaultUnit == null) throw new IllegalArgumentException("defaultUnit == null");
 
-        ConnectivityManager cm =
-                (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        NetworkInfo netInfo = mConnectivityManager.getActiveNetworkInfo();
 
         boolean online = netInfo != null && netInfo.isConnected();
-        PreferenceHelper preferenceHelper = PreferenceHelper.getInstance(mContext);
 
 
         if (BuildConfig.DEBUG) Log.d("WeatherLoadingService", "Handling sync");
@@ -154,7 +317,7 @@ public class WeatherLoadingService {
             result.stats.numIoExceptions++;
             return;
         }
-        boolean syncWhenRoaming = preferenceHelper.getSyncWhenRoaming();
+        boolean syncWhenRoaming = mPreferenceHelper.getSyncWhenRoaming();
         if (netInfo.isRoaming() && !syncWhenRoaming) {
             bailOut("Not syncing because of roaming connection");
             result.stats.numIoExceptions++;
@@ -209,7 +372,7 @@ public class WeatherLoadingService {
             if (BuildConfig.DEBUG) Log.d("WeatherLoadingService", "request location");
             Location location;
 
-            if (PermissionUtils.holdsPermission(
+            if (mPermissionUtils.holdsPermission(
                     mContext, Manifest.permission.ACCESS_COARSE_LOCATION)) {
                 location = requestLocationInfoBlocking();
             } else {
@@ -221,7 +384,7 @@ public class WeatherLoadingService {
 
             SimpleArrayMap<String, WeatherData> previousData = new SimpleArrayMap<>(woeids.length);
             for (String woeid : woeids) {
-                WeatherData data = WeatherUtils.getWeatherData(mContext, woeid);
+                WeatherData data = mWeatherUtils.getWeatherData(mContext, woeid);
                 previousData.put(woeid, data);
             }
 
@@ -237,7 +400,8 @@ public class WeatherLoadingService {
             for (int i = 0; i < size; i++) {
                 WeatherData weatherData = data.get(i);
                 try {
-                    syncImages(result, cm, preferenceHelper, woeidTimezones, previousData,
+                    syncImages(result, mConnectivityManager, mPreferenceHelper, woeidTimezones,
+                            previousData,
                             weatherData);
                 } catch (VolleyError e) {
                     Log.w("WeatherLoadingService", "error getting images", e);
@@ -254,29 +418,23 @@ public class WeatherLoadingService {
 
     }
 
-    static void bailOut(String reason) {
-        Log.i("WeatherLoadingService", "not updating weather for reason: " + reason);
-    }
-
     @Nullable
     @RequiresPermission(anyOf = {ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION})
     private Location requestLocationInfoBlocking() throws InterruptedException {
 
-        final LocationManager locationManager =
-                (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
-        List<String> providers = locationManager.getAllProviders();
+        List<String> providers = mLocationManager.getAllProviders();
 
         if (!providers.contains(LocationManager.NETWORK_PROVIDER)) return null;
-        if (!locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) return null;
+        if (!mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) return null;
 
-        SimpleLocationListener listener = new SimpleLocationListener(locationManager);
+        SimpleLocationListener listener = new SimpleLocationListener(mLocationManager);
 
-        locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, listener,
+        mLocationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, listener,
                 Looper.getMainLooper());
 
         Location result = listener.waitForResult();
         if (result == null) {
-            result = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            result = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         }
         if (BuildConfig.DEBUG) Log.d("WeatherLoadingService", "location: " + result);
         return result;
@@ -285,7 +443,7 @@ public class WeatherLoadingService {
     private String[] addFallbackWoeid(String[] woeids,
             SimpleArrayMap<String, String> woeidTimezones) {
 
-        PreferenceHelper preferenceHelper = PreferenceHelper.getInstance(mContext);
+        PreferenceHelper preferenceHelper = mPreferenceHelper;
         String woeid = preferenceHelper.getDefaultLocationWoeId();
         if (woeid != null) {
             String[] tmp = new String[woeids.length + 1];
@@ -308,7 +466,7 @@ public class WeatherLoadingService {
         NetworkInfo netInfo;
         String woeid = weatherData.woeid;
         WeatherData previous = previousData.get(woeid);
-        File[] photos = WeatherUtils.getCityPhotos(mContext, woeid);
+        File[] photos = mWeatherUtils.getCityPhotos(mContext, woeid);
 
         boolean changed = photos == null || previous == null ||
                 previous.nowConditionCode != weatherData.nowConditionCode;
@@ -344,155 +502,9 @@ public class WeatherLoadingService {
             // settings
             if (downloadEnabled) {
                 String timezone = woeidTimezones.get(woeid);
-                downloadWeatherImages(mContext, woeid, weatherData, timezone);
+                downloadWeatherImages(mContext, mBitmapUtils, woeid, weatherData, timezone);
                 result.stats.numInserts++;
             }
-        }
-    }
-
-    /**
-     * Downloads the header images for the given woeid and weather-data. Failure is considered
-     * non-fatal.
-     *
-     * @throws VolleyError
-     */
-    public static void downloadWeatherImages(Context context, String woeid,
-            WeatherData weatherData, String timezone) throws VolleyError {
-
-        // first we need to determine if it is day or night.
-        // TODO: this needs the timezone
-
-
-        if (timezone == null) {
-            timezone = TimeZone.getDefault().getID();
-        }
-
-
-        boolean isDay = WeatherUtils.isDay(timezone, weatherData);
-        ImageDownloadHelper downloadHelper = ImageDownloadHelper.getInstance(context);
-
-        // call into the download-helper this will return a json object with
-        // city photos matching the current weather condition.
-        JSONObject photos = downloadHelper.searchCityWeatherPhotos(
-                woeid, weatherData.nowConditionCode, isDay);
-
-        // Now we need the screen dimension to know which photos have a usable size.
-        int dimen = getMaxScreenDimension(context);
-
-        // determine the photos that can be used.
-        List<ImageDownloadHelper.PhotoInfo> result = new ArrayList<>();
-        ImageDownloadHelper.getEligiblePhotosFromResponse(photos, result, dimen);
-
-        // when no usable photos have been found try photos at the city level with
-        // no weather condition info.
-        if (result.isEmpty()) {
-            photos = downloadHelper.searchCityImage(woeid);
-            ImageDownloadHelper.getEligiblePhotosFromResponse(photos, result, dimen);
-            // when still no photo was found, clear the existing photos and return
-            if (result.isEmpty()) {
-                WeatherUtils.clearCityPhotos(context, woeid, 0);
-                return;
-            }
-        }
-
-        // Now determine the amount of photos we should download
-        int N = Math.min(MAX_PHOTO_COUNT, result.size());
-        // idx keeps the index of the actually downloaded photo count
-        int idx = 0;
-        // note the idx < N instead of i < N.
-        // this loop must continue until the amount is satisfied.
-        for (int i = 0; idx < N; i++) {
-            // quit when the end of the list is reached
-            if (i >= result.size()) break;
-
-            // try to download the photo details from the webservice.
-            ImageDownloadHelper.PhotoInfo info = result.get(i);
-            JSONObject photoInfo = downloadHelper.loadPhotoInfo(context, info.id);
-            if (photoInfo != null) {
-
-                // we need to know if the photo is rotated. If so, we need to apply this
-                // rotation after download.
-                int rotation = ImageDownloadHelper.getRotationFromJson(photoInfo);
-                if (downloadFile(context, info, woeid, idx)) {
-                    // Apply rotation when non zero
-                    if (rotation != 0) {
-                        File cacheDir = WeatherUtils.getWeatherPhotoCacheDir(context);
-                        String fileName = WeatherUtils.createPhotoFileName(woeid, idx);
-                        File photoImage = new File(cacheDir, fileName);
-                        Bitmap bitmap =
-                                BitmapUtils.decodeSampledBitmapFromFile(photoImage, dimen, dimen);
-                        if (bitmap == null) {
-                            Log.wtf("WeatherLoadingService", "error decoding bitmap");
-                            continue;
-                        }
-
-                        Matrix matrix = new Matrix();
-                        matrix.postRotate(rotation);
-                        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
-                                bitmap.getHeight(),
-                                matrix, false);
-                        WeatherUtils.saveBitmap(context, bitmap, woeid, idx);
-                    }
-                    // success, handle the next one.
-                    idx++;
-                }
-            }
-        }
-        // remove photos at higher indexes than the amount downloaded.
-        WeatherUtils.clearCityPhotos(context, woeid, idx + 1);
-
-    }
-
-    private static int getMaxScreenDimension(Context context) {
-        WindowManager windowManager =
-                (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        Point point = new Point();
-        windowManager.getDefaultDisplay().getSize(point);
-        int dimen = Math.max(point.x, point.y);
-        dimen = (dimen * 3) / 4;
-        return dimen;
-    }
-
-    private static boolean downloadFile(Context context,
-            ImageDownloadHelper.PhotoInfo photoInfo, String woeid, int idx) {
-
-        File cacheDir = WeatherUtils.getWeatherPhotoCacheDir(context);
-        String fileName = WeatherUtils.createPhotoFileName(woeid, idx);
-        File photoImage = new File(cacheDir, fileName);
-        try {
-            URL url = new URL(photoInfo.url);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setConnectTimeout(30000);
-            InputStream in = new BufferedInputStream(connection.getInputStream());
-            try {
-                OutputStream out = new BufferedOutputStream(new FileOutputStream(photoImage));
-
-                int totalRead = 0;
-                try {
-                    byte[] bytes = new byte[64 * 1024];
-                    int read;
-                    while ((read = in.read(bytes)) != -1) {
-                        out.write(bytes, 0, read);
-                        totalRead += read;
-                    }
-                    out.flush();
-                } finally {
-                    out.close();
-                }
-                if (BuildConfig.DEBUG) {
-                    Log.d("WeatherLoadingService",
-                            "received " + totalRead + " bytes for: " + photoInfo.url);
-                }
-            } finally {
-                in.close();
-            }
-            return true;
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            return false;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
         }
     }
 
@@ -668,8 +680,7 @@ public class WeatherLoadingService {
                 }
                 // save this woeid in the preferences to make sure
                 // this is used as the latest weather info
-                SharedPreferences prefs = PreferencesFactory.getPreferences(mContext);
-                prefs.edit().putString(PREFERENCE_LAST_KNOWN_WOEID, currentWoeid).apply();
+                mPreferences.edit().putString(PREFERENCE_LAST_KNOWN_WOEID, currentWoeid).apply();
 
                 return currentWoeid;
             }

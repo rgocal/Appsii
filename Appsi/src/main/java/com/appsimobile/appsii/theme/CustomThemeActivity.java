@@ -35,7 +35,9 @@ import com.appsimobile.appsii.AppsiiUtils;
 import com.appsimobile.appsii.DrawableCompat;
 import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.ThemingUtils;
-import com.appsimobile.appsii.preference.PreferencesFactory;
+import com.appsimobile.appsii.dagger.AppInjector;
+
+import javax.inject.Inject;
 
 /**
  * An activity that allows the user to set-up a custom theme for Appsii.
@@ -96,6 +98,7 @@ public class CustomThemeActivity extends Activity implements View.OnClickListene
      */
     ImageView mAccentColorPreview;
 
+    @Inject
     SharedPreferences mPreferences;
 
     /**
@@ -183,6 +186,8 @@ public class CustomThemeActivity extends Activity implements View.OnClickListene
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppInjector.inject(this);
+
         ActivityUtils.setContentView(this, R.layout.activity_customize_theme);
 
         mBaseThemeView = findViewById(R.id.base_theme);
@@ -223,7 +228,6 @@ public class CustomThemeActivity extends Activity implements View.OnClickListene
         menuInflater.inflate(R.menu.theme_editor, toolbar.getMenu());
         toolbar.setOnMenuItemClickListener(this);
 
-        mPreferences = PreferencesFactory.getPreferences(this);
         String baseTheme = mPreferences.getString(
                 ThemingUtils.PREF_APPSII_BASE_THEME, ThemingUtils.DEFAULT_BASE_THEME);
         String primary = mPreferences.getString(

@@ -27,15 +27,15 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.appsimobile.appsii.appwidget.IconCache;
+import com.appsimobile.appsii.appwidget.AppWidgetIconCache;
 import com.appsimobile.appsii.appwidget.Utilities;
 
 import java.util.List;
 
-class AppWidgetManagerCompatV16 extends AppWidgetManagerCompat {
+public class AppWidgetManagerCompatV16 extends AppWidgetManagerCompat {
 
-    AppWidgetManagerCompatV16(Context context) {
-        super(context);
+    public AppWidgetManagerCompatV16(Context context, AppWidgetManager awm) {
+        super(context, awm);
     }
 
     @Override
@@ -84,7 +84,7 @@ class AppWidgetManagerCompatV16 extends AppWidgetManagerCompat {
     }
 
     @Override
-    public Drawable loadIcon(AppWidgetProviderInfo info, IconCache cache) {
+    public Drawable loadIcon(AppWidgetProviderInfo info, AppWidgetIconCache cache) {
         return cache.getFullResIcon(info.provider.getPackageName(), info.icon);
     }
 

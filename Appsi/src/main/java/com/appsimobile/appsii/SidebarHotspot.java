@@ -26,7 +26,6 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Vibrator;
-import android.preference.PreferenceManager;
 import android.support.v4.util.CircularArray;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -35,10 +34,13 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
 import com.appsimobile.util.ArrayUtils;
 
 import java.lang.ref.WeakReference;
+
+import javax.inject.Inject;
 
 public class SidebarHotspot extends View {
 
@@ -76,35 +78,29 @@ public class SidebarHotspot extends View {
     ContentObserver mHotspotsPagesObserver;
 
     AsyncTask<Void, Void, CircularArray<HotspotPageEntry>> mLoadDataTask;
-
+    /**
+     * A shared preferences listener
+     */
+    SharedPreferencesListener mSharedPreferencesListener;
+    @Inject
+    Vibrator mVibrator;
+    @Inject
+    SharedPreferences mPreferences;
     private float mMinimumMove;
-
     private boolean mVibrate;
-
     private boolean mLeft;
-
     private int mTop;
-
     private int mLeftPos;
-
     private boolean mVisibleHotspots;
-
     /**
      * The hotspot-item this hotspot is bound to.
      * This contains the properties of the hotspot.
      */
     private HotspotItem mHotspotItem;
-
-    /**
-     * A shared preferences listener
-     */
-    private SharedPreferencesListener mSharedPreferencesListener;
-
     /**
      * A velocity tracked given to the listeners so they can determine the speed if needed
      */
     private VelocityTracker mVelocityTracker;
-
     /**
      * The current background drawable
      */
@@ -120,6 +116,19 @@ public class SidebarHotspot extends View {
 
     public SidebarHotspot(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+    }
+
+    public static Gesture detectAction(float deltaX, float deltaY, float minDistance) {
+        Gesture swipeAction = null;
+        if (deltaX >= minDistance) {
+            swipeAction = Gesture.TO_CENTER;
+        } else if (deltaY > minDistance) {
+            swipeAction = Gesture.DOWN;
+        } else if (deltaY < -minDistance) {
+            swipeAction = Gesture.UP;
+        }
+        return swipeAction;
+
     }
 
     @Override
@@ -166,8 +175,7 @@ public class SidebarHotspot extends View {
     }
 
     private void vibrate() {
-        Vibrator v = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
-        v.vibrate(VIBRATE_DURATION);
+        mVibrator.vibrate(VIBRATE_DURATION);
     }
 
     private boolean detectSwipe(float x, float y, MotionEvent e) {
@@ -219,19 +227,6 @@ public class SidebarHotspot extends View {
         mVelocityTracker.addMovement(e);
         mVelocityTracker.recycle();
         mVelocityTracker = null;
-    }
-
-    public static Gesture detectAction(float deltaX, float deltaY, float minDistance) {
-        Gesture swipeAction = null;
-        if (deltaX >= minDistance) {
-            swipeAction = Gesture.TO_CENTER;
-        } else if (deltaY > minDistance) {
-            swipeAction = Gesture.DOWN;
-        } else if (deltaY < -minDistance) {
-            swipeAction = Gesture.UP;
-        }
-        return swipeAction;
-
     }
 
     @Override
@@ -353,11 +348,12 @@ public class SidebarHotspot extends View {
 
     void init(Context context) {
 
+        AppInjector.inject(this);
+
         float scale = AppsiApplication.getDensity(context);
         mMinimumMove = scale * SIDEBAR_MINIMUM_MOVE;
 
-        SharedPreferences sharedPreferences =
-                PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences sharedPreferences = mPreferences;
         mVisibleHotspots = !sharedPreferences.getBoolean("pref_hide_hotspots", false);
         mSharedPreferencesListener = new SharedPreferencesListener(this);
         sharedPreferences.registerOnSharedPreferenceChangeListener(mSharedPreferencesListener);

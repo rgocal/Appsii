@@ -49,6 +49,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
 /**
  * Created by nick on 09/01/15.
  */
@@ -65,28 +67,21 @@ class AppsAdapter extends RecyclerView.Adapter<AppsController.AbstractAppViewHol
     static final int VIEW_TYPE_NO_RECENT_APPS = R.layout.list_item_no_recent_apps;
 
     static final int VIEW_TYPE_EMPTY_TAG = R.layout.list_item_empty_tag;
-
-    final AppView.AppActionListener mAppActionListener;
-
-    final AppView.TagActionListener mTagActionListener;
-
     final LongSparseArray<Boolean> mExpandedTags = new LongSparseArray<>();
-
     /**
      * A list of items that are currently showing in the list/grid
      */
     private final List<Object> mVisibleItems = new ArrayList<>();
-
+    AppView.AppActionListener mAppActionListener;
+    AppView.TagActionListener mTagActionListener;
     AppPageData mData;
 
     View.OnClickListener mOnClickListener;
 
     private View mParallaxView;
 
-    AppsAdapter(AppView.AppActionListener appActionListener,
-            AppView.TagActionListener tagActionListener) {
-        mAppActionListener = appActionListener;
-        mTagActionListener = tagActionListener;
+    @Inject
+    AppsAdapter() {
         mVisibleItems.add(null);
         setHasStableIds(true);
     }
@@ -320,6 +315,14 @@ class AppsAdapter extends RecyclerView.Adapter<AppsController.AbstractAppViewHol
         return top / mParallaxView.getHeight();
     }
 
+    public void setAppsActionListener(AppView.AppActionListener l) {
+        mAppActionListener = l;
+    }
+
+    public void setTagActionListener(AppView.TagActionListener l) {
+        mTagActionListener = l;
+    }
+
     static class NoRecentAppsItem implements AppEntry {
 
         @Override
@@ -401,16 +404,11 @@ class AppsAdapter extends RecyclerView.Adapter<AppsController.AbstractAppViewHol
     static class OverflowTouchDelegate extends TouchDelegate {
 
         final int mMinHeight;
-
-        final private Rect mBounds;
-
-        final private Rect mSlopBounds;
-
         final View mDelegateView;
-
-        boolean mDelegateTargeted;
-
+        final private Rect mBounds;
+        final private Rect mSlopBounds;
         private final int mSlop;
+        boolean mDelegateTargeted;
 
         public OverflowTouchDelegate(View delegateView) {
             super(new Rect(), delegateView);
@@ -507,11 +505,9 @@ class AppsAdapter extends RecyclerView.Adapter<AppsController.AbstractAppViewHol
     class AppHeaderHolder extends AppsController.AbstractAppViewHolder
             implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
-        AppTag mAppTag;
-
         final TextView mTextView;
-
         final View mHeaderOverflow;
+        AppTag mAppTag;
 
         public AppHeaderHolder(View itemView) {
             super(itemView);

@@ -39,19 +39,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.appsimobile.appsii.AppsiApplication;
 import com.appsimobile.appsii.BuildConfig;
 import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.appwidget.AppWidgetUtils;
-import com.appsimobile.appsii.appwidget.AppsiiAppWidgetHost;
 import com.appsimobile.appsii.compat.AppWidgetManagerCompat;
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.module.home.config.HomeItemConfiguration;
-import com.appsimobile.appsii.module.home.config.HomeItemConfigurationHelper;
 
 import java.text.Collator;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * The activity that lets user select and configure a widget to add to a cell.
@@ -111,6 +111,7 @@ public class WidgetChooserActivity extends Activity
     /**
      * The appWidgetHost. Used to allocate app-widget-ids
      */
+    @Inject
     AppWidgetHost mAppWidgetHost;
 
     /**
@@ -123,15 +124,20 @@ public class WidgetChooserActivity extends Activity
      * The widget manager. Used to perform most of the operations on compatible with
      * multiple api levels.
      */
+    @Inject
     AppWidgetManagerCompat mAppWidgetManager;
+
+    @Inject
+    HomeItemConfiguration mHomeItemConfiguration;
+
+    @Inject
+    AppWidgetUtils mAppWidgetUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mAppWidgetManager = AppWidgetManagerCompat.getInstance(this);
-
-        mAppWidgetHost = new AppsiiAppWidgetHost(this, AppsiApplication.APPWIDGET_HOST_ID);
+        AppInjector.inject(this);
 
         setContentView(R.layout.fragment_widget_chooser);
 
@@ -146,12 +152,12 @@ public class WidgetChooserActivity extends Activity
         mSingleSelectionDecoration = new SingleSelectionDecoration(this);
         mRecyclerView.addItemDecoration(mSingleSelectionDecoration);
 
-        List<AppWidgetProviderInfo> appWidgetProviders =
-                AppWidgetUtils.loadAppWidgetProviderInfos(this);
+        List<AppWidgetProviderInfo> appWidgetProviders = mAppWidgetUtils
+                .loadAppWidgetProviderInfos();
 
-        Collections.sort(appWidgetProviders, new WidgetNameComparator(this));
+        Collections.sort(appWidgetProviders, new WidgetNameComparator(this, mAppWidgetManager));
 
-        WidgetAdapter adapter = new WidgetAdapter(appWidgetProviders, this);
+        WidgetAdapter adapter = new WidgetAdapter(appWidgetProviders, this, mAppWidgetUtils);
         mRecyclerView.setAdapter(adapter);
 
         mCellId = getIntent().getLongExtra(EXTRA_CELL_ID, -1);
@@ -305,11 +311,9 @@ public class WidgetChooserActivity extends Activity
      */
     private void finishAndSaveWidgetToCell(final int appWidgetId) {
 
-        HomeItemConfiguration itemConfigurationHelper =
-                HomeItemConfigurationHelper.getInstance(this);
 
-        itemConfigurationHelper.
-                updateProperty(mCellId, "app_widget_id", String.valueOf(appWidgetId));
+        mHomeItemConfiguration
+                .updateProperty(mCellId, "app_widget_id", String.valueOf(appWidgetId));
         finish();
     }
 
@@ -319,17 +323,21 @@ public class WidgetChooserActivity extends Activity
 
         final WidgetViewHolder.OnWidgetClickedListener mOnWidgetClickedListener;
 
+        final AppWidgetUtils mAppWidgetUtils;
+
         WidgetAdapter(List<AppWidgetProviderInfo> appWidgetProviders,
-                WidgetViewHolder.OnWidgetClickedListener onWidgetClickedListener) {
+                WidgetViewHolder.OnWidgetClickedListener onWidgetClickedListener,
+                AppWidgetUtils appWidgetUtils) {
             mAppWidgetProviders = appWidgetProviders;
             mOnWidgetClickedListener = onWidgetClickedListener;
+            mAppWidgetUtils = appWidgetUtils;
         }
 
         @Override
         public WidgetViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             View view = inflater.inflate(R.layout.grid_item_widget, parent, false);
-            return new WidgetViewHolder(view, mOnWidgetClickedListener);
+            return new WidgetViewHolder(view, mAppWidgetUtils, mOnWidgetClickedListener);
         }
 
         @Override
@@ -354,8 +362,8 @@ public class WidgetChooserActivity extends Activity
 
         private final Collator mCollator;
 
-        WidgetNameComparator(Context context) {
-            mManager = AppWidgetManagerCompat.getInstance(context);
+        WidgetNameComparator(Context context, AppWidgetManagerCompat awm) {
+            mManager = awm;
             mPackageManager = context.getPackageManager();
             mLabelCache = new SimpleArrayMap<>();
             mCollator = Collator.getInstance();

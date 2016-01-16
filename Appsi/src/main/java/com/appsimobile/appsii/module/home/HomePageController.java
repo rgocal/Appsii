@@ -50,6 +50,7 @@ import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.SidebarContext;
 import com.appsimobile.appsii.appwidget.AppsiiAppWidgetHost;
 import com.appsimobile.appsii.appwidget.AppsiiAppWidgetHost.AppsiAppWidgetHostView;
+import com.appsimobile.appsii.dagger.AppsiInjector;
 import com.appsimobile.appsii.module.PermissionHelper;
 import com.appsimobile.appsii.module.ToolbarScrollListener;
 import com.appsimobile.appsii.module.home.config.HomeItemConfiguration;
@@ -59,6 +60,8 @@ import com.crashlytics.android.Crashlytics;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * Created by nick on 10/08/14.
@@ -91,17 +94,18 @@ public class HomePageController extends PageController implements Toolbar.OnMenu
     boolean mUserVisible;
 
     RecyclerViewTouchListener mRecyclerViewTouchListener;
-
-    private Rect mRect;
-
     ViewGroup mPermissionOverlay;
-
     ArrayList<String> mDismissedPermissions;
-
     PendingPermissionError mPendingPermissionError;
+    @Inject
+    HomeItemConfigurationHelper mHomeItemConfigurationHelper;
+    @Inject
+    PermissionUtils mPermissionUtils;
+    private Rect mRect;
 
     public HomePageController(Context context, long pageId, String title) {
         super(context, title);
+        AppsiInjector.inject(this);
         mPageId = pageId;
         mContext = (SidebarContext) context;
     }
@@ -239,9 +243,7 @@ public class HomePageController extends PageController implements Toolbar.OnMenu
             long homeItemId = state.getLong("home_item_id", -1L);
             String viewName = state.getString("view_name");
 
-            HomeItemConfiguration helper =
-                    HomeItemConfigurationHelper.getInstance(mContext);
-
+            HomeItemConfiguration helper = mHomeItemConfigurationHelper;
 
             if (action == CLOSE_ACTION_AUTO_CLOSE) {
                 String closeButtonNames =
@@ -410,8 +412,7 @@ public class HomePageController extends PageController implements Toolbar.OnMenu
         String viewName = getViewName(hostView.getAppWidgetInfo(), clicked);
         HomeItem homeItem = mHomeAdapter.getHomeItemForAppWidgetId(appWidgetId);
 
-        HomeItemConfiguration helper =
-                HomeItemConfigurationHelper.getInstance(mContext);
+        HomeItemConfiguration helper = mHomeItemConfigurationHelper;
 
         String closeButtonNames = helper.getProperty(homeItem.mId, "always_close_buttons", null);
         String keepOpenButtonNames = helper.getProperty(homeItem.mId, "keep_open_buttons", null);
@@ -459,7 +460,7 @@ public class HomePageController extends PageController implements Toolbar.OnMenu
 
     @Override
     public void onPermissionDenied(String permission, String id, @StringRes int textResId) {
-        if (PermissionUtils.shouldShowPermissionError(mContext, id)) {
+        if (mPermissionUtils.shouldShowPermissionError(mContext, id)) {
             if (mPermissionOverlay == null) {
                 if (mPendingPermissionError == null) {
                     mPendingPermissionError = new PendingPermissionError(permission, id, textResId);
@@ -484,7 +485,7 @@ public class HomePageController extends PageController implements Toolbar.OnMenu
 
     @Override
     public void onAccepted(PermissionHelper permissionHelper) {
-        Intent intent = PermissionUtils.
+        Intent intent = mPermissionUtils.
                 buildRequestPermissionsIntent(mContext, 1, permissionHelper.getPermissions());
         mContext.startActivity(intent);
     }
@@ -493,9 +494,25 @@ public class HomePageController extends PageController implements Toolbar.OnMenu
     public void onCancelled(PermissionHelper permissionHelper, boolean dontShowAgain) {
         if (dontShowAgain) {
             String id = (String) mPermissionOverlay.getTag();
-            PermissionUtils.setDontShowPermissionAgain(mContext, id);
+            mPermissionUtils.setDontShowPermissionAgain(mContext, id);
         }
 
+    }
+
+    static class PendingPermissionError {
+
+        final String mPermission;
+
+        final String mId;
+
+        @StringRes
+        final int mTextResId;
+
+        PendingPermissionError(String permission, String id, int textResId) {
+            mPermission = permission;
+            mId = id;
+            mTextResId = textResId;
+        }
     }
 
     class HomeLoaderCallbacks implements LoaderManager.LoaderCallbacks<List<HomeItem>> {
@@ -644,22 +661,6 @@ public class HomePageController extends PageController implements Toolbar.OnMenu
             copy.setLocation(x, y);
             mEventQueue.dispatchTouchEvent(copy);
 
-        }
-    }
-
-    static class PendingPermissionError {
-
-        final String mPermission;
-
-        final String mId;
-
-        @StringRes
-        final int mTextResId;
-
-        PendingPermissionError(String permission, String id, int textResId) {
-            mPermission = permission;
-            mId = id;
-            mTextResId = textResId;
         }
     }
 

@@ -37,10 +37,11 @@ public class ShortcutNameComparator implements Comparator<LauncherActivityInfoCo
 
     private final Map<ComponentName, CharSequence> mLabelCache;
 
-    public ShortcutNameComparator(Context context, Map<ComponentName, CharSequence> labelCache) {
+    public ShortcutNameComparator(Context context, Map<ComponentName, CharSequence> labelCache,
+            LauncherAppsCompat lac) {
         mLabelCache = labelCache;
         mCollator = Collator.getInstance();
-        mLauncherAppsCompat = LauncherAppsCompat.getInstance(context);
+        mLauncherAppsCompat = lac;
     }
 
     public final int compare(LauncherActivityInfoCompat lhr, LauncherActivityInfoCompat rhs) {

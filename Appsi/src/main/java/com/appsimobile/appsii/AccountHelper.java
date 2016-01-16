@@ -35,16 +35,17 @@ import com.appsimobile.appsii.module.home.WeatherFragment;
 import com.appsimobile.appsii.module.weather.WeatherContract;
 import com.appsimobile.appsii.module.weather.WeatherLoadingService;
 import com.appsimobile.appsii.preference.PreferenceHelper;
-import com.appsimobile.appsii.preference.PreferencesFactory;
 
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * Created by nick on 14/04/15.
  */
-public class AccountHelper implements SharedPreferences.OnSharedPreferenceChangeListener {
+@Singleton
+public final class AccountHelper implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     // The authority for the sync adapter's content provider
     public static final String AUTHORITY = WeatherContract.AUTHORITY;
@@ -63,20 +64,22 @@ public class AccountHelper implements SharedPreferences.OnSharedPreferenceChange
     // The account name
     public static final String ACCOUNT = "Appsii";
 
-    private static final Lock sAccountHelperLock = new ReentrantLock();
+    private final PreferenceHelper mPreferenceHelper;
 
-    private static volatile AccountHelper sInstance;
-
-    final SharedPreferences mSharedPreferences;
-
+    private final AccountManager mAccountManager;
     private final Context mContext;
-
+    SharedPreferences mPrefs;
     Account mAccount;
 
     String mDefaultWeatherUnit;
 
-    private AccountHelper(Context context) {
+    @Inject
+    public AccountHelper(Context context, SharedPreferences preferences,
+            PreferenceHelper preferenceHelper, AccountManager accountManager) {
         mContext = context;
+        mPrefs = preferences;
+        mPreferenceHelper = preferenceHelper;
+        mAccountManager = accountManager;
 
         BroadcastReceiver receiver = new BroadcastReceiver() {
             @Override
@@ -87,31 +90,50 @@ public class AccountHelper implements SharedPreferences.OnSharedPreferenceChange
         IntentFilter intentFilter =
                 new IntentFilter(WeatherLoadingService.ACTION_WEATHER_UPDATED);
         mContext.registerReceiver(receiver, intentFilter);
-        mSharedPreferences = PreferencesFactory.getPreferences(context);
 
-        PreferenceHelper preferenceHelper = PreferenceHelper.getInstance(context);
         mDefaultWeatherUnit = preferenceHelper.getDefaultWeatherTemperatureUnit();
-        mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
+        mPrefs.registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Nullable
+    public static Account getExistingAccount(AccountManager accountManager) {
+
+        Account[] accounts = accountManager.getAccountsByType(ACCOUNT_TYPE);
+        if (accounts.length > 0) {
+            return accounts[0];
+        }
+        return null;
+    }
+
+    /**
+     * Create a new dummy account for the sync adapter
+     *
+     * @param context The application context
+     */
+    private static Account createSyncAccount(Context context, AccountManager accountManager) {
+
+        // Create the account type and default account
+        Account newAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
+
+        /*
+         * Add the account and account type, no password or user data
+         * If successful, return the Account object, otherwise report an error.
+         */
+        if (!accountManager.addAccountExplicitly(newAccount, null, null)) {
+            /*
+             * The account exists or some other error occurred. Log this, report it,
+             * or handle it internally.
+             */
+            Log.i("Appsi", "local account already exists");
+        }
+        return newAccount;
     }
 
     void onWeatherUpdated() {
-        SharedPreferences prefs = PreferencesFactory.getPreferences(mContext);
-        prefs.edit().putLong(
+        mPrefs.edit().putLong(
                 WeatherLoadingService.PREFERENCE_LAST_UPDATED_MILLIS, System.currentTimeMillis()).
                 apply();
 
-    }
-
-    public static AccountHelper getInstance(Context context) {
-        sAccountHelperLock.lock();
-        try {
-            if (sInstance == null) {
-                sInstance = new AccountHelper(context.getApplicationContext());
-            }
-        } finally {
-            sAccountHelperLock.unlock();
-        }
-        return sInstance;
     }
 
     public void requestSync(String woeid) {
@@ -134,11 +156,9 @@ public class AccountHelper implements SharedPreferences.OnSharedPreferenceChange
 
     @NonNull
     private Bundle createDefaultSyncBundle() {
-        PreferenceHelper preferenceHelper = PreferenceHelper.getInstance(mContext);
-        String defaultUnit = preferenceHelper.getDefaultWeatherTemperatureUnit();
+        String defaultUnit = mPreferenceHelper.getDefaultWeatherTemperatureUnit();
 
-        SharedPreferences prefs = PreferencesFactory.getPreferences(mContext);
-        String unit = prefs.getString(WeatherFragment.PREFERENCE_WEATHER_UNIT, defaultUnit);
+        String unit = mPrefs.getString(WeatherFragment.PREFERENCE_WEATHER_UNIT, defaultUnit);
 
         Bundle bundle = new Bundle();
         bundle.putString(WeatherLoadingService.EXTRA_UNIT, unit);
@@ -161,10 +181,10 @@ public class AccountHelper implements SharedPreferences.OnSharedPreferenceChange
 
     public boolean createAccountIfNeeded() {
         // Get an instance of the Android account manager
-        mAccount = getExistingAccount(mContext);
+        mAccount = getExistingAccount(mAccountManager);
         boolean created = mAccount == null;
         if (mAccount == null) {
-            mAccount = createSyncAccount(mContext);
+            mAccount = createSyncAccount(mContext, mAccountManager);
         }
 
         // start of as not syncable
@@ -195,52 +215,9 @@ public class AccountHelper implements SharedPreferences.OnSharedPreferenceChange
         ContentResolver.requestSync(mAccount, AUTHORITY, extras);
     }
 
-    @Nullable
-    public static Account getExistingAccount(Context context) {
-
-        // Get an instance of the Android account manager
-        AccountManager accountManager =
-                (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
-
-
-        Account[] accounts = accountManager.getAccountsByType(ACCOUNT_TYPE);
-        if (accounts.length > 0) {
-            return accounts[0];
-        }
-        return null;
-    }
-
-    /**
-     * Create a new dummy account for the sync adapter
-     *
-     * @param context The application context
-     */
-    private static Account createSyncAccount(Context context) {
-
-        // Get an instance of the Android account manager
-        AccountManager accountManager =
-                (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
-
-        // Create the account type and default account
-        Account newAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
-
-        /*
-         * Add the account and account type, no password or user data
-         * If successful, return the Account object, otherwise report an error.
-         */
-        if (!accountManager.addAccountExplicitly(newAccount, null, null)) {
-            /*
-             * The account exists or some other error occurred. Log this, report it,
-             * or handle it internally.
-             */
-            Log.i("Appsi", "local account already exists");
-        }
-        return newAccount;
-    }
-
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (getExistingAccount(mContext) == null) {
+        if (getExistingAccount(mAccountManager) == null) {
             Log.d("AccountHelper", "Weather unit changed, but no account. Not updating settings…");
             return;
         }

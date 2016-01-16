@@ -40,8 +40,11 @@ import android.text.TextUtils;
 import com.appsimobile.appsii.AppsiApplication;
 import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.appwidget.AppsiiAppWidgetHost;
+import com.appsimobile.appsii.dagger.AppInjector;
 
 import java.util.Map;
+
+import javax.inject.Inject;
 
 import static com.appsimobile.appsii.module.home.WeatherFragment.PREFERENCE_WEATHER_LOCATION;
 import static com.appsimobile.appsii.module.home.WeatherFragment.PREFERENCE_WEATHER_WOEID;
@@ -284,6 +287,69 @@ public class HomeContentProvider extends ContentProvider {
      */
     private SQLiteOpenHelper mOpenHelper;
 
+    /**
+     * The where projection of the queries to the rows and cells table needs to be changed
+     * because the projection is mapped and the id may become ambiguous. This method returns
+     * the correct where for the args provided.
+     */
+    private static String fixWhereProjection(Uri uri, String selection) {
+        if (selection == null) return null;
+        String table = uri.getPathSegments().get(0);
+
+        switch (table) {
+            case HomeContract.CELLS_TABLE_NAME:
+                return selection.
+                        replaceAll("(^_id)|( _id)", " " + HomeContract.CELLS_TABLE_NAME + "._id");
+            case ROWS_TABLE_NAME:
+                return selection.
+                        replaceAll("(^_id)|( _id)", " " + ROWS_TABLE_NAME + "._id");
+        }
+        return selection;
+    }
+
+    /**
+     * Return the actual tables to be queries when the user queries the specified table.
+     */
+    private static String createTablesFromTableQuery(String queriedTable) {
+        if (HomeContract.CELLS_TABLE_NAME.equals(queriedTable)) {
+            return CELLS_QUERY_TABLES;
+        } else if (ROWS_TABLE_NAME.equals(queriedTable)) {
+            return ROWS_QUERY_TABLES;
+        } else if (HOTSPOTS_TABLE_NAME.equals(queriedTable)) {
+            return HOTSPOTS_QUERY_TABLES;
+        } else if (HOTSPOT_PAGES_DETAILS_TABLE_NAME.equals(queriedTable)) {
+            return HOTSPOTPAGE_DETAILS_QUERY_TABLES;
+        }
+        return queriedTable;
+    }
+
+    /**
+     * Return the projection map for a query on the given table.
+     */
+    private static Map<String, String> getProjectionMapForTable(String queriedTable) {
+        if (HomeContract.CELLS_TABLE_NAME.equals(queriedTable)) {
+            return CELLS_QUERY_MAP;
+        } else if (ROWS_TABLE_NAME.equals(queriedTable)) {
+            return ROWS_QUERY_MAP;
+        } else if (HOTSPOTS_TABLE_NAME.equals(queriedTable)) {
+            return HOTSPOTS_QUERY_MAP;
+        } else if (HOTSPOT_PAGES_DETAILS_TABLE_NAME.equals(queriedTable)) {
+            return HOTSPOTPAGE_DETAILS_QUERY_MAP;
+        }
+        return null;
+    }
+
+    private static String fixSortOrder(String sortOrder) {
+        if (sortOrder == null) return null;
+
+
+        return sortOrder.
+                replaceAll(MATCH_SORT_POSITION,
+                        ROWS_TABLE_NAME + "." + HomeContract.RowColumns.POSITION).
+                replaceAll(MATCH_PAGE_ID, PAGES_TABLE_NAME + "._id");
+
+    }
+
     @Override
     public boolean onCreate() {
         mOpenHelper = new HomeDatabaseHelper(getContext());
@@ -422,69 +488,6 @@ public class HomeContentProvider extends ContentProvider {
     }
 
     /**
-     * The where projection of the queries to the rows and cells table needs to be changed
-     * because the projection is mapped and the id may become ambiguous. This method returns
-     * the correct where for the args provided.
-     */
-    private static String fixWhereProjection(Uri uri, String selection) {
-        if (selection == null) return null;
-        String table = uri.getPathSegments().get(0);
-
-        switch (table) {
-            case HomeContract.CELLS_TABLE_NAME:
-                return selection.
-                        replaceAll("(^_id)|( _id)", " " + HomeContract.CELLS_TABLE_NAME + "._id");
-            case ROWS_TABLE_NAME:
-                return selection.
-                        replaceAll("(^_id)|( _id)", " " + ROWS_TABLE_NAME + "._id");
-        }
-        return selection;
-    }
-
-    /**
-     * Return the actual tables to be queries when the user queries the specified table.
-     */
-    private static String createTablesFromTableQuery(String queriedTable) {
-        if (HomeContract.CELLS_TABLE_NAME.equals(queriedTable)) {
-            return CELLS_QUERY_TABLES;
-        } else if (ROWS_TABLE_NAME.equals(queriedTable)) {
-            return ROWS_QUERY_TABLES;
-        } else if (HOTSPOTS_TABLE_NAME.equals(queriedTable)) {
-            return HOTSPOTS_QUERY_TABLES;
-        } else if (HOTSPOT_PAGES_DETAILS_TABLE_NAME.equals(queriedTable)) {
-            return HOTSPOTPAGE_DETAILS_QUERY_TABLES;
-        }
-        return queriedTable;
-    }
-
-    /**
-     * Return the projection map for a query on the given table.
-     */
-    private static Map<String, String> getProjectionMapForTable(String queriedTable) {
-        if (HomeContract.CELLS_TABLE_NAME.equals(queriedTable)) {
-            return CELLS_QUERY_MAP;
-        } else if (ROWS_TABLE_NAME.equals(queriedTable)) {
-            return ROWS_QUERY_MAP;
-        } else if (HOTSPOTS_TABLE_NAME.equals(queriedTable)) {
-            return HOTSPOTS_QUERY_MAP;
-        } else if (HOTSPOT_PAGES_DETAILS_TABLE_NAME.equals(queriedTable)) {
-            return HOTSPOTPAGE_DETAILS_QUERY_MAP;
-        }
-        return null;
-    }
-
-    private static String fixSortOrder(String sortOrder) {
-        if (sortOrder == null) return null;
-
-
-        return sortOrder.
-                replaceAll(MATCH_SORT_POSITION,
-                        ROWS_TABLE_NAME + "." + HomeContract.RowColumns.POSITION).
-                replaceAll(MATCH_PAGE_ID, PAGES_TABLE_NAME + "._id");
-
-    }
-
-    /**
      * The sqliteOpenHelper for the Home database. This class is responsible for upgrading and
      * creating the database when needed. Changes to the structure must be added to the {@link
      * #onCreate} method and they have to be added to the
@@ -576,10 +579,35 @@ public class HomeContentProvider extends ContentProvider {
 
         private final Context mContext;
 
+        @Inject
+        AppWidgetHost mAppWidgetHost;
 
         public HomeDatabaseHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
             mContext = context;
+        }
+
+        private static long insertDefaultHotspotsV7(ContentValues values, SQLiteDatabase db) {
+
+            values.clear();
+            values.put(HotspotColumns.HEIGHT, .1f);
+            values.put(HotspotColumns.Y_POSITION, .15f);
+            values.put(HotspotColumns.NEEDS_CONFIGURATION, 0);
+            values.put(HotspotColumns.NAME, "Appsii");
+            values.put(HotspotColumns.LEFT_BORDER, 1);
+            values.put(HotspotColumns.ALWAYS_OPEN_LAST, 1);
+            values.putNull(HotspotColumns._DEFAULT_PAGE);
+            return db.insert(HOTSPOTS_TABLE_NAME, null, values);
+
+        }
+
+        private static void insertKeyValue(SQLiteDatabase db, ContentValues vals, long cellId,
+                String key, String value) {
+            vals.clear();
+            vals.put(HomeContract.ConfigurationColumns._CELL_ID, cellId);
+            vals.put(HomeContract.ConfigurationColumns.KEY, key);
+            vals.put(HomeContract.ConfigurationColumns.VALUE, value);
+            db.insert(HomeContract.CONFIG_TABLE_NAME, null, vals);
         }
 
         @Override
@@ -591,9 +619,12 @@ public class HomeContentProvider extends ContentProvider {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
+            AppInjector.inject(this);
             AppWidgetHost appWidgetHost = new AppsiiAppWidgetHost(mContext,
                     AppsiApplication.APPWIDGET_HOST_ID);
 
+            // Remove possibly in use appwidget ids
+            // in case the data was resets
             appWidgetHost.deleteHost();
 
             db.beginTransaction();
@@ -671,20 +702,6 @@ public class HomeContentProvider extends ContentProvider {
 
 
             insertDefaultHomePageValuesV7(db, v, homePageId);
-        }
-
-        private static long insertDefaultHotspotsV7(ContentValues values, SQLiteDatabase db) {
-
-            values.clear();
-            values.put(HotspotColumns.HEIGHT, .1f);
-            values.put(HotspotColumns.Y_POSITION, .15f);
-            values.put(HotspotColumns.NEEDS_CONFIGURATION, 0);
-            values.put(HotspotColumns.NAME, "Appsii");
-            values.put(HotspotColumns.LEFT_BORDER, 1);
-            values.put(HotspotColumns.ALWAYS_OPEN_LAST, 1);
-            values.putNull(HotspotColumns._DEFAULT_PAGE);
-            return db.insert(HOTSPOTS_TABLE_NAME, null, values);
-
         }
 
         private void insertDefaultHomePageValuesV7(SQLiteDatabase db, ContentValues v,
@@ -776,15 +793,6 @@ public class HomeContentProvider extends ContentProvider {
             vals.put(HomeContract.CellColumns.POSITION, position);
             vals.put(HomeContract.CellColumns.TYPE, type);
             return db.insert(HomeContract.CELLS_TABLE_NAME, null, vals);
-        }
-
-        private static void insertKeyValue(SQLiteDatabase db, ContentValues vals, long cellId,
-                String key, String value) {
-            vals.clear();
-            vals.put(HomeContract.ConfigurationColumns._CELL_ID, cellId);
-            vals.put(HomeContract.ConfigurationColumns.KEY, key);
-            vals.put(HomeContract.ConfigurationColumns.VALUE, value);
-            db.insert(HomeContract.CONFIG_TABLE_NAME, null, vals);
         }
 
         @Override

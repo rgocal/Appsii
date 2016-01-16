@@ -28,7 +28,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -46,9 +45,12 @@ import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.annotation.VisibleForTesting;
 import com.appsimobile.appsii.compat.LauncherAppsCompat;
 import com.appsimobile.appsii.compat.UserHandleCompat;
+import com.appsimobile.appsii.dagger.AppsiInjector;
 import com.appsimobile.appsii.module.ToolbarScrollListener;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * The controller for the apps page. Shows the app from the different folders
@@ -77,6 +79,7 @@ public class AppsController extends PageController
      * The adapter used to display the apps in the
      * list-view
      */
+    @Inject
     AppsAdapter mAppsAdapter;
 
     /**
@@ -92,22 +95,22 @@ public class AppsController extends PageController
     QueryHandler mQueryHandler;
 
     int mColumnCount;
-
+    @Inject
+    SharedPreferences mSharedPreferences;
+    @Inject
+    LauncherAppsCompat mLauncherAppsCompat;
     /**
      * A handler for the content observer to post the event into
      */
     private Handler mHandler;
-
     /**
      * The toolbar for this page
      */
     private Toolbar mToolbar;
-
     /**
      * The layout-manager that is being used in the recycler-view
      */
     private GridLayoutManager mLayoutManager;
-
     /**
      * A helper class providing access to the bottom sheet functionality
      */
@@ -134,7 +137,7 @@ public class AppsController extends PageController
 
         mBottomSheetHelper.onViewCreated(view);
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences preferences = mSharedPreferences;
         int defaultColumnCount = getResources().getInteger(R.integer.default_app_columns);
         mColumnCount = preferences.getInt("page_apps_column_count", defaultColumnCount);
 
@@ -187,8 +190,11 @@ public class AppsController extends PageController
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppsiInjector.inject(this);
+
         mBottomSheetHelper = new BottomSheetHelper(getContext(), this /* appController */);
-        mAppsAdapter = new AppsAdapter(this /* appActionListener */, this /* tagActionListener */);
+        mAppsAdapter.setAppsActionListener(this);
+        mAppsAdapter.setTagActionListener(this);
 
         mHandler = new Handler();
 
@@ -250,7 +256,7 @@ public class AppsController extends PageController
     @Override
     public Loader<AppPageData> onCreateLoader(int id, Bundle args) {
         if (id == APPS_LOADER_ID) {
-            return new AppPageLoader(getContext());
+            return new AppPageLoader(getContext(), mLauncherAppsCompat);
         }
         return null;
     }
@@ -282,7 +288,7 @@ public class AppsController extends PageController
         AppView view = (AppView) v;
         AppEntry app = view.getAppEntry();
 
-        LauncherAppsCompat launcherApps = LauncherAppsCompat.getInstance(getContext());
+        LauncherAppsCompat launcherApps = mLauncherAppsCompat;
         launcherApps.startActivityForProfile(app.getComponentName(),
                 UserHandleCompat.myUserHandle(),
                 null,
@@ -367,7 +373,7 @@ public class AppsController extends PageController
     }
 
     private void saveColumnCount(int columnCount) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences preferences = mSharedPreferences;
         preferences.edit().
                 putInt("page_apps_column_count", columnCount).
                 apply();

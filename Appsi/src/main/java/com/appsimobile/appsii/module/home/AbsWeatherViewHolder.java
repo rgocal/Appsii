@@ -44,6 +44,7 @@ import android.widget.TextView;
 import com.appsimobile.appsii.AccountHelper;
 import com.appsimobile.appsii.BitmapUtils;
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.module.home.config.HomeItemConfiguration;
 import com.appsimobile.appsii.module.home.config.HomeItemConfigurationHelper;
 import com.appsimobile.appsii.module.weather.ImageDownloadHelper;
@@ -52,60 +53,57 @@ import com.appsimobile.appsii.module.weather.WeatherLoadingService;
 import com.appsimobile.appsii.module.weather.WeatherUtils;
 import com.appsimobile.appsii.module.weather.loader.WeatherData;
 import com.appsimobile.appsii.preference.PreferenceHelper;
-import com.appsimobile.appsii.preference.PreferencesFactory;
 import com.appsimobile.paintjob.PaintJob;
 
 import java.io.File;
 import java.util.TimeZone;
 
+import javax.inject.Inject;
+
 /**
  * Created by nick on 22/01/15.
  */
-abstract class AbsWeatherViewHolder extends AbsHomeViewHolder implements
+public abstract class AbsWeatherViewHolder extends AbsHomeViewHolder implements
         HomeItemConfigurationHelper.ConfigurationListener, View.OnClickListener,
         PopupMenu.OnMenuItemClickListener {
 
     static final Time sTime = new Time();
-
-    final HomeItemConfiguration mConfigurationHelper;
-
-    final SharedPreferences mSharedPreferences;
-
     final boolean mShowsWallpaper;
-
-    HomeItem mHomeItem;
-
-    AsyncTask<Void, Void, WeatherData> mLoaderTask;
-
-    BroadcastReceiver mReceiver;
-
     final View mOverflow;
-
-    OnWeatherCellClickListener mOnWeatherCellClickListener;
-
-    final PreferenceHelper mPreferenceHelper;
-
     /**
      * This is null when {@link #mShowsWallpaper} is false
      */
     @Nullable
     final
     ImageView mCellBackground;
-
+    @Inject
+    HomeItemConfiguration mConfigurationHelper;
+    @Inject
+    SharedPreferences mSharedPreferences;
+    @Inject
+    BitmapUtils mBitmapUtils;
+    @Inject
+    WeatherUtils mWeatherUtils;
+    HomeItem mHomeItem;
+    AsyncTask<Void, Void, WeatherData> mLoaderTask;
+    BroadcastReceiver mReceiver;
+    OnWeatherCellClickListener mOnWeatherCellClickListener;
+    @Inject
+    PreferenceHelper mPreferenceHelper;
     String mBackgroundLoadedForWoeid;
 
     WeatherData mWeatherData;
 
     PaintJob mPaintJob;
 
+    @Inject
+    AccountHelper mAccountHelper;
+
     public AbsWeatherViewHolder(HomeViewWrapper view, boolean showsWallpaper) {
         super(view);
+        AppInjector.inject(this);
         mShowsWallpaper = showsWallpaper;
-        Context context = view.getContext();
-        mPreferenceHelper = PreferenceHelper.getInstance(context);
 
-        mConfigurationHelper = HomeItemConfigurationHelper.getInstance(context);
-        mSharedPreferences = PreferencesFactory.getPreferences(context);
         mOverflow = view.findViewById(R.id.overflow);
         mCellBackground = (ImageView) view.findViewById(R.id.weather_location_background);
         mOverflow.setOnClickListener(this);
@@ -198,8 +196,7 @@ abstract class AbsWeatherViewHolder extends AbsHomeViewHolder implements
             }
         }
         if (woeid == null) {
-            PreferenceHelper preferenceHelper = PreferenceHelper.getInstance(itemView.getContext());
-            woeid = preferenceHelper.getDefaultLocationWoeId();
+            woeid = mPreferenceHelper.getDefaultLocationWoeId();
         }
 
         if (woeid != null) {
@@ -208,10 +205,8 @@ abstract class AbsWeatherViewHolder extends AbsHomeViewHolder implements
             onNoWeatherDataAvailable();
         }
 
-        Context context = itemView.getContext();
-
-        if (WeatherLoadingService.hasTimeoutExpired(context)) {
-            AccountHelper.getInstance(context).requestSync();
+        if (WeatherLoadingService.hasTimeoutExpired(mSharedPreferences)) {
+            mAccountHelper.requestSync();
         }
     }
 
@@ -224,7 +219,7 @@ abstract class AbsWeatherViewHolder extends AbsHomeViewHolder implements
         mLoaderTask = new AsyncTask<Void, Void, WeatherData>() {
             @Override
             protected WeatherData doInBackground(Void... params) {
-                return WeatherUtils.getWeatherData(context, woeid);
+                return mWeatherUtils.getWeatherData(context, woeid);
             }
 
             @Override
@@ -263,7 +258,7 @@ abstract class AbsWeatherViewHolder extends AbsHomeViewHolder implements
         int h = (int) (itemView.getHeight() * 1.5f);
 
         PaintJob.Builder builder = PaintJob.newBuilder(itemView, new BackgroundLoader(
-                itemView.getContext(), woeid, w, h, 10, true));
+                itemView.getContext(), mWeatherUtils, woeid, w, h, 10, true, mBitmapUtils));
 
         builder.setBitmapCallback(new PaintJob.BitmapCallback() {
             @Override
@@ -365,15 +360,14 @@ abstract class AbsWeatherViewHolder extends AbsHomeViewHolder implements
     }
 
     void setupTitle(TextView textView, WeatherData weatherData, long cellId) {
-        PreferenceHelper preferenceHelper = PreferenceHelper.getInstance(
-                itemView.getContext());
+        PreferenceHelper preferenceHelper = mPreferenceHelper;
         String defaultTitleType = preferenceHelper.getDefaultWeatherTitleType();
 
         String titleType = mConfigurationHelper.getProperty(cellId,
                 WeatherFragment.PREFERENCE_WEATHER_TITLE_TYPE, defaultTitleType);
 
         if ("condition".equals(titleType)) {
-            String title = WeatherUtils.formatConditionCode(weatherData.nowConditionCode);
+            String title = mWeatherUtils.formatConditionCode(weatherData.nowConditionCode);
             textView.setText(title);
         } else {
             textView.setText(weatherData.location);
@@ -400,26 +394,33 @@ abstract class AbsWeatherViewHolder extends AbsHomeViewHolder implements
 
         final int mConditionCode;
 
-        BackgroundLoader(Context context, String woeid, int w, int h, int conditionCode,
-                boolean isDay) {
+        final BitmapUtils mBitmapUtils;
+
+        WeatherUtils mWeatherUtils;
+
+        BackgroundLoader(Context context, WeatherUtils weatherUtils, String woeid, int w, int h,
+                int conditionCode, boolean isDay, BitmapUtils bitmapUtils) {
+
             mContext = context;
+            mWeatherUtils = weatherUtils;
             mWoeid = woeid;
             mWidth = w;
             mHeight = h;
             mConditionCode = conditionCode;
             mIsDay = isDay;
+            mBitmapUtils = bitmapUtils;
         }
 
 
         @Override
         public Bitmap loadBitmapAsync() {
-            File[] files = WeatherUtils.getCityPhotos(mContext, mWoeid);
+            File[] files = mWeatherUtils.getCityPhotos(mContext, mWoeid);
             Bitmap bitmap;
 
             if (files != null) {
                 int idx = 0;
                 File file = files[idx];
-                bitmap = BitmapUtils.decodeSampledBitmapFromFile(file, mWidth, mHeight);
+                bitmap = mBitmapUtils.decodeSampledBitmapFromFile(file, mWidth, mHeight);
                 return bitmap;
             }
 

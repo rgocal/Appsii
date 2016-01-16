@@ -42,20 +42,19 @@ public class AppListLoader extends AsyncTaskLoader<List<AppEntry>> {
     static final Map<ComponentName, CharSequence> sLabelCache = new ConcurrentHashMap<>();
 
     final InterestingConfigChanges mLastConfig = new InterestingConfigChanges();
-
-    private final ShortcutNameComparator mShortcutNameComparator;
-
-    private final Map<ComponentName, CharSequence> mLabelCache;
-
     final PackageManager mPackageManager;
-
+    private final ShortcutNameComparator mShortcutNameComparator;
+    private final Map<ComponentName, CharSequence> mLabelCache;
     List<AppEntry> mApps;
 
     PackageIntentReceiver mPackageObserver;
 
-    public AppListLoader(Context context) {
+    LauncherAppsCompat mLauncherAppsCompat;
+
+    public AppListLoader(Context context, LauncherAppsCompat launcherAppsCompat) {
         super(context);
 
+        mLauncherAppsCompat = launcherAppsCompat;
         mLabelCache = sLabelCache;
 
         // Retrieve the package manager for later use; note we don't
@@ -63,7 +62,8 @@ public class AppListLoader extends AsyncTaskLoader<List<AppEntry>> {
         // context returned by getContext().
         mPackageManager = getContext().getPackageManager();
 
-        mShortcutNameComparator = new ShortcutNameComparator(context, mLabelCache);
+        mShortcutNameComparator =
+                new ShortcutNameComparator(context, mLabelCache, launcherAppsCompat);
     }
 
     static ComponentName getComponentNameFromResolveInfo(ResolveInfo info) {
@@ -96,9 +96,7 @@ public class AppListLoader extends AsyncTaskLoader<List<AppEntry>> {
 
         List<AppEntry> result = new ArrayList<>();
 
-        Context context = getContext();
-
-        LauncherAppsCompat lap = LauncherAppsCompat.getInstance(context);
+        LauncherAppsCompat lap = mLauncherAppsCompat;
         List<LauncherActivityInfoCompat> apps =
                 lap.getActivityList(null, UserHandleCompat.myUserHandle());
 

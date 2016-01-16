@@ -39,7 +39,8 @@ import android.widget.SeekBar;
 import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
 import com.appsimobile.appsii.preference.PreferenceHelper;
-import com.appsimobile.appsii.preference.PreferencesFactory;
+
+import javax.inject.Inject;
 
 /**
  * This fragment allows the user to set the height of the given hotspot
@@ -92,7 +93,11 @@ public class ChangeHotspotHeightFragment extends DialogFragment
      */
     Handler mHandler;
 
+    @Inject
     PreferenceHelper mPreferenceHelper;
+
+    @Inject
+    SharedPreferences mPreferences;
 
     /**
      * Creates a new instance of the fragment. This sets the arguments
@@ -114,8 +119,6 @@ public class ChangeHotspotHeightFragment extends DialogFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
-
-        mPreferenceHelper = PreferenceHelper.getInstance(getActivity());
 
         mHotspotId = args.getLong("hotspot_id");
 
@@ -148,8 +151,7 @@ public class ChangeHotspotHeightFragment extends DialogFragment
         super.onStart();
         // While the editor is visible, we make sure the hotspots are shown
         // resetting this is controlled by the mHideHotspotsWhenDone variable
-        SharedPreferences prefs = PreferencesFactory.getPreferences(getActivity());
-        prefs.edit().putBoolean("pref_hide_hotspots", false).apply();
+        mPreferences.edit().putBoolean("pref_hide_hotspots", false).apply();
     }
 
     @Override
@@ -163,8 +165,7 @@ public class ChangeHotspotHeightFragment extends DialogFragment
     public void onStop() {
         super.onStop();
         if (mHideHotspotsWhenDone) {
-            SharedPreferences prefs = PreferencesFactory.getPreferences(getActivity());
-            prefs.edit().putBoolean("pref_hide_hotspots", true).apply();
+            mPreferences.edit().putBoolean("pref_hide_hotspots", true).apply();
         }
     }
 

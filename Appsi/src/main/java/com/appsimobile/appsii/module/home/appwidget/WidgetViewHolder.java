@@ -47,7 +47,10 @@ public class WidgetViewHolder extends RecyclerView.ViewHolder implements View.On
 
     AsyncTask<Void, Void, Bitmap> mBitmapLoader;
 
-    public WidgetViewHolder(View itemView, OnWidgetClickedListener onWidgetClickedListener) {
+    AppWidgetUtils mAppWidgetUtils;
+
+    public WidgetViewHolder(View itemView, AppWidgetUtils appWidgetUtils,
+            OnWidgetClickedListener onWidgetClickedListener) {
         super(itemView);
 
         mOnWidgetClickedListener = onWidgetClickedListener;
@@ -69,8 +72,7 @@ public class WidgetViewHolder extends RecyclerView.ViewHolder implements View.On
         mBitmapLoader = new AsyncTask<Void, Void, Bitmap>() {
             @Override
             protected Bitmap doInBackground(Void... params) {
-                return AppWidgetUtils.getWidgetPreviewBitmap(
-                        itemView.getContext(), mAppWidgetProviderInfo, null);
+                return mAppWidgetUtils.getWidgetPreviewBitmap(mAppWidgetProviderInfo, null);
             }
 
             @Override
@@ -80,7 +82,7 @@ public class WidgetViewHolder extends RecyclerView.ViewHolder implements View.On
             }
         };
         mImageView.setImageDrawable(null);
-        mWidgetTitleView.setText(AppWidgetUtils.getWidgetTitle(itemView.getContext(), info));
+        mWidgetTitleView.setText(mAppWidgetUtils.getWidgetTitle(info));
         mBitmapLoader.execute();
 
     }

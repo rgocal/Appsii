@@ -56,9 +56,9 @@ import com.appsimobile.appsii.BitmapUtils;
 import com.appsimobile.appsii.BuildConfig;
 import com.appsimobile.appsii.DrawableStartTintPainter;
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.module.weather.loader.WeatherData;
 import com.appsimobile.appsii.preference.PreferenceHelper;
-import com.appsimobile.appsii.preference.PreferencesFactory;
 import com.appsimobile.paintjob.PaintJob;
 import com.appsimobile.paintjob.ViewPainters;
 import com.appsimobile.util.TimeUtils;
@@ -68,6 +68,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+
+import javax.inject.Inject;
 
 /**
  * Shows the detailed weather on a single location.
@@ -122,7 +124,20 @@ public class WeatherActivity extends Activity {
 
     RecyclerView mRecyclerView;
 
+    @Inject
     SharedPreferences mSharedPreferences;
+
+    @Inject
+    PreferenceHelper mPreferenceHelper;
+
+    @Inject
+    BitmapUtils mBitmapUtils;
+
+    @Inject
+    WeatherUtils mWeatherUtils;
+
+    @Inject
+    WindowManager mWindowManager;
 
     View mCurrentWeatherContainer;
 
@@ -136,15 +151,25 @@ public class WeatherActivity extends Activity {
 
     Bitmap mBitmap;
 
+    static void setTemperatureText(TextView textView, int temperature, String unit,
+            String displayUnit) {
+        Context context = textView.getContext();
+        WeatherUtils weatherUtils = AppInjector.provideWeatherUtils();
+        String text = weatherUtils.formatTemperature(context, temperature, unit, displayUnit,
+                WeatherUtils.FLAG_TEMPERATURE_NO_UNIT);
+
+        textView.setText(text);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        AppInjector.inject(this);
+
         if (savedInstanceState != null) {
             mBitmap = savedInstanceState.getParcelable("selected_image");
         }
-
-        mSharedPreferences = PreferencesFactory.getPreferences(this);
 
         String woeid = getIntent().getStringExtra(EXTRA_WOEID);
         if (woeid == null) {
@@ -152,8 +177,7 @@ public class WeatherActivity extends Activity {
                     WeatherLoadingService.PREFERENCE_LAST_KNOWN_WOEID, null);
         }
         if (woeid == null) {
-            PreferenceHelper preferenceHelper = PreferenceHelper.getInstance(this);
-            woeid = preferenceHelper.getDefaultLocationWoeId();
+            woeid = mPreferenceHelper.getDefaultLocationWoeId();
         }
 
         if (woeid == null) {
@@ -219,13 +243,13 @@ public class WeatherActivity extends Activity {
 
         mAdapter.setForecast(forecastForDays);
 
-        mIsDay = WeatherUtils.isDay(mTimezone, weatherData);
+        mIsDay = mWeatherUtils.isDay(mTimezone, weatherData);
 
-        int icon = WeatherUtils.getConditionCodeIconResId(weatherData.nowConditionCode, mIsDay);
+        int icon = mWeatherUtils.getConditionCodeIconResId(weatherData.nowConditionCode, mIsDay);
         mCurrentWeatherIcon.setImageResource(icon);
 
         mLocationView.setText(weatherData.location);
-        String feelsLikeTemp = WeatherUtils.formatTemperature(this, weatherData.windChill,
+        String feelsLikeTemp = mWeatherUtils.formatTemperature(this, weatherData.windChill,
                 weatherData.unit, mDisplayUnit, WeatherUtils.FLAG_TEMPERATURE_NO_UNIT);
 
 
@@ -239,7 +263,7 @@ public class WeatherActivity extends Activity {
             mMaxTempView.setText("-");
         }
 
-        String wind = WeatherUtils.formatWindSpeed(this, weatherData.windSpeed, weatherData.unit,
+        String wind = mWeatherUtils.formatWindSpeed(this, weatherData.windSpeed, weatherData.unit,
                 mDisplayUnit);
 
         mWindDrawable.mAngle = weatherData.windDirection;
@@ -257,7 +281,7 @@ public class WeatherActivity extends Activity {
 
         mWindView.setText(wind);
 
-        mConditionView.setText(WeatherUtils.formatConditionCode(weatherData.nowConditionCode));
+        mConditionView.setText(mWeatherUtils.formatConditionCode(weatherData.nowConditionCode));
     }
 
     private void showDefaultImage(final int conditionCode) {
@@ -311,17 +335,8 @@ public class WeatherActivity extends Activity {
         mAdapter.setPaintJob(paintJob);
     }
 
-    static void setTemperatureText(TextView textView, int temperature, String unit,
-            String displayUnit) {
-        Context context = textView.getContext();
-        String text = WeatherUtils.formatTemperature(context, temperature, unit, displayUnit,
-                WeatherUtils.FLAG_TEMPERATURE_NO_UNIT);
-
-        textView.setText(text);
-    }
-
     Bitmap loadBitmapBlocking(String woeid, boolean isDay, int conditionCode) {
-        File[] files = WeatherUtils.getCityPhotos(WeatherActivity.this, woeid);
+        File[] files = mWeatherUtils.getCityPhotos(WeatherActivity.this, woeid);
         Bitmap bitmap;
 
         if (files != null) {
@@ -329,10 +344,10 @@ public class WeatherActivity extends Activity {
             Random random = new Random();
             int idx = random.nextInt(N);
             File file = files[idx];
-            WindowManager windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+            WindowManager windowManager = mWindowManager;
             Display defaultDisplay = windowManager.getDefaultDisplay();
             int dimen = Math.max(defaultDisplay.getWidth(), defaultDisplay.getHeight());
-            bitmap = BitmapUtils.decodeSampledBitmapFromFile(file, dimen, dimen);
+            bitmap = mBitmapUtils.decodeSampledBitmapFromFile(file, dimen, dimen);
             return bitmap;
         }
 
@@ -395,7 +410,7 @@ public class WeatherActivity extends Activity {
         final Drawable mLowDrawable;
 
         final Drawable mHighDrawable;
-
+        final WeatherUtils mWeatherUtils;
         PaintJob mPaintJob;
 
         public ForecastViewHolder(View itemView, String weatherDisplayUnit) {
@@ -408,6 +423,7 @@ public class WeatherActivity extends Activity {
             mHighDrawable = mTemperatureHigh.getCompoundDrawablesRelative()[0];
             mForecastDate = (TextView) itemView.findViewById(R.id.forecast_date);
             mForecastCondition = (TextView) itemView.findViewById(R.id.forecast_condition);
+            mWeatherUtils = AppInjector.provideWeatherUtils();
         }
 
         public void setPaintJob(PaintJob paintJob) {
@@ -428,12 +444,12 @@ public class WeatherActivity extends Activity {
 
             // for forecast icons always use the day icon.
             int iconResId =
-                    WeatherUtils.getConditionCodeIconResId(info.conditionCode, true /* day */);
+                    mWeatherUtils.getConditionCodeIconResId(info.conditionCode, true /* day */);
             mForecastImage.setImageResource(iconResId);
 
             setTemperatureText(mTemperatureHigh, info.tempHigh, info.unit, mWeatherDisplayUnit);
             setTemperatureText(mTemperatureLow, info.tempLow, info.unit, mWeatherDisplayUnit);
-            mForecastCondition.setText(WeatherUtils.formatConditionCode(info.conditionCode));
+            mForecastCondition.setText(mWeatherUtils.formatConditionCode(info.conditionCode));
 
             int today = TimeUtils.getJulianDay();
 

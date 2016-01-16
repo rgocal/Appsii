@@ -33,7 +33,9 @@ import android.view.ViewGroup;
 
 import com.appsimobile.appsii.BuildConfig;
 import com.appsimobile.appsii.R;
-import com.appsimobile.appsii.preference.PreferencesFactory;
+import com.appsimobile.appsii.dagger.AppInjector;
+
+import javax.inject.Inject;
 
 /**
  * Created by nick on 23/06/15.
@@ -51,15 +53,24 @@ public class ProcessMonitorFragment extends Fragment implements View.OnClickList
 
     long mSelectedInterval;
 
+    @Inject
     SharedPreferences mPreferences;
+
+    private static int getSelectedIndex(long selectedInterval, long[] sIntervals) {
+        for (int i = 0, sIntervalsLength = sIntervals.length; i < sIntervalsLength; i++) {
+            long interval = sIntervals[i];
+            if (interval == selectedInterval) return i;
+        }
+        return -1;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppInjector.inject(this);
 
         mContext = getActivity();
 
-        mPreferences = PreferencesFactory.getPreferences(getActivity());
         mSelectedInterval = mPreferences.getLong("procmon_poll_interval", 3000);
 
         FragmentManager fm = getFragmentManager();
@@ -107,7 +118,7 @@ public class ProcessMonitorFragment extends Fragment implements View.OnClickList
     @Override
     public void onStart() {
         super.onStart();
-        SharedPreferences prefs = PreferencesFactory.getPreferences(getActivity());
+        SharedPreferences prefs = mPreferences;
 
         @SuppressWarnings("SimplifiableConditionalExpression")
         boolean dismissed = BuildConfig.DEBUG ?
@@ -123,14 +134,6 @@ public class ProcessMonitorFragment extends Fragment implements View.OnClickList
         }
     }
 
-    private static int getSelectedIndex(long selectedInterval, long[] sIntervals) {
-        for (int i = 0, sIntervalsLength = sIntervals.length; i < sIntervalsLength; i++) {
-            long interval = sIntervals[i];
-            if (interval == selectedInterval) return i;
-        }
-        return -1;
-    }
-
     @Override
     public void onIntervalSelected(long intervalMillis) {
         mSelectedInterval = intervalMillis;
@@ -141,8 +144,17 @@ public class ProcessMonitorFragment extends Fragment implements View.OnClickList
 
         View mGotItButton;
 
+        @Inject
+        SharedPreferences mSharedPreferences;
+
         public GotItFragment() {
             setStyle(STYLE_NO_TITLE, 0);
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            AppInjector.inject(this);
         }
 
         @Override
@@ -168,8 +180,7 @@ public class ProcessMonitorFragment extends Fragment implements View.OnClickList
         @Override
         public void onClick(View v) {
             dismiss();
-            SharedPreferences prefs = PreferencesFactory.getPreferences(getActivity());
-            prefs.edit().putBoolean("process_monitor_got_it_dismissed", true).apply();
+            mSharedPreferences.edit().putBoolean("process_monitor_got_it_dismissed", true).apply();
         }
 
 

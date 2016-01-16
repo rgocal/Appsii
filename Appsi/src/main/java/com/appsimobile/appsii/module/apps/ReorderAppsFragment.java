@@ -39,6 +39,8 @@ import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.compat.LauncherAppsCompat;
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.module.BaseListAdapter;
 import com.appsimobile.appsii.module.ViewHolder;
 import com.mobeta.android.dslv.ConditionalRemovableAdapter;
@@ -46,6 +48,8 @@ import com.mobeta.android.dslv.DragSortListView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * Created by nick on 31/08/14.
@@ -78,7 +82,8 @@ public class ReorderAppsFragment extends Fragment implements DragSortListView.Re
     QueryHandler mQueryHandler;
 
     RetainQueryHelperFragment mRetainFragment;
-
+    @Inject
+    LauncherAppsCompat mLauncherAppsCompat;
     private AppTag mAppTag;
 
     public static Fragment createInstance(AppTag appTag) {
@@ -99,6 +104,7 @@ public class ReorderAppsFragment extends Fragment implements DragSortListView.Re
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppInjector.inject(this);
         // create the adapter here to make sure we can set it's data and register it's listener
         // This ensures the life cycles are the same
         mAppsAdapter = new AppsAdapter();
@@ -256,10 +262,8 @@ public class ReorderAppsFragment extends Fragment implements DragSortListView.Re
         final View mDragHandle;
 
         final View mUndoDelete;
-
-        AppIconLoaderTaskImpl mAppIconLoaderTask;
-
         final Context mContext;
+        AppIconLoaderTaskImpl mAppIconLoaderTask;
 
         public TaggedAppViewHolder(View view) {
             super(view);
@@ -548,7 +552,7 @@ public class ReorderAppsFragment extends Fragment implements DragSortListView.Re
 
         @Override
         public Loader<List<AppEntry>> onCreateLoader(int id, Bundle args) {
-            return new AppListLoader(getActivity());
+            return new AppListLoader(getActivity(), mLauncherAppsCompat);
         }
 
         @Override

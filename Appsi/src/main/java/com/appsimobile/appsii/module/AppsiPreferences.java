@@ -16,9 +16,9 @@
 
 package com.appsimobile.appsii.module;
 
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
+
+import com.appsimobile.appsii.dagger.AppInjector;
 
 /**
  * Created by nick on 25/05/14.
@@ -29,8 +29,9 @@ public class AppsiPreferences {
         ModulePreferences.initializeDefaults(preferences, restoreDefaults);
     }
 
-    public static SharedPreferences.Editor editor(Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).edit();
+    public static SharedPreferences.Editor editor() {
+        SharedPreferences preferences = AppInjector.provideSharedPreferences();
+        return preferences.edit();
     }
 
     public static class ModulePreferences {

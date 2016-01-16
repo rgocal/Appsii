@@ -29,6 +29,10 @@ import android.view.ViewParent;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
+import com.appsimobile.appsii.dagger.AppInjector;
+
+import javax.inject.Inject;
+
 /**
  * A wrapper around the window-manager, intended to make adding and removing
  * different components easier. For example this adds the root-layer, that
@@ -37,20 +41,18 @@ import android.widget.FrameLayout;
 public class PopupLayer extends FrameLayout {
 
     /**
+     * The last known alpha. So we know if it has changed
+     */
+    final float mLastAlpha = -1;
+    /**
      * The window-manager we will be adding stuff to.
      */
+    @Inject
     WindowManager mWindowManager;
-
     /**
      * The default dim amount that is used for Appsii
      */
     float mDefaultDimAlpha;
-
-    /**
-     * The last known alpha. So we know if it has changed
-     */
-    final float mLastAlpha = -1;
-
     /**
      * True when the root layer is added
      */
@@ -225,11 +227,12 @@ public class PopupLayer extends FrameLayout {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
+        AppInjector.inject(this);
+
         mDimLayerView = findViewById(R.id.dim_view);
         if (AppsiApplication.API19) {
             mDimLayerView.setVisibility(GONE);
         }
-        mWindowManager = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
         setFocusableInTouchMode(true);
     }
 
@@ -263,7 +266,7 @@ public class PopupLayer extends FrameLayout {
 
         void onPopupLayerForceClosed();
 
-        void opPopupLayerHidden();
+        void opPopupLayerHidden() throws PermissionDeniedException;
 
         void opPopupLayerShown();
     }

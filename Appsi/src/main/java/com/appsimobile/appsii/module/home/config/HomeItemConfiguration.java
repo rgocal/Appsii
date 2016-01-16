@@ -54,8 +54,9 @@ public interface HomeItemConfiguration {
 
         long mCellId;
 
-        void put(String key, String value) {
+        public ConfigurationProperty put(String key, String value) {
             mValues.put(key, value);
+            return this;
         }
 
         void remove(String key) {

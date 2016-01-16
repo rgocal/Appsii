@@ -18,20 +18,40 @@
 
 package com.appsimobile.appsii.module.home;
 
+import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.matcher.ViewMatchers;
-import android.test.ActivityInstrumentationTestCase2;
+import android.support.test.rule.ActivityTestRule;
+import android.support.test.runner.AndroidJUnit4;
+import android.support.v4.util.LongSparseArray;
+import android.test.mock.MockContentProvider;
 
+import com.appsimobile.appsii.MockApplicationComponent;
+import com.appsimobile.appsii.MockAppsiApplication;
 import com.appsimobile.appsii.R;
-import com.appsimobile.appsii.module.home.config.HomeItemConfiguration;
-import com.appsimobile.appsii.module.home.config.HomeItemConfigurationFactory;
+import com.appsimobile.appsii.module.home.YahooLocationChooserDialogFragment.LocationUpdateHelper;
+import com.appsimobile.appsii.module.home.config.HomeItemConfiguration.ConfigurationProperty;
 import com.appsimobile.appsii.module.home.config.HomeItemConfigurationHelper;
-import com.appsimobile.appsii.module.home.config.MockHomeItemConfiguration;
+import com.appsimobile.appsii.module.home.config.HomeItemConfigurationHelper
+        .HomeItemConfigurationLoader;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
+import com.appsimobile.appsii.permissions.PermissionUtils;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+
+import javax.inject.Inject;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -39,33 +59,84 @@ import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static com.appsimobile.appsii.module.home.YahooLocationChooserDialogFragment
+        .LOCATION_REQUEST_RESULT_PERMISSION_DENIED;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by nick on 24/03/15.
  */
-public class WeatherActivityTest extends ActivityInstrumentationTestCase2<CellWeatherActivity> {
+@RunWith(AndroidJUnit4.class)
+public class WeatherActivityTest {
 
-    CellWeatherActivity mWeatherActivity;
+    @Rule
+    public ActivityTestRule<CellWeatherActivity> mActivityRule = new ActivityTestRule<>(
+            CellWeatherActivity.class,
+            true,     // initialTouchMode
+            false);   // launchActivity. False so we can customize the intent per test method
 
-    MockHomeItemConfiguration mConfiguration;
+    @Inject
+    SharedPreferences mSharedPreferences;
 
-    public WeatherActivityTest() {
-        super(CellWeatherActivity.class);
+    @Inject
+    PermissionUtils mPermissionUtils;
+
+    @Inject
+    HomeItemConfigurationLoader mHomeItemConfigurationLoader;
+
+    @Inject
+    LocationUpdateHelper mLocationUpdateHelper;
+
+    MockContentProvider mContentProvider;
+
+    ConfigurationProperty mConfigurationProperty;
+    private Intent mLaunchIntent;
+
+    static Context anyContext() {
+        return any(Context.class);
     }
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        Intent i = new Intent(getInstrumentation().getContext(), CellWeatherActivity.class);
-        i.putExtra(CellWeatherActivity.EXTRA_CELL_ID, 1L);
-        i.putExtra(CellWeatherActivity.EXTRA_CELL_TYPE,
+    static <T> ArrayList<T> anyList(Class<T> c) {
+        return any(ArrayList.class);
+    }
+
+    private static void initializeConfigurationProperty(ConfigurationProperty prop,
+            String unit, String location, String woeid, String timezone) {
+
+        prop.put(WeatherFragment.PREFERENCE_WEATHER_UNIT, unit)
+                .put(WeatherFragment.PREFERENCE_WEATHER_LOCATION, location)
+                .put(WeatherFragment.PREFERENCE_WEATHER_WOEID, woeid)
+                .put(WeatherFragment.PREFERENCE_WEATHER_TIMEZONE, timezone);
+    }
+
+    @Before
+    public void setUp() {
+        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        MockAppsiApplication app =
+                (MockAppsiApplication) instrumentation.getTargetContext().getApplicationContext();
+        MockApplicationComponent component =
+                (MockApplicationComponent) app.getApplicationComponent();
+        component.inject(this);
+
+        mContentProvider = new MockContentProvider(app);
+        Mockito.reset(mSharedPreferences, mPermissionUtils);
+
+        when(mSharedPreferences.getBoolean(eq("cling_preferences_shown"), anyBoolean()))
+                .thenReturn(true);
+
+        mLaunchIntent = new Intent(app, CellWeatherActivity.class);
+        mLaunchIntent.putExtra(CellWeatherActivity.EXTRA_CELL_ID, 1L);
+        mLaunchIntent.putExtra(CellWeatherActivity.EXTRA_CELL_TYPE,
                 HomeContract.Cells.DISPLAY_TYPE_WEATHER_TEMP);
-        setActivityIntent(i);
+
+        mConfigurationProperty = new ConfigurationProperty();
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    @After
+    public void tearDown() throws Exception {
         nullifyStaticFields(HomeItemConfigurationHelper.class);
         nullifyStaticFields(YahooLocationChooserDialogFragment.class);
     }
@@ -77,7 +148,6 @@ public class WeatherActivityTest extends ActivityInstrumentationTestCase2<CellWe
      * someone else to hold onto.
      *
      * @param testCaseClass The class of the derived TestCase implementation.
-     *
      * @throws IllegalAccessException
      */
     protected void nullifyStaticFields(final Class<?> testCaseClass)
@@ -101,54 +171,65 @@ public class WeatherActivityTest extends ActivityInstrumentationTestCase2<CellWe
         }
     }
 
+    @Test
     public void testPreSelections_setToImperial() {
+        LongSparseArray<ConfigurationProperty> result = new LongSparseArray<>();
 
-        HomeItemConfigurationHelper.setFactory(new MockImperialLocationFactory());
+        initializeConfigurationProperty(
+                mConfigurationProperty, "f", "mock_location", "10000", "Europe/Amsterdam");
 
-        mWeatherActivity = getActivity();
-        mConfiguration = (MockHomeItemConfiguration) HomeItemConfigurationHelper.
-                getInstance(mWeatherActivity);
+        result.put(1, mConfigurationProperty);
+        when(mHomeItemConfigurationLoader.loadConfigurations(any(Context.class)))
+                .thenReturn(result);
 
+        mActivityRule.launchActivity(mLaunchIntent);
 
         onView(withId(R.id.weather_location)).check(matches(withText("mock_location")));
         onView(withId(R.id.weather_unit)).check(matches(withText(R.string.imperial)));
     }
 
+    @Test
     public void testPreSelections_setToMetric() {
+        LongSparseArray<ConfigurationProperty> result = new LongSparseArray<>();
+        initializeConfigurationProperty(
+                mConfigurationProperty, "c", "mock_location", "10000", "Europe/Amsterdam");
 
-        HomeItemConfigurationHelper.setFactory(new MockMetricLocationFactory());
+        result.put(1, mConfigurationProperty);
+        when(mHomeItemConfigurationLoader.loadConfigurations(any(Context.class)))
+                .thenReturn(result);
 
-        mWeatherActivity = getActivity();
-        mConfiguration = (MockHomeItemConfiguration) HomeItemConfigurationHelper.
-                getInstance(mWeatherActivity);
-
+        mActivityRule.launchActivity(mLaunchIntent);
 
         onView(withId(R.id.weather_location)).check(matches(withText("mock_location")));
         onView(withId(R.id.weather_unit)).check(matches(withText(R.string.metric)));
     }
 
+    @Test
     public void testPreSelections_none() {
+        LongSparseArray<ConfigurationProperty> result = new LongSparseArray<>();
+        when(mHomeItemConfigurationLoader.loadConfigurations(any(Context.class)))
+                .thenReturn(result);
 
-        HomeItemConfigurationHelper.setFactory(new MockLocationFactory());
+        result.put(1, mConfigurationProperty);
+        when(mHomeItemConfigurationLoader.loadConfigurations(any(Context.class)))
+                .thenReturn(result);
 
-        mWeatherActivity = getActivity();
-        mConfiguration = (MockHomeItemConfiguration) HomeItemConfigurationHelper.
-                getInstance(mWeatherActivity);
+        mActivityRule.launchActivity(mLaunchIntent);
 
         onView(withId(R.id.weather_location)).check(
                 matches(withText(R.string.weather_auto_location)));
         onView(withId(R.id.weather_unit)).check(matches(withText(R.string.metric)));
     }
 
+    @Test
     public void testPickLocation_locationDisabled() {
+        when(mHomeItemConfigurationLoader.loadConfigurations(any(Context.class)))
+                .thenReturn(new LongSparseArray<ConfigurationProperty>());
 
-        HomeItemConfigurationHelper.setFactory(new MockLocationFactory());
+        when(mLocationUpdateHelper.startLocationUpdateIfNeeded(Mockito.any(Context.class)))
+                .thenReturn(YahooLocationChooserDialogFragment.LOCATION_REQUEST_RESULT_DISABLED);
 
-        YahooLocationChooserDialogFragment.sLocationUpdateHelper = new DisabledLocationUpdate();
-
-        mWeatherActivity = getActivity();
-        mConfiguration = (MockHomeItemConfiguration) HomeItemConfigurationHelper.
-                getInstance(mWeatherActivity);
+        mActivityRule.launchActivity(mLaunchIntent);
 
         onView(withId(R.id.weather_location)).perform(click());
         onView(withId(R.id.location_title)).check(matches(withText(R.string.cant_access_location)));
@@ -166,16 +247,16 @@ public class WeatherActivityTest extends ActivityInstrumentationTestCase2<CellWe
 
     }
 
+    @Test
     public void testPickLocation_locationPermissionDenied() {
+        when(mLocationUpdateHelper.startLocationUpdateIfNeeded(Mockito.any(Context.class)))
+                .thenReturn(LOCATION_REQUEST_RESULT_PERMISSION_DENIED);
 
-        HomeItemConfigurationHelper.setFactory(new MockLocationFactory());
+        LongSparseArray<ConfigurationProperty> result = new LongSparseArray<>();
+        when(mHomeItemConfigurationLoader.loadConfigurations(any(Context.class)))
+                .thenReturn(result);
 
-        YahooLocationChooserDialogFragment.sLocationUpdateHelper =
-                new PermissionDeniedLocationUpdate();
-
-        mWeatherActivity = getActivity();
-        mConfiguration = (MockHomeItemConfiguration) HomeItemConfigurationHelper.
-                getInstance(mWeatherActivity);
+        mActivityRule.launchActivity(mLaunchIntent);
 
         onView(withId(R.id.weather_location)).perform(click());
         onView(withId(R.id.location_title)).check(
@@ -193,101 +274,5 @@ public class WeatherActivityTest extends ActivityInstrumentationTestCase2<CellWe
         // TODO choose auto option and verify
 
     }
-
-    private static class MockImperialLocationFactory implements HomeItemConfigurationFactory {
-
-        MockImperialLocationFactory() {
-        }
-
-        @Override
-        public HomeItemConfiguration createInstance(Context context) {
-            MockHomeItemConfiguration configuration =
-                    new MockHomeItemConfiguration(context);
-            configuration.initProperty(WeatherFragment.PREFERENCE_WEATHER_UNIT, "f");
-            configuration.initProperty(WeatherFragment.PREFERENCE_WEATHER_LOCATION,
-                    "mock_location");
-            configuration.initProperty(WeatherFragment.PREFERENCE_WEATHER_WOEID, "10000");
-            configuration.initProperty(WeatherFragment.PREFERENCE_WEATHER_TIMEZONE,
-                    "Europe/Amsterdam");
-
-            return configuration;
-        }
-    }
-
-    private static class MockMetricLocationFactory implements HomeItemConfigurationFactory {
-
-        MockMetricLocationFactory() {
-        }
-
-        @Override
-        public HomeItemConfiguration createInstance(Context context) {
-            MockHomeItemConfiguration configuration =
-                    new MockHomeItemConfiguration(context);
-            configuration.initProperty(WeatherFragment.PREFERENCE_WEATHER_UNIT, "c");
-            configuration.initProperty(WeatherFragment.PREFERENCE_WEATHER_LOCATION,
-                    "mock_location");
-            configuration.initProperty(WeatherFragment.PREFERENCE_WEATHER_WOEID, "10000");
-            configuration.initProperty(WeatherFragment.PREFERENCE_WEATHER_TIMEZONE,
-                    "Europe/Amsterdam");
-
-            return configuration;
-        }
-    }
-
-    private static class DisabledLocationUpdate
-            extends YahooLocationChooserDialogFragment.AbstractDefaultLocationUpdate {
-
-        DisabledLocationUpdate() {
-        }
-
-        @Override
-        protected int doStartLocationUpdateIfNeeded(Context context, int passedMinutes) {
-            return YahooLocationChooserDialogFragment.LOCATION_REQUEST_RESULT_DISABLED;
-        }
-
-        @Override
-        public void setFragment(YahooLocationChooserDialogFragment fragment) {
-
-        }
-
-        @Override
-        public void onStop() {
-
-        }
-    }
-
-    private static class PermissionDeniedLocationUpdate
-            extends YahooLocationChooserDialogFragment.AbstractDefaultLocationUpdate {
-
-        PermissionDeniedLocationUpdate() {
-        }
-
-        @Override
-        protected int doStartLocationUpdateIfNeeded(Context context, int passedMinutes) {
-            return YahooLocationChooserDialogFragment.LOCATION_REQUEST_RESULT_PERMISSION_DENIED;
-        }
-
-        @Override
-        public void setFragment(YahooLocationChooserDialogFragment fragment) {
-
-        }
-
-        @Override
-        public void onStop() {
-
-        }
-    }
-
-    private class MockLocationFactory implements HomeItemConfigurationFactory {
-
-        MockLocationFactory() {
-        }
-
-        @Override
-        public HomeItemConfiguration createInstance(Context context) {
-            return new MockHomeItemConfiguration(context);
-        }
-    }
-
 
 }

@@ -30,6 +30,10 @@ import android.os.StrictMode;
 import android.util.Log;
 import android.view.ViewConfiguration;
 
+import com.appsimobile.appsii.dagger.AppInjector;
+import com.appsimobile.appsii.dagger.ApplicationComponent;
+import com.appsimobile.appsii.dagger.ApplicationModule;
+import com.appsimobile.appsii.dagger.DaggerApplicationComponent;
 import com.appsimobile.appsii.iab.FeatureManager;
 import com.appsimobile.appsii.iab.FeatureManagerFactory;
 import com.appsimobile.appsii.iab.FeatureManagerHelper;
@@ -37,6 +41,8 @@ import com.appsimobile.appsii.module.home.provider.HomeContract;
 import com.crashlytics.android.Crashlytics;
 
 import java.lang.reflect.Field;
+
+import javax.inject.Inject;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -52,8 +58,8 @@ public class AppsiApplication extends Application {
     private static float density = -1;
 
     private static Bitmap mDefaultAppIcon;
-
-
+    @Inject
+    FeatureManagerHelper mFeatureManagerHelper;
 
     public static float getDensity(Context context) {
         if (density == -1) {
@@ -95,7 +101,9 @@ public class AppsiApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        AnalyticsManager.getInstance(this);
+        initializeDagger();
+        AppInjector.inject(this);
+
         Fabric.with(this, new Crashlytics.Builder().disabled(BuildConfig.DEBUG).build());
 
         verifyPurchases();
@@ -151,27 +159,27 @@ public class AppsiApplication extends Application {
 
     void updateInventory(FeatureManager featureManager) {
         {
-            boolean agendaAccess = FeatureManagerHelper.hasAgendaAccess(this, featureManager);
+            boolean agendaAccess = mFeatureManagerHelper.hasAgendaAccess(this, featureManager);
             updatePageEnabledState(HomeContract.Pages.PAGE_AGENDA, agendaAccess);
         }
 
         {
-            boolean peopleAccess = FeatureManagerHelper.hasPeopleAccess(this, featureManager);
+            boolean peopleAccess = mFeatureManagerHelper.hasPeopleAccess(this, featureManager);
             updatePageEnabledState(HomeContract.Pages.PAGE_PEOPLE, peopleAccess);
         }
 
         {
-            boolean callsAccess = FeatureManagerHelper.hasCallsAccess(this, featureManager);
+            boolean callsAccess = mFeatureManagerHelper.hasCallsAccess(this, featureManager);
             updatePageEnabledState(HomeContract.Pages.PAGE_CALLS, callsAccess);
         }
 
         {
-            boolean settingsAccess = FeatureManagerHelper.hasSettingsAccess(this, featureManager);
+            boolean settingsAccess = mFeatureManagerHelper.hasSettingsAccess(this, featureManager);
             updatePageEnabledState(HomeContract.Pages.PAGE_SETTINGS, settingsAccess);
         }
 
         {
-            boolean smsAccess = FeatureManagerHelper.hasSmsAccess(this, featureManager);
+            boolean smsAccess = mFeatureManagerHelper.hasSmsAccess(this, featureManager);
             updatePageEnabledState(HomeContract.Pages.PAGE_SMS, smsAccess);
         }
     }
@@ -199,6 +207,12 @@ public class AppsiApplication extends Application {
         }
     }
 
-
+    protected void initializeDagger() {
+        ApplicationComponent applicationComponent = DaggerApplicationComponent
+                .builder()
+                .applicationModule(new ApplicationModule(this))
+                .build();
+        AppInjector.setComponent(applicationComponent);
+    }
 
 }

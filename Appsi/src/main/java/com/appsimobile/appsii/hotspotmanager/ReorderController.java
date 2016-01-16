@@ -28,6 +28,7 @@ import android.view.ViewGroup;
 
 import com.appsimobile.appsii.HotspotPageEntry;
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.module.BaseListAdapter;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
 import com.appsimobile.appsii.permissions.PermissionUtils;
@@ -35,6 +36,8 @@ import com.mobeta.android.dslv.ConditionalRemovableAdapter;
 import com.mobeta.android.dslv.DragSortListView;
 
 import java.util.ArrayList;
+
+import javax.inject.Inject;
 
 /**
  * Created by nick on 14/06/15.
@@ -53,11 +56,19 @@ public class ReorderController implements DragSortListView.DropListener,
 
     final QueryHandlerImpl mQueryHandler;
 
+    @Inject
+    PermissionUtils mPermissionUtils;
+
+    @Inject
+    ContentResolver mContentResolver;
+
     public ReorderController(Activity context, long hotspotId) {
         mContext = context;
         mHotspotId = hotspotId;
+        AppInjector.inject(this);
+
         mHotspotAdapter = new HotspotAdapter(this);
-        mQueryHandler = new QueryHandlerImpl(context.getContentResolver());
+        mQueryHandler = new QueryHandlerImpl(mContentResolver);
     }
 
     /**
@@ -114,22 +125,25 @@ public class ReorderController implements DragSortListView.DropListener,
     private void checkPermissions(int pageType) {
         switch (pageType) {
             case HomeContract.Pages.PAGE_AGENDA:
-                if (!PermissionUtils.holdsPermission(mContext, Manifest.permission.READ_CALENDAR)) {
-                    PermissionUtils.requestPermission(mContext,
+                if (!mPermissionUtils
+                        .holdsPermission(mContext, Manifest.permission.READ_CALENDAR)) {
+                    mPermissionUtils.requestPermission(mContext,
                             PermissionUtils.REQUEST_CODE_PERMISSION_READ_CALENDAR,
                             Manifest.permission.READ_CALENDAR);
                 }
                 break;
             case HomeContract.Pages.PAGE_PEOPLE:
-                if (!PermissionUtils.holdsPermission(mContext, Manifest.permission.READ_CONTACTS)) {
-                    PermissionUtils.requestPermission(mContext,
+                if (!mPermissionUtils
+                        .holdsPermission(mContext, Manifest.permission.READ_CONTACTS)) {
+                    mPermissionUtils.requestPermission(mContext,
                             PermissionUtils.REQUEST_CODE_PERMISSION_READ_CONTACTS,
                             Manifest.permission.READ_CONTACTS);
                 }
                 break;
             case HomeContract.Pages.PAGE_CALLS:
-                if (!PermissionUtils.holdsPermission(mContext, Manifest.permission.READ_CALL_LOG)) {
-                    PermissionUtils.requestPermission(mContext,
+                if (!mPermissionUtils
+                        .holdsPermission(mContext, Manifest.permission.READ_CALL_LOG)) {
+                    mPermissionUtils.requestPermission(mContext,
                             PermissionUtils.REQUEST_CODE_PERMISSION_READ_CALL_LOG,
                             Manifest.permission.READ_CALL_LOG);
                 }

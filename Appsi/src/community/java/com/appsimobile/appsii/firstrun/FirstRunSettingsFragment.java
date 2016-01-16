@@ -29,8 +29,11 @@ import android.widget.CompoundButton;
 
 import com.appsimobile.appsii.PageHelper;
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.module.home.provider.HomeContract.Pages;
 import com.appsimobile.appsii.permissions.PermissionUtils;
+
+import javax.inject.Inject;
 
 import static android.Manifest.permission.READ_CALENDAR;
 import static android.Manifest.permission.READ_CALL_LOG;
@@ -57,6 +60,15 @@ public final class FirstRunSettingsFragment extends AbstractFirstRunSettingsFrag
     boolean mInitiallyEnabled;
 
     PageHelper mPageHelper;
+
+    @Inject
+    PermissionUtils mPermissionUtils;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        AppInjector.inject(this);
+    }
 
     @Nullable
     @Override
@@ -123,8 +135,8 @@ public final class FirstRunSettingsFragment extends AbstractFirstRunSettingsFrag
     }
 
     private boolean checkAndRequestPermission(int rc, String... permission) {
-        if (!PermissionUtils.holdsAllPermissions(getActivity(), permission)) {
-            PermissionUtils.requestPermission(this, rc, permission);
+        if (!mPermissionUtils.holdsAllPermissions(getActivity(), permission)) {
+            mPermissionUtils.requestPermission(this, rc, permission);
             return false;
         }
         return true;
@@ -194,7 +206,7 @@ public final class FirstRunSettingsFragment extends AbstractFirstRunSettingsFrag
             pageHelper.enablePageAccess(Pages.PAGE_APPS, true);
             // we do not change the other pages, when the new permission model is
             // enabled as these require permissions to function
-            if (!PermissionUtils.runtimePermissionsAvailable()) {
+            if (!mPermissionUtils.runtimePermissionsAvailable()) {
                 pageHelper.enablePageAccess(Pages.PAGE_AGENDA, true);
                 pageHelper.enablePageAccess(Pages.PAGE_PEOPLE, true);
                 pageHelper.enablePageAccess(Pages.PAGE_CALLS, true);

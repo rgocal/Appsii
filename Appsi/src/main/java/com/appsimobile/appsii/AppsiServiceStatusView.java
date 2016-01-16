@@ -28,6 +28,10 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.appsimobile.appsii.dagger.AppInjector;
+
+import javax.inject.Inject;
+
 /**
  * A simple view that displays the running status of Appsii.
  * <p/>
@@ -35,7 +39,11 @@ import android.widget.TextView;
  */
 public class AppsiServiceStatusView extends RelativeLayout implements View.OnClickListener {
 
-    final AnalyticsManager mAnalyticsManager = AnalyticsManager.getInstance();
+    @Inject
+    AnalyticsManager mAnalyticsManager;
+
+    @Inject
+    AppsiiUtils mAppsiiUtils;
 
     TextView mStatusView;
 
@@ -60,6 +68,7 @@ public class AppsiServiceStatusView extends RelativeLayout implements View.OnCli
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public AppsiServiceStatusView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        AppInjector.inject(this);
     }
 
     @Override
@@ -133,7 +142,7 @@ public class AppsiServiceStatusView extends RelativeLayout implements View.OnCli
 
     private void onAppsiDisabled() {
         mStatusView.setText(R.string.appsi_status_stopped);
-        mActionButton.setImageResource(R.drawable.ic_media_play);
+        mActionButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
         mStatus = Appsi.RESULT_RUNNING_STATUS_DISABLED;
     }
 
@@ -152,7 +161,7 @@ public class AppsiServiceStatusView extends RelativeLayout implements View.OnCli
                 onAppsiEnabled();
                 break;
             case Appsi.RESULT_RUNNING_STATUS_ENABLED:
-                AppsiiUtils.stopAppsi(getContext());
+                mAppsiiUtils.stopAppsi(getContext());
                 onAppsiDisabled();
                 track(AnalyticsManager.ACTION_STOP_APPSI, AnalyticsManager.CATEGORY_OTHER);
                 break;

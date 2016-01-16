@@ -18,39 +18,79 @@
 
 package com.appsimobile.appsii;
 
+import android.app.Instrumentation;
+import android.content.Context;
 import android.content.Intent;
-import android.test.ActivityInstrumentationTestCase2;
+import android.content.SharedPreferences;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.rule.ActivityTestRule;
 
-import com.appsimobile.appsii.preference.PreferencesFactory;
+import com.appsimobile.appsii.permissions.PermissionUtils;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.mockito.Mockito;
+
+import java.util.ArrayList;
+
+import javax.inject.Inject;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.eq;
 
 /**
  * Created by nick on 14/01/15.
  */
-public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActivity> {
+public class MainActivityTest {
+
+    @Rule
+    public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(
+            MainActivity.class,
+            true,     // initialTouchMode
+            false);   // launchActivity. False so we can customize the intent per test method
+
+
+    @Inject
+    SharedPreferences mSharedPreferences;
+
+    @Inject
+    PermissionUtils mPermissionUtils;
 
     MainActivity mMainActivity;
 
-    SimplePreferences mPreferences;
-
-    public MainActivityTest() {
-        super(MainActivity.class);
+    static Context anyContext() {
+        return org.mockito.Matchers.any(Context.class);
     }
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        mPreferences = new SimplePreferences();
-        mPreferences.put("cling_preferences_shown", Boolean.TRUE);
-        PreferencesFactory.setPreferences(mPreferences);
-        mMainActivity = getActivity();
+    static <T> ArrayList<T> anyList(Class<T> c) {
+        return org.mockito.Matchers.any(ArrayList.class);
     }
 
+    @Before
+    public void setUp() {
+        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        MockAppsiApplication app =
+                (MockAppsiApplication) instrumentation.getTargetContext().getApplicationContext();
+        MockApplicationComponent component =
+                (MockApplicationComponent) app.getApplicationComponent();
+        component.inject(this);
+
+        Mockito.reset(mSharedPreferences, mPermissionUtils);
+
+        Mockito.when(mSharedPreferences.getBoolean(eq("cling_preferences_shown"), anyBoolean())).thenReturn(true);
+
+        mMainActivity = mActivityRule.launchActivity(null);
+
+    }
+
+    @Test
     public void testStartAndStopAppsii() throws InterruptedException {
+
 //        onView(withId(R.id.status_view)).check(matches(withText(R.string.appsi_status_stopped)));
         Thread.sleep(1000);
         onView(withId(R.id.status_view)).check(matches(withText(R.string.appsi_status_running)));

@@ -46,7 +46,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.util.CircularArray;
 import android.support.v4.widget.ScrollerCompat;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.WindowManager;
@@ -58,16 +57,22 @@ import android.widget.RelativeLayout;
 
 import com.appsimobile.appsii.Sidebar.SidebarListener;
 import com.appsimobile.appsii.SidebarHotspot.SwipeListener;
+import com.appsimobile.appsii.dagger.AppInjector;
+import com.appsimobile.appsii.dagger.AppsiComponent;
+import com.appsimobile.appsii.dagger.AppsiInjector;
+import com.appsimobile.appsii.dagger.AppsiModule;
+import com.appsimobile.appsii.dagger.DaggerAppsiComponent;
 import com.appsimobile.appsii.hotspotmanager.ManageHotspotsActivity;
 import com.appsimobile.appsii.icontheme.iconpack.ActiveIconPackInfo;
 import com.appsimobile.appsii.module.home.config.HomeItemConfigurationHelper;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
+import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.appsimobile.appsii.plugins.IconCache;
 import com.appsimobile.appsii.preference.PreferenceHelper;
-import com.appsimobile.appsii.preference.PreferencesFactory;
-import com.appsimobile.appsii.tinting.AppsiLayoutInflater;
 
 import java.lang.ref.WeakReference;
+
+import javax.inject.Inject;
 
 /**
  * Appsii's main service.
@@ -82,71 +87,57 @@ public class Appsi extends Service
      * Notification Ids
      */
     public static final int ONGOING_NOTIFICATION_ID = 11;
-
     /**
      * Will be sent to Appsi to exit the main service
      */
     public static final String ACTION_STOP_APPSI =
             BuildConfig.APPLICATION_ID + ".ACTION_STOP_APPSI";
-
     /**
      * Will be sent to Appsi to restart the main service. For example after a theme change
      */
     public static final String ACTION_RESTART_APPSI =
             BuildConfig.APPLICATION_ID + ".ACTION_RESTART_APPSI";
-
     /**
      * Broadcast to send to Appsi to resume all hotspots
      */
     public static final String ACTION_UNSUSPEND = BuildConfig.APPLICATION_ID + ".UNSUSPEND_APPSI";
-
     /**
      * Sent to Appsi to close the sidebar
      */
     public static final String ACTION_CLOSE_SIDEBAR =
             BuildConfig.APPLICATION_ID + ".action_close_sidebar";
-
     /**
      * Sent to Appsi to close the sidebar
      */
     public static final String ACTION_TRY_PAGE = BuildConfig.APPLICATION_ID + ".action_try";
-
     /**
      * Broadcast to get the status from Appsi
      */
     public static final String ACTION_ORDERED_BROADCAST_RUNNING =
             "com.appsimobile.appsii.ACTION_RUNNING";
-
-    // ORDERED BROADCASTS
-
     public static final int RESULT_RUNNING_STATUS_SUSPENDED = 3;
 
+    // ORDERED BROADCASTS
     public static final int RESULT_RUNNING_STATUS_ENABLED = 4;
-
     public static final int RESULT_RUNNING_STATUS_DISABLED = 5;
-
     public static final String ACTION_LOCAL_OPEN_SIDEBAR_FROM_SHORTCUT =
             "com.appsimobile.appsii.ACTION_LOCAL_OPEN_SIDEBAR_FROM_SHORTCUT";
-
     /**
      * FLAG for appsi to indicate it should open from the left
      */
     public static final int OPEN_FLAG_LEFT = 2;
-
     /**
      * FLAG for appsi to indicate it should open from the right
      */
     public static final int OPEN_FLAG_RIGHT = 4;
-
     /**
      * FLAG for appsi to indicate it should open from the right
      */
     public static final int OPEN_FLAG_LIKE_NOTIFICATION_BAR = 8;
-
     static final int MESSAGE_CLOSE_SIDEBAR = 101;
+    private static final String TAG = "Appsi";
 
     // RECEIVERS
-
     /**
      * True if Appsi was suspended by the user
      */
@@ -178,6 +169,7 @@ public class Appsi extends Service
     /**
      * A reference to the action sidebar view
      */
+    @Inject
     Sidebar mSidebar;
 
     // VIEWS
@@ -186,6 +178,7 @@ public class Appsi extends Service
      * The layer we add views to. This layer automatically handles things like
      * showing and hiding the screen dimming
      */
+    @Inject
     PopupLayer mPopupLayer;
 
     private final Animator.AnimatorListener mCloseListener = new AnimatorAdapter() {
@@ -226,13 +219,21 @@ public class Appsi extends Service
      * Used to query the keyguard status. When the key-guard is showing Appsi will
      * not be shown.
      */
+    @Inject
     KeyguardManager mKeyguardManager;
 
     /**
      * The window manager. This is a system service used to show views on top of
      * other apps.
      */
+    @Inject
     WindowManager mWindowManager;
+
+    @Inject
+    IconCache mIconCache;
+
+    @Inject
+    PermissionUtils mPermissionUtils;
 
     /**
      * The total number of plugins currently added.
@@ -251,7 +252,25 @@ public class Appsi extends Service
     NotificationLikeOpener mNotificationLikeOpener;
 
     AnimationListener mScrollAnimationListener;
-
+    /**
+     * The shared preferences for Appsi
+     */
+    SharedPreferences mPrefs;
+    /**
+     * Handles things like showing/hiding the hotspots and flashing the hotspots.
+     * In it's early days, Appsi had two operating modes, one for a hotspot per
+     * plugin and one for a single hotspot. This was removed later when Appsi
+     * evolved.
+     */
+    @Inject
+    AbstractHotspotHelper mHotspotHelper;
+    @Inject
+    LoaderManagerImpl mLoaderManager;
+    @Inject
+    PreferenceHelper mPreferenceHelper;
+    @Inject
+    HomeItemConfigurationHelper mHomeItemConfigurationHelper;
+    AppsiComponent mApplicationComponent;
     /**
      * receives and handles several broadcasts and updates Appsi accordingly. This
      * mostly involves things like removing an open sidebar when the screen is turned
@@ -265,44 +284,25 @@ public class Appsi extends Service
      * {@link android.content.Intent#ACTION_SCREEN_OFF}
      */
     private ExternalEventsListener mExternalEventsReceiver;
-
     /**
      * Handles the following LOCAL broadcasts:
      * {@link #ACTION_ORDERED_BROADCAST_RUNNING}
      * {@link #ACTION_STOP_APPSI}
      */
     private AppsiStatusBroadcastReceiver mIsRunningBroadcastReceiver;
-
     /**
      * Handles plugin installation events
      */
     private BroadcastReceiver mAppStatusReceiver;
-
-    /**
-     * The shared preferences for Appsi
-     */
-    private SharedPreferences mPrefs;
-
-    /**
-     * Handles things like showing/hiding the hotspots and flashing the hotspots.
-     * In it's early days, Appsi had two operating modes, one for a hotspot per
-     * plugin and one for a single hotspot. This was removed later when Appsi
-     * evolved.
-     */
-    private AbstractHotspotHelper mHotspotHelper;
-
     /**
      * True while the sidebar is visible.
      */
     private boolean mSidebarVisible;
-
     /**
      * The hotspot configurations that have been found in the
      * appsi database.
      */
     private CircularArray<HotspotItem> mHotspotItems;
-
-    private LoaderManagerImpl mLoaderManager;
 
     public Appsi() {
 
@@ -310,57 +310,52 @@ public class Appsi extends Service
 
     @Override
     public void onCreate() {
+        Log.d(TAG, "onCreate() called with: " + "");
         super.onCreate();
 
+        Log.d(TAG, "onCreate() create shared prefs");
+        mPrefs = AppInjector.provideSharedPreferences();
 
-        SharedPreferences prefs = PreferencesFactory.getPreferences(this);
-        Context context = ThemingUtils.createContextThemeWrapper(this, prefs);
+        Context context = ThemingUtils.createContextThemeWrapper(this, mPrefs);
 
-        LayoutInflater layoutInflater = LayoutInflater.from(context);
-        if (layoutInflater.getFactory() == null) {
-            layoutInflater.setFactory(new AppsiLayoutInflater.FactoryImpl());
-        }
+        Log.d(TAG, "onCreate() initializeDagger");
+        initializeDagger(context);
 
-        mLoaderManager = new LoaderManagerImpl("Appsi", this, false);
-        mNotificationLikeOpener = new NotificationLikeOpener(this);
-        mLastConfiguration = new Configuration(getResources().getConfiguration());
-
-        mSidebar = (Sidebar) layoutInflater.inflate(R.layout.sidebar, null);
-        mSidebar.setLoaderManager(mLoaderManager);
-        mSidebar.setOnCancelCloseListener(this);
-
-        mSidebar.setSidebarListener(this);
-        mPopupLayer = (PopupLayer) layoutInflater.inflate(R.layout.popup_layer, null);
+        Log.d(TAG, "onCreate() configure popup layer");
         mPopupLayer.setPopuplayerListener(this);
 
-        mPrefs = prefs;
+        mNotificationLikeOpener = new NotificationLikeOpener(this);
+        Log.d(TAG, "onCreate() create configuration");
+        mLastConfiguration = new Configuration(getResources().getConfiguration());
 
-        PreferenceHelper preferenceHelper = PreferenceHelper.getInstance(this);
+        Log.d(TAG, "onCreate() configure sidebar");
+        mSidebar.setOnCancelCloseListener(this);
+        mSidebar.setSidebarListener(this);
 
-        mSidebarPercentage = preferenceHelper.getSidebarWidth();
+        Log.d(TAG, "onCreate() preferences");
+        mSidebarPercentage = mPreferenceHelper.getSidebarWidth();
 
-        int value = preferenceHelper.getSidebarDimLevel();
+        int value = mPreferenceHelper.getSidebarDimLevel();
         updateDefaultDimColor(ThemingUtils.getPercentage(value));
 
-        prefs.registerOnSharedPreferenceChangeListener(this);
+        mPrefs.registerOnSharedPreferenceChangeListener(this);
 
-        mHotspotHelper = new HotspotHelperImpl(this, this, mPopupLayer);
-
-        mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
-
-        mKeyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
-
+        Log.d(TAG, "onCreate() create External events receiver");
         mExternalEventsReceiver = new ExternalEventsListener();
         mExternalEventsReceiver.register(this);
 
+        Log.d(TAG, "onCreate() create Runnig receiver");
         mIsRunningBroadcastReceiver = new AppsiStatusBroadcastReceiver();
         mIsRunningBroadcastReceiver.register(this);
 
+        Log.d(TAG, "onCreate() create status receiver");
         mAppStatusReceiver = AppStatusReceiver.register(this);
 
+        Log.d(TAG, "onCreate() create local receiver");
         mLocalActionsReceiver = new LocalReceiver();
         mLocalActionsReceiver.register(this);
 
+        Log.d(TAG, "onCreate() Handler");
         mHandler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(Message msg) {
@@ -372,12 +367,15 @@ public class Appsi extends Service
         });
 
         // listen for changes in the hotspots
+        Log.d(TAG, "onCreate() registering contentObserver");
         getContentResolver().registerContentObserver(HomeContract.Hotspots.CONTENT_URI, true,
                 mHotspotsContentObserver);
 
         // Now that appsi has been initialized, scan the hotspot config
+        Log.d(TAG, "onCreate() Load hotspots");
         reloadHotspots();
         mCreated = true;
+        Log.d(TAG, "onCreate() completed onCreate…");
     }
 
     private void updateDefaultDimColor(float alpha) {
@@ -427,11 +425,14 @@ public class Appsi extends Service
 
     @Override
     public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
+        Log.d(TAG,
+                "onStartCommand() called with: " + "intent = [" + intent + "], flags = [" + flags +
+                        "], startId = [" + startId + "]");
         startAppsiService();
         // force initialize the home config to make everything a bit smoother
         // and this makes sure we don't have to wait for it when opening the
         // sidebar for the first time.
-        HomeItemConfigurationHelper.getInstance(this);
+        // mHomeItemConfigurationHelper
 
         String action = intent == null ? null : intent.getAction();
         if (ACTION_TRY_PAGE.equals(action)) {
@@ -492,7 +493,7 @@ public class Appsi extends Service
 
         if (directionChanged || localeChanged) {
             Log.i("Appsi", "restarting because of direction or locale change");
-            AppsiiUtils.restartAppsi(this);
+            restartAppsiService();
             return;
         }
 
@@ -516,6 +517,7 @@ public class Appsi extends Service
     }
 
     private void startAppsiService() {
+        Log.d(TAG, "Starting Appsi…");
         updateNotificationStatus();
 
         mHandler.postDelayed(new Runnable() {
@@ -649,6 +651,7 @@ public class Appsi extends Service
     }
 
     protected void updateNotificationStatus() {
+        Log.d(TAG, "starting foreground");
         if (mSuspended) {
             startForeground(ONGOING_NOTIFICATION_ID, createSuspendedNotification());
         } else {
@@ -796,7 +799,7 @@ public class Appsi extends Service
     }
 
     void stopAppsiService() {
-
+        Log.d(TAG, "stopAppsiService() called with: " + "");
         onSuspend();
         mCreated = true;
         mHotspotHelper.removeHotspots();
@@ -804,6 +807,7 @@ public class Appsi extends Service
         mLoaderManager.doDestroy();
         stopSelf();
         removeHotspots();
+        AppsiInjector.setAppsiComponent(null);
     }
 
     void onSuspend() {
@@ -820,7 +824,7 @@ public class Appsi extends Service
     /**
      * Updates Appsi's status to or from suspended.
      */
-    public void setSuspended(boolean suspended) {
+    public void setSuspended(boolean suspended) throws PermissionDeniedException {
         if (mSuspended != suspended) {
             mSuspended = suspended;
             updateNotificationStatus();
@@ -832,13 +836,13 @@ public class Appsi extends Service
         }
     }
 
-    void onUnsuspend() {
+    void onUnsuspend() throws PermissionDeniedException {
         addHotspotsIfUnlocked();
         Intent i = new Intent(AppsiiUtils.ACTION_UNSUSPEND);
         sendBroadcast(i);
     }
 
-    void addHotspotsIfUnlocked() {
+    void addHotspotsIfUnlocked() throws PermissionDeniedException {
         if (!isKeyguardLocked() && !mSuspended) {
             addHotspots();
         }
@@ -848,7 +852,7 @@ public class Appsi extends Service
         return mKeyguardManager.isKeyguardLocked();
     }
 
-    void addHotspots() {
+    void addHotspots() throws PermissionDeniedException {
         if (!mSuspended) {
             mHotspotHelper.addHotspots();
         }
@@ -864,7 +868,12 @@ public class Appsi extends Service
         updateNotificationStatus();
         mHotspotHelper.onHotspotsLoaded(configurations);
         removeHotspots();
-        addHotspotsIfUnlocked();
+        try {
+            addHotspotsIfUnlocked();
+        } catch (PermissionDeniedException e) {
+            // STOPSHIP: FIXME: this must be changed!
+            onPermissionDenied(e);
+        }
     }
 
     void openSidebarFromShortcut(Intent intent) {
@@ -887,13 +896,12 @@ public class Appsi extends Service
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        PreferenceHelper preferenceHelper = PreferenceHelper.getInstance(this);
         switch (key) {
             case "pref_minimal_notification":
                 onNotificationOptionsChanged();
                 break;
             case "pref_sidebar_dimming_level":
-                int value = preferenceHelper.getSidebarDimLevel();
+                int value = mPreferenceHelper.getSidebarDimLevel();
                 updateDefaultDimColor(ThemingUtils.getPercentage(value));
                 break;
             case "pref_icon_theme":
@@ -901,20 +909,24 @@ public class Appsi extends Service
                 String iconPackStringUri = sharedPreferences.getString("pref_icon_theme", null);
                 Uri iconPackUri = iconPackStringUri == null ? null : Uri.parse(iconPackStringUri);
                 ActiveIconPackInfo.getInstance(this).setActiveIconPackUri(iconPackUri);
-                IconCache.getInstance(this).clearAllIcons();
+                mIconCache.clearAllIcons();
                 break;
             case "pref_hotspot_width":
                 removeHotspots();
-                addHotspotsIfUnlocked();
+                try {
+                    addHotspotsIfUnlocked();
+                } catch (PermissionDeniedException e) {
+                    Log.wtf(TAG, "permission denied?", e);
+                }
                 break;
             case "pref_hide_persistent_notification_with_hack":
                 onNotificationOptionsChanged();
                 break;
             case "pref_sidebar_size":
-                mSidebarPercentage = preferenceHelper.getSidebarWidth();
+                mSidebarPercentage = mPreferenceHelper.getSidebarWidth();
                 break;
             case "pref_sidebar_haptic_feedback":
-                boolean mVibrate = preferenceHelper.getHotspotsHapticFeedbackEnabled();
+                boolean mVibrate = mPreferenceHelper.getHotspotsHapticFeedbackEnabled();
                 mHotspotHelper.setVibrate(mVibrate);
                 break;
         }
@@ -930,7 +942,7 @@ public class Appsi extends Service
     }
 
     @Override
-    public void opPopupLayerHidden() {
+    public void opPopupLayerHidden() throws PermissionDeniedException {
         addHotspotsIfUnlocked();
     }
 
@@ -1004,6 +1016,27 @@ public class Appsi extends Service
     @Override
     public void onCloseCancelled() {
         mHandler.removeMessages(MESSAGE_CLOSE_SIDEBAR);
+    }
+
+    void onPermissionDenied(PermissionDeniedException e) {
+        Log.d(TAG, "No permission", e);
+        mPermissionUtils.showPermissionNotification(this, 1001,
+                android.Manifest.permission.SYSTEM_ALERT_WINDOW, 0);
+        stopAppsiService();
+
+    }
+
+    protected void initializeDagger(Context themedContext) {
+        mApplicationComponent = DaggerAppsiComponent
+                .builder()
+                .appsiModule(new AppsiModule(this, themedContext))
+                .build();
+        AppsiInjector.setAppsiComponent(mApplicationComponent);
+
+//        mSidebar = AppsiInjector.provideSidebar();
+//        mPopupLayer = AppsiInjector.providePopupLayer();
+//        mHotspotHelper = AppsiInjector.provideHotspotHelper();
+        AppsiInjector.inject(this);
     }
 
     static class HotspotLoader extends AsyncTask<Void, Void, CircularArray<HotspotItem>> {
@@ -1262,6 +1295,14 @@ public class Appsi extends Service
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            try {
+                onReceiveImpl(context, intent);
+            } catch (PermissionDeniedException e) {
+                onPermissionDenied(e);
+            }
+        }
+
+        public void onReceiveImpl(Context context, Intent intent) throws PermissionDeniedException {
             String action = intent.getAction();
             switch (action) {
                 case ACTION_CLOSE_SIDEBAR:
@@ -1323,5 +1364,6 @@ public class Appsi extends Service
             mHandler.sendEmptyMessageDelayed(MESSAGE_CLOSE_SIDEBAR, delayMillis);
         }
     }
+
 
 }

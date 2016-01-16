@@ -28,6 +28,7 @@ import android.support.annotation.UiThread;
 import android.support.annotation.WorkerThread;
 
 import com.appsimobile.appsii.annotation.VisibleForTesting;
+import com.appsimobile.appsii.dagger.AppInjector;
 
 import net.jcip.annotations.GuardedBy;
 
@@ -164,7 +165,7 @@ public class ProcessMonitorFactory {
             checkThread("ProcessMonitorImpl");
             mContext = context.getApplicationContext();
             mMts = new MultiThreadState();
-            mActivityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            mActivityManager = AppInjector.provideActivityManager();
         }
 
         static void checkThread(String methodName) {
