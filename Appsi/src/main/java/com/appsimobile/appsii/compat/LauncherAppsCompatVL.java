@@ -18,7 +18,6 @@ package com.appsimobile.appsii.compat;
 
 import android.annotation.TargetApi;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.LauncherActivityInfo;
 import android.content.pm.LauncherApps;
@@ -36,20 +35,23 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class LauncherAppsCompatVL extends LauncherAppsCompat {
-
-    final Context mContext;
 
     private final SimpleArrayMap<OnAppsChangedCallbackCompat, WrappedCallback> mCallbacks =
             new SimpleArrayMap<>();
 
     private final LauncherApps mLauncherApps;
 
-    LauncherAppsCompatVL(Context context) {
+    AppsiiUtils mAppsiiUtils;
+
+    @Inject
+    public LauncherAppsCompatVL(AppsiiUtils appsiiUtils) {
         super();
         mLauncherApps = AppInjector.provideLauncherApps();
-        mContext = context;
+        mAppsiiUtils = appsiiUtils;
     }
 
     @Override
@@ -88,13 +90,13 @@ public class LauncherAppsCompatVL extends LauncherAppsCompat {
             // the app was uninstalled and the list was not updated. This is strange
             Crashlytics.logException(e);
         }
-        AppsiiUtils.closeSidebar(mContext);
+        mAppsiiUtils.closeSidebar();
     }
 
     @Override
     public void showAppDetailsForProfile(ComponentName component, UserHandleCompat user) {
         mLauncherApps.startAppDetailsActivity(component, user.getUser(), null, null);
-        AppsiiUtils.closeSidebar(mContext);
+        mAppsiiUtils.closeSidebar();
     }
 
     @Override

@@ -101,6 +101,9 @@ public class CustomThemeActivity extends Activity implements View.OnClickListene
     @Inject
     SharedPreferences mPreferences;
 
+    @Inject
+    AppsiiUtils mAppsiiUtils;
+
     /**
      * The possible values for the base themes. As defined in a string-array
      */
@@ -327,7 +330,7 @@ public class CustomThemeActivity extends Activity implements View.OnClickListene
                 putString(ThemingUtils.PREF_APPSII_THEME, "custom").
                 putString(ThemingUtils.PREF_APPSII_BASE_THEME, baseTheme).
                 apply();
-        AppsiiUtils.restartAppsi(this);
+        mAppsiiUtils.restartAppsi(this);
     }
 
     private String getBaseThemeByColor(final int color) {
@@ -360,7 +363,7 @@ public class CustomThemeActivity extends Activity implements View.OnClickListene
                 putString(ThemingUtils.PREF_APPSII_THEME, "custom").
                 putString(ThemingUtils.PREF_APPSII_COLOR_PRIMARY, primaryColorValue).
                 apply();
-        AppsiiUtils.restartAppsi(this);
+        mAppsiiUtils.restartAppsi(this);
     }
 
     @Override
@@ -409,7 +412,7 @@ public class CustomThemeActivity extends Activity implements View.OnClickListene
                 putString(ThemingUtils.PREF_APPSII_THEME, "custom").
                 putString(ThemingUtils.PREF_APPSII_COLOR_ACCENT, accentColorValue).
                 apply();
-        AppsiiUtils.restartAppsi(this);
+        mAppsiiUtils.restartAppsi(this);
     }
 
     private void showPrimaryColorPicker() {
@@ -465,7 +468,7 @@ public class CustomThemeActivity extends Activity implements View.OnClickListene
         // When the theme has been changed, Appsii needs to be restarted.
         // This is because it's context needs to be changed. And all of the
         // views are depending on these values in the theme.
-        AppsiiUtils.restartAppsi(this);
+        mAppsiiUtils.restartAppsi(this);
         mPrimaryColor = primaryColor;
         mAccentColor = accentColor;
         mBaseTheme = baseTheme;

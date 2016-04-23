@@ -17,25 +17,18 @@
 
 package com.appsimobile.appsii.firstrun;
 
-import android.Manifest;
-import android.app.Fragment;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
-import com.appsimobile.appsii.AccountHelper;
-import com.appsimobile.appsii.AppsiiUtils;
 import com.appsimobile.appsii.PageHelper;
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
-import com.appsimobile.appsii.permissions.PermissionUtils;
 
 /**
  * Created by nick on 10/06/15.
@@ -48,6 +41,12 @@ public final class FirstRunSettingsFragment extends AbstractFirstRunSettingsFrag
     CheckBox mAppsCheckbox;
 
     boolean mInitiallyEnabled;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        AppInjector.inject(this);
+    }
 
     @Nullable
     @Override

@@ -23,8 +23,6 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
-import com.appsimobile.appsii.appwidget.Utilities;
-
 import java.util.List;
 import java.util.WeakHashMap;
 
@@ -40,22 +38,7 @@ public abstract class LauncherAppsCompat {
 
     private static final Object sInstanceLock = new Object();
 
-    protected LauncherAppsCompat() {
-    }
-
-    public static LauncherAppsCompat createInstance(Context context) {
-        synchronized (sInstanceLock) {
-            LauncherAppsCompat instance = sInstanceMap.get(context);
-            if (instance == null) {
-                if (Utilities.isLmpOrAbove()) {
-                    instance = new LauncherAppsCompatVL(context);
-                } else {
-                    instance = new LauncherAppsCompatV16(context);
-                }
-                sInstanceMap.put(context, instance);
-            }
-            return instance;
-        }
+    public LauncherAppsCompat() {
     }
 
     @Nullable

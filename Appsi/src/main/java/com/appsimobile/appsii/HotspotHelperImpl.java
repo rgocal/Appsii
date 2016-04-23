@@ -73,7 +73,7 @@ public class HotspotHelperImpl extends AbstractHotspotHelper
     public HotspotHelperImpl(Context context, SharedPreferences sharedPreferences, PermissionUtils permissionUtils,
             WindowManager windowManager, PopupLayer popupLayer
             ) {
-        super(context);
+        super(context, windowManager);
 
         mWindowManager = windowManager;
         mSharedPreferences = sharedPreferences;
@@ -101,6 +101,7 @@ public class HotspotHelperImpl extends AbstractHotspotHelper
         return true;
     }
 
+    @Override
     public void setCallback(HotspotHelperListener callback) {
         mCallback = callback;
     }

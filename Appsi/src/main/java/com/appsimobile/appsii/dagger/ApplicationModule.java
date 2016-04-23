@@ -27,6 +27,7 @@ import android.view.inputmethod.InputMethodManager;
 
 import com.appsimobile.appsii.AnalyticsManager;
 import com.appsimobile.appsii.AppsiApplication;
+import com.appsimobile.appsii.AppsiiUtils;
 import com.appsimobile.appsii.BuildConfig;
 import com.appsimobile.appsii.LoaderManagerImpl;
 import com.appsimobile.appsii.appwidget.AppWidgetIconCache;
@@ -36,10 +37,14 @@ import com.appsimobile.appsii.compat.AppWidgetManagerCompat;
 import com.appsimobile.appsii.compat.AppWidgetManagerCompatV16;
 import com.appsimobile.appsii.compat.AppWidgetManagerCompatVL;
 import com.appsimobile.appsii.compat.LauncherAppsCompat;
+import com.appsimobile.appsii.compat.LauncherAppsCompatV16;
+import com.appsimobile.appsii.compat.LauncherAppsCompatVL;
 import com.appsimobile.appsii.compat.UserManagerCompat;
 import com.appsimobile.appsii.compat.UserManagerCompatV16;
 import com.appsimobile.appsii.compat.UserManagerCompatV17;
 import com.appsimobile.appsii.compat.UserManagerCompatVL;
+import com.appsimobile.appsii.iab.FeatureManager;
+import com.appsimobile.appsii.iab.FeatureManagerFactory;
 import com.appsimobile.appsii.iab.FeatureManagerHelper;
 import com.appsimobile.appsii.module.home.YahooLocationChooserDialogFragment;
 import com.appsimobile.appsii.module.home.config.HomeItemConfiguration;
@@ -251,8 +256,18 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    LauncherAppsCompat provideLauncherAppsCompat(Context context) {
-        return LauncherAppsCompat.createInstance(context);
+    LauncherAppsCompat provideLauncherAppsCompat(Context context, AppsiiUtils appsiiUtils) {
+        if (Utilities.isLmpOrAbove()) {
+            return new LauncherAppsCompatVL(appsiiUtils);
+        } else {
+            return new LauncherAppsCompatV16(context);
+        }
+    }
+
+    @Provides
+    @Singleton
+    FeatureManager provideFeatureManager(Context context) {
+        return FeatureManagerFactory.getFeatureManager(context);
     }
 
     @Provides
@@ -265,6 +280,8 @@ public class ApplicationModule {
             return new AppWidgetManagerCompatV16(context.getApplicationContext(), awm);
         }
     }
+
+
 
     @Provides
     @Singleton

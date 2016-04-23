@@ -33,6 +33,7 @@ import com.appsimobile.appsii.MockApplicationComponent;
 import com.appsimobile.appsii.MockAppsiApplication;
 import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.module.home.YahooLocationChooserDialogFragment.LocationUpdateHelper;
+import com.appsimobile.appsii.module.home.config.HomeItemConfiguration;
 import com.appsimobile.appsii.module.home.config.HomeItemConfiguration.ConfigurationProperty;
 import com.appsimobile.appsii.module.home.config.HomeItemConfigurationHelper;
 import com.appsimobile.appsii.module.home.config.HomeItemConfigurationHelper
@@ -45,6 +46,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import java.lang.reflect.Field;
@@ -89,6 +91,9 @@ public class WeatherActivityTest {
 
     @Inject
     LocationUpdateHelper mLocationUpdateHelper;
+
+    @Inject
+    HomeItemConfiguration mHomeItemConfiguration;
 
     MockContentProvider mContentProvider;
 
@@ -173,14 +178,10 @@ public class WeatherActivityTest {
 
     @Test
     public void testPreSelections_setToImperial() {
-        LongSparseArray<ConfigurationProperty> result = new LongSparseArray<>();
-
-        initializeConfigurationProperty(
-                mConfigurationProperty, "f", "mock_location", "10000", "Europe/Amsterdam");
-
-        result.put(1, mConfigurationProperty);
-        when(mHomeItemConfigurationLoader.loadConfigurations(any(Context.class)))
-                .thenReturn(result);
+        when(mHomeItemConfiguration.getProperty(eq(1L), eq(WeatherFragment.PREFERENCE_WEATHER_UNIT), Matchers.anyString())).thenReturn("f");
+        when(mHomeItemConfiguration.getProperty(eq(1L), eq(WeatherFragment.PREFERENCE_WEATHER_LOCATION), Matchers.anyString())).thenReturn("mock_location");
+        when(mHomeItemConfiguration.getProperty(eq(1L), eq(WeatherFragment.PREFERENCE_WEATHER_WOEID), Matchers.anyString())).thenReturn("10000");
+        when(mHomeItemConfiguration.getProperty(eq(1L), eq(WeatherFragment.PREFERENCE_WEATHER_TIMEZONE), Matchers.anyString())).thenReturn("Europe/Amsterdam");
 
         mActivityRule.launchActivity(mLaunchIntent);
 
@@ -190,13 +191,11 @@ public class WeatherActivityTest {
 
     @Test
     public void testPreSelections_setToMetric() {
-        LongSparseArray<ConfigurationProperty> result = new LongSparseArray<>();
-        initializeConfigurationProperty(
-                mConfigurationProperty, "c", "mock_location", "10000", "Europe/Amsterdam");
-
-        result.put(1, mConfigurationProperty);
-        when(mHomeItemConfigurationLoader.loadConfigurations(any(Context.class)))
-                .thenReturn(result);
+        Mockito.reset(mHomeItemConfiguration);
+        when(mHomeItemConfiguration.getProperty(eq(1L), eq(WeatherFragment.PREFERENCE_WEATHER_UNIT), Matchers.anyString())).thenReturn("c");
+        when(mHomeItemConfiguration.getProperty(eq(1L), eq(WeatherFragment.PREFERENCE_WEATHER_LOCATION), Matchers.anyString())).thenReturn("mock_location");
+        when(mHomeItemConfiguration.getProperty(eq(1L), eq(WeatherFragment.PREFERENCE_WEATHER_WOEID), Matchers.anyString())).thenReturn("10000");
+        when(mHomeItemConfiguration.getProperty(eq(1L), eq(WeatherFragment.PREFERENCE_WEATHER_TIMEZONE), Matchers.anyString())).thenReturn("Europe/Amsterdam");
 
         mActivityRule.launchActivity(mLaunchIntent);
 
@@ -206,13 +205,13 @@ public class WeatherActivityTest {
 
     @Test
     public void testPreSelections_none() {
-        LongSparseArray<ConfigurationProperty> result = new LongSparseArray<>();
-        when(mHomeItemConfigurationLoader.loadConfigurations(any(Context.class)))
-                .thenReturn(result);
 
-        result.put(1, mConfigurationProperty);
-        when(mHomeItemConfigurationLoader.loadConfigurations(any(Context.class)))
-                .thenReturn(result);
+        when(mHomeItemConfiguration.getProperty(eq(1L), eq(WeatherFragment.PREFERENCE_WEATHER_UNIT), eq("f"))).thenReturn("f");
+        when(mHomeItemConfiguration.getProperty(eq(1L), eq(WeatherFragment.PREFERENCE_WEATHER_UNIT), eq("c"))).thenReturn("c");
+        when(mHomeItemConfiguration.getProperty(eq(1L), eq(WeatherFragment.PREFERENCE_WEATHER_LOCATION), Matchers.anyString())).thenReturn(null);
+        when(mHomeItemConfiguration.getProperty(eq(1L), eq(WeatherFragment.PREFERENCE_WEATHER_WOEID), Matchers.anyString())).thenReturn(null);
+        when(mHomeItemConfiguration.getProperty(eq(1L), eq(WeatherFragment.PREFERENCE_WEATHER_TIMEZONE), Matchers.anyString())).thenReturn(null);
+
 
         mActivityRule.launchActivity(mLaunchIntent);
 

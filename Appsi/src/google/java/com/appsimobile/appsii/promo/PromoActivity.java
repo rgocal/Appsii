@@ -33,9 +33,9 @@ import com.appsimobile.appsii.AnalyticsManager;
 import com.appsimobile.appsii.AppsiiUtils;
 import com.appsimobile.appsii.PageHelper;
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.iab.BaseIabHelper;
 import com.appsimobile.appsii.iab.FeatureManager;
-import com.appsimobile.appsii.iab.FeatureManagerFactory;
 import com.appsimobile.appsii.iab.FeatureManagerHelper;
 import com.appsimobile.appsii.iab.IabPurchaseHelper;
 import com.appsimobile.appsii.iab.ProductPurchaseHelper;
@@ -43,7 +43,8 @@ import com.appsimobile.appsii.iab.Purchase;
 import com.appsimobile.appsii.iab.PurchaseHelper;
 import com.appsimobile.appsii.iab.SkuDetails;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
-import com.appsimobile.appsii.preference.PreferencesFactory;
+
+import javax.inject.Inject;
 
 /**
  * Created by nick on 16/11/14.
@@ -58,7 +59,8 @@ public class PromoActivity extends AppCompatActivity
      */
     final static int PURCHASE_REQUEST_CODE = 0x0BADBABE;
 
-    final AnalyticsManager mAnalyticsManager = AnalyticsManager.getInstance();
+    @Inject
+    AnalyticsManager mAnalyticsManager;
 
     /**
      * The button to manage the home pages
@@ -107,19 +109,24 @@ public class PromoActivity extends AppCompatActivity
     /**
      * The feature manager which we can use to get info about purchased items
      */
+    @Inject
     FeatureManager mFeatureManager;
+
+    @Inject
+    FeatureManagerHelper mFeatureManagerHelper;
+
 
     boolean mIabHelperConnected;
 
+    @Inject
     SharedPreferences mPreferences;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppInjector.inject(this);
         ActivityUtils.setContentView(this, R.layout.activity_promo);
-
-        mPreferences = PreferencesFactory.getPreferences(this);
 
         mGotIt = findViewById(R.id.appsi_plugins_got_it);
         mGotItButton = (Button) findViewById(R.id.appsi_plugins_got_it_button);
@@ -153,7 +160,6 @@ public class PromoActivity extends AppCompatActivity
 
         mPurchaseHelper = new PurchaseHelper(this, this);
 
-        mFeatureManager = FeatureManagerFactory.getFeatureManager(this);
         // make sure the purchases are loaded, but don't force.
         mFeatureManager.load(true);
         mFeatureManager.registerFeatureManagerListener(this);
@@ -204,11 +210,11 @@ public class PromoActivity extends AppCompatActivity
 
     private void updateButtonStatusFromInventory() {
         if (mFeatureManager.areFeaturesLoaded()) {
-            boolean agendaAccess = FeatureManagerHelper.hasAgendaAccess(this, mFeatureManager);
-            boolean settingsAccess = FeatureManagerHelper.hasSettingsAccess(this, mFeatureManager);
-            boolean peopleAccess = FeatureManagerHelper.hasPeopleAccess(this, mFeatureManager);
-            boolean callsAccess = FeatureManagerHelper.hasCallsAccess(this, mFeatureManager);
-            boolean smsAccess = FeatureManagerHelper.hasSmsAccess(this, mFeatureManager);
+            boolean agendaAccess = mFeatureManagerHelper.hasAgendaAccess(this, mFeatureManager);
+            boolean settingsAccess = mFeatureManagerHelper.hasSettingsAccess(this, mFeatureManager);
+            boolean peopleAccess = mFeatureManagerHelper.hasPeopleAccess(this, mFeatureManager);
+            boolean callsAccess = mFeatureManagerHelper.hasCallsAccess(this, mFeatureManager);
+            boolean smsAccess = mFeatureManagerHelper.hasSmsAccess(this, mFeatureManager);
 
             if (agendaAccess) {
                 mAgendaUnlockButton.setText(R.string.unlocked);

@@ -19,20 +19,12 @@
 package com.appsimobile.appsii.module.apps;
 
 import android.app.Instrumentation;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ServiceTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.appsimobile.appsii.Appsi;
 import com.appsimobile.appsii.MockAppsiApplication;
-import com.appsimobile.appsii.MockAppsiComponent;
-import com.appsimobile.appsii.SidebarContext;
-import com.appsimobile.appsii.dagger.AppInjector;
-import com.appsimobile.appsii.dagger.AppsiInjector;
-import com.appsimobile.appsii.permissions.PermissionUtils;
 
 import junit.framework.Assert;
 
@@ -40,14 +32,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import javax.inject.Inject;
-
-import static org.mockito.Matchers.any;
 
 /**
  * Created by nick on 09/03/15.
@@ -60,17 +47,7 @@ public class AppsControllerTest {
 
     Appsi mAppsi;
 
-    @Inject
-    SidebarContext mSidebarContext;
-
-    @Inject
     AppsAdapter mAppsAdapter;
-
-    @Inject
-    PermissionUtils mPermissionUtils;
-
-    @Inject
-    SharedPreferences mSharedPreferences;
 
     @Before
     public void setup() throws Exception {
@@ -78,16 +55,18 @@ public class AppsControllerTest {
         MockAppsiApplication app =
                 (MockAppsiApplication) instrumentation.getTargetContext().getApplicationContext();
 
-        mPermissionUtils = AppInjector.getApplicationComponent().providePermissionUtils();
-        Mockito.when(mPermissionUtils.canDrawOverlays(any(Context.class))).thenReturn(true);
+//        mPermissionUtils = AppInjector.getApplicationComponent().providePermissionUtils();
 
-        mServiceRule.startService(new Intent(app, Appsi.class));
+//        Mockito.when(mPermissionUtils.canDrawOverlays(any(Context.class))).thenReturn(true);
 
-        MockAppsiComponent ac = (MockAppsiComponent) AppsiInjector.getAppsiComponent();
-        ac.inject(this);
-        mAppsi = AppsiInjector.provideAppsi();
-        Mockito.reset(mSidebarContext);
+//        mServiceRule.startService(new Intent(app, Appsi.class));
 
+//        MockAppsiComponent ac = (MockAppsiComponent) AppsiInjector.getAppsiComponent();
+//        ac.inject(this);
+
+//        mAppsi = AppsiInjector.provideAppsi();
+
+        mAppsAdapter = new AppsAdapter();
 
     }
 

@@ -29,6 +29,8 @@ import com.appsimobile.appsii.appwidget.AppsiiAppWidgetHost;
 import com.appsimobile.appsii.compat.AppWidgetManagerCompat;
 import com.appsimobile.appsii.compat.LauncherAppsCompat;
 import com.appsimobile.appsii.compat.UserManagerCompat;
+import com.appsimobile.appsii.iab.FeatureManager;
+import com.appsimobile.appsii.iab.FeatureManagerFactory;
 import com.appsimobile.appsii.iab.FeatureManagerHelper;
 import com.appsimobile.appsii.module.home.YahooLocationChooserDialogFragment;
 import com.appsimobile.appsii.module.home.config.HomeItemConfiguration;
@@ -147,6 +149,12 @@ public class MockApplicationModule {
         return Mockito.mock(FeatureManagerHelper.class);
     }
 
+    @Provides
+    @Singleton
+    FeatureManager provideFeatureManager(Context context) {
+        return FeatureManagerFactory.getFeatureManager(context);
+    }
+
     @Singleton
     @Provides
     ConnectivityManager provideConnectivityManager() {
@@ -156,7 +164,8 @@ public class MockApplicationModule {
     @Singleton
     @Provides
     WindowManager provideWindowManager() {
-        return Mockito.mock(WindowManager.class);
+        return (WindowManager) mApplication.getSystemService(Context.WINDOW_SERVICE);
+//        return Mockito.mock(WindowManager.class);
     }
 
     @Singleton

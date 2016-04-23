@@ -321,6 +321,8 @@ public class Appsi extends Service
         Log.d(TAG, "onCreate() initializeDagger");
         initializeDagger(context);
 
+        mHotspotHelper.setCallback(this);
+
         Log.d(TAG, "onCreate() configure popup layer");
         mPopupLayer.setPopuplayerListener(this);
 

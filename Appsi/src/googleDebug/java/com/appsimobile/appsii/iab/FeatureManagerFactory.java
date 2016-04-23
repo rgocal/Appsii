@@ -21,7 +21,6 @@ package com.appsimobile.appsii.iab;
 import android.content.Context;
 
 import com.appsimobile.appsii.BuildConfig;
-import com.appsimobile.appsii.annotation.VisibleForTesting;
 
 /**
  * Created by nick on 04/02/15.
@@ -29,11 +28,6 @@ import com.appsimobile.appsii.annotation.VisibleForTesting;
 public class FeatureManagerFactory {
 
     private static FeatureManager sFeatureManager;
-
-    @VisibleForTesting
-    public static void setFeatureManager(FeatureManager featureManager) {
-        sFeatureManager = featureManager;
-    }
 
     public static FeatureManager getFeatureManager(Context context) {
         if (sFeatureManager == null) {

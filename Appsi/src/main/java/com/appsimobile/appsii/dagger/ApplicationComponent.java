@@ -54,6 +54,8 @@ import com.appsimobile.appsii.module.weather.WeatherSyncAdapter;
 import com.appsimobile.appsii.module.weather.WeatherUtils;
 import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.appsimobile.appsii.processmon.ProcessMonitorFragment;
+import com.appsimobile.appsii.promo.PromoActivity;
+import com.appsimobile.appsii.promo.PromoUnlockFragment;
 import com.appsimobile.appsii.theme.CustomThemeActivity;
 import com.appsimobile.view.ParallaxListView;
 
@@ -181,4 +183,8 @@ public interface ApplicationComponent {
     void inject(AppsiApplication appsiApplication);
 
     PermissionUtils providePermissionUtils();
+
+    void inject(PromoUnlockFragment promoUnlockFragment);
+
+    void inject(PromoActivity promoActivity);
 }

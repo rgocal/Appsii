@@ -25,12 +25,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Singleton;
+
 /**
  * The normal implementation of the feature manager.
  * <p/>
  * Created by nick on 04/02/15.
  */
-class FeatureManagerImpl implements FeatureManager, BaseIabHelper.OnIabSetupFinishedListener {
+@Singleton
+public class FeatureManagerImpl
+        implements FeatureManager, BaseIabHelper.OnIabSetupFinishedListener {
 
 
     /**

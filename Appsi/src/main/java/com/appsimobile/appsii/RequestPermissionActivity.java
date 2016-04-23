@@ -25,14 +25,15 @@ import android.support.annotation.NonNull;
 import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.permissions.PermissionUtils;
 
+import javax.inject.Inject;
+
 /**
  * Created by nick on 17/06/15.
  */
 public class RequestPermissionActivity extends Activity {
 
+    @Inject
     PermissionUtils mPermissionUtils;
-
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

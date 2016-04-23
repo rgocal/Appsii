@@ -29,7 +29,6 @@ import android.widget.Toast;
 import com.appsimobile.appsii.BuildConfig;
 import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.preference.ObfuscatedPreferences;
-import com.appsimobile.appsii.preference.PreferencesFactory;
 import com.google.android.vending.licensing.LicenseValidator;
 import com.google.android.vending.licensing.util.Base64;
 import com.google.android.vending.licensing.util.Base64DecoderException;
@@ -59,6 +58,12 @@ abstract class LicenseChecker {
 
     final String mFeature;
 
+    final Activity mContext;
+
+    final String mVersionCode;
+
+    final ObfuscatedPreferences mObfuscatedPreferences;
+
     private final String mKey;
 
     private final String mPackageName;
@@ -67,15 +72,13 @@ abstract class LicenseChecker {
 
     PluginConnectionHelper mPluginConnectionHelper;
 
-    final Activity mContext;
-
-    final String mVersionCode;
-
     AsyncTask<Void, Void, Bundle> mTask;
 
-    LicenseChecker(Activity context, String packageName, String key, String feature) {
+    LicenseChecker(Activity context, String packageName, String key, String feature,
+            ObfuscatedPreferences obfuscatedPreferences) {
 
         mFeature = feature;
+        mObfuscatedPreferences = obfuscatedPreferences;
         mFeatureKey = "unlocked" + mFeature;
         // the key is already suffixed with 0
         mKey = key;
@@ -268,9 +271,7 @@ abstract class LicenseChecker {
             if (DEBUG) Log.d("Appsii", "received: " + bundleSha1);
 
             if (TextUtils.equals(expectedSha1, bundleSha1) && verified) {
-                ObfuscatedPreferences preferences =
-                        PreferencesFactory.getObfuscatedPreferences(mContext);
-                preferences.edit().putString(mFeature, mFeatureKey).apply();
+                mObfuscatedPreferences.edit().putString(mFeature, mFeatureKey).apply();
             }
 
         } finally {

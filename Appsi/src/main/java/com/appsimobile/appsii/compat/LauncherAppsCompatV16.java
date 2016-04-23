@@ -52,7 +52,7 @@ public class LauncherAppsCompatV16 extends LauncherAppsCompat {
 
     private final PackageMonitor mPackageMonitor;
 
-    LauncherAppsCompatV16(Context context) {
+    public LauncherAppsCompatV16(Context context) {
         mPm = context.getPackageManager();
         mContext = context;
         mPackageMonitor = new PackageMonitor();

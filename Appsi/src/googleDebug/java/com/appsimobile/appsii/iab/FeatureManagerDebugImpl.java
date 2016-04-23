@@ -19,17 +19,20 @@ package com.appsimobile.appsii.iab;
 import android.content.Context;
 import android.support.v4.util.SimpleArrayMap;
 
+import javax.inject.Singleton;
+
 /**
  * A special implementation of the feature-manager that can mark certain
  * purchases as purchased.
  * <p/>
  * Created by nick on 04/02/15.
  */
+@Singleton
 public class FeatureManagerDebugImpl extends FeatureManagerImpl {
 
     static final SimpleArrayMap<String, Purchase> sPurchasedSkus = new SimpleArrayMap<>();
 
-    FeatureManagerDebugImpl(Context context) {
+    public FeatureManagerDebugImpl(Context context) {
         super(context);
     }
 

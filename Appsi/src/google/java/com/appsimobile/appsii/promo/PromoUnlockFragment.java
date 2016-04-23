@@ -38,20 +38,25 @@ import android.widget.Toast;
 import com.appsimobile.appsii.AnalyticsManager;
 import com.appsimobile.appsii.PageHelper;
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.iab.FeatureManager;
 import com.appsimobile.appsii.iab.FeatureManagerHelper;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
+import com.appsimobile.appsii.preference.ObfuscatedPreferences;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
+import javax.inject.Inject;
 
 /**
  * Created by nick on 01/02/15.
  */
 public class PromoUnlockFragment extends DialogFragment implements View.OnClickListener {
 
-    final AnalyticsManager mAnalyticsManager = AnalyticsManager.getInstance();
+    @Inject
+    AnalyticsManager mAnalyticsManager;
 
 //    AsyncQueryHandlerImpl mAsyncQueryHandler;
 
@@ -78,6 +83,12 @@ public class PromoUnlockFragment extends DialogFragment implements View.OnClickL
     LicenseCheckerFragment mLicenseCheckerFragment;
 
     UnlockListener mUnlockListener;
+
+    @Inject
+    FeatureManagerHelper mFeatureManagerHelper;
+
+    @Inject
+    ObfuscatedPreferences mObfuscatedPreferences;
 
     public PromoUnlockFragment() {
         setStyle(STYLE_NO_TITLE, 0);
@@ -165,6 +176,7 @@ public class PromoUnlockFragment extends DialogFragment implements View.OnClickL
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppInjector.inject(this);
         mLicenseCheckerFragment =
                 (LicenseCheckerFragment) getFragmentManager().findFragmentByTag("checker");
 
@@ -225,13 +237,13 @@ public class PromoUnlockFragment extends DialogFragment implements View.OnClickL
     }
 
     private void startAgendaCheck() {
-        if (FeatureManagerHelper.legacyAgendaUnlocked(getActivity())) {
+        if (mFeatureManagerHelper.legacyAgendaUnlocked(getActivity())) {
             Toast.makeText(getActivity(), R.string.already_unlocked, Toast.LENGTH_SHORT).show();
             return;
         }
         if (!mLicenseCheckerFragment.isCheckInProgress()) {
             if (mLicenseCheckerFragment.startCheck(
-                    new AgendaLicenseCheckerImpl(getActivity()))) {
+                    new AgendaLicenseCheckerImpl(getActivity(), mObfuscatedPreferences))) {
 
                 setCheckInProgress(true);
             }
@@ -239,13 +251,13 @@ public class PromoUnlockFragment extends DialogFragment implements View.OnClickL
     }
 
     private void startCallsCheck() {
-        if (FeatureManagerHelper.legacyCallsUnlocked(getActivity())) {
+        if (mFeatureManagerHelper.legacyCallsUnlocked(getActivity())) {
             Toast.makeText(getActivity(), R.string.already_unlocked, Toast.LENGTH_SHORT).show();
             return;
         }
         if (!mLicenseCheckerFragment.isCheckInProgress()) {
             if (mLicenseCheckerFragment.startCheck(
-                    new CallsLicenseCheckerImpl(getActivity()))) {
+                    new CallsLicenseCheckerImpl(getActivity(), mObfuscatedPreferences))) {
 
                 setCheckInProgress(true);
             }
@@ -253,13 +265,13 @@ public class PromoUnlockFragment extends DialogFragment implements View.OnClickL
     }
 
     private void startSmsCheck() {
-        if (FeatureManagerHelper.legacySmsUnlocked(getActivity())) {
+        if (mFeatureManagerHelper.legacySmsUnlocked(getActivity())) {
             Toast.makeText(getActivity(), R.string.already_unlocked, Toast.LENGTH_SHORT).show();
             return;
         }
         if (!mLicenseCheckerFragment.isCheckInProgress()) {
             if (mLicenseCheckerFragment.startCheck(
-                    new SmsLicenseCheckerImpl(getActivity()))) {
+                    new SmsLicenseCheckerImpl(getActivity(), mObfuscatedPreferences))) {
 
                 setCheckInProgress(true);
             }
@@ -267,13 +279,13 @@ public class PromoUnlockFragment extends DialogFragment implements View.OnClickL
     }
 
     private void startSettingsCheck() {
-        if (FeatureManagerHelper.legacySettingsUnlocked(getActivity())) {
+        if (mFeatureManagerHelper.legacySettingsUnlocked(getActivity())) {
             Toast.makeText(getActivity(), R.string.already_unlocked, Toast.LENGTH_SHORT).show();
             return;
         }
         if (!mLicenseCheckerFragment.isCheckInProgress()) {
             if (mLicenseCheckerFragment.startCheck(
-                    new SettingsLicenseCheckerImpl(getActivity()))) {
+                    new SettingsLicenseCheckerImpl(getActivity(), mObfuscatedPreferences))) {
 
                 setCheckInProgress(true);
             }
@@ -288,13 +300,13 @@ public class PromoUnlockFragment extends DialogFragment implements View.OnClickL
     }
 
     private void startPeopleCheck() {
-        if (FeatureManagerHelper.legacyPeopleUnlocked(getActivity())) {
+        if (mFeatureManagerHelper.legacyPeopleUnlocked(getActivity())) {
             Toast.makeText(getActivity(), R.string.already_unlocked, Toast.LENGTH_SHORT).show();
             return;
         }
         if (!mLicenseCheckerFragment.isCheckInProgress()) {
             if (mLicenseCheckerFragment.startCheck(
-                    new ContactsLicenseCheckerImpl(getActivity()))) {
+                    new ContactsLicenseCheckerImpl(getActivity(), mObfuscatedPreferences))) {
 
                 setCheckInProgress(true);
             }
@@ -302,13 +314,13 @@ public class PromoUnlockFragment extends DialogFragment implements View.OnClickL
     }
 
     private void startPowerPackCheck() {
-        if (FeatureManagerHelper.legacyPowerPackUnlocked(getActivity())) {
+        if (mFeatureManagerHelper.legacyPowerPackUnlocked(getActivity())) {
             Toast.makeText(getActivity(), R.string.already_unlocked, Toast.LENGTH_SHORT).show();
             return;
         }
         if (!mLicenseCheckerFragment.isCheckInProgress()) {
             if (mLicenseCheckerFragment.startCheck(
-                    new PowerPackLicenseCheckerImpl(getActivity()))) {
+                    new PowerPackLicenseCheckerImpl(getActivity(), mObfuscatedPreferences))) {
 
                 setCheckInProgress(true);
             }
@@ -350,27 +362,27 @@ public class PromoUnlockFragment extends DialogFragment implements View.OnClickL
         mPowerPackView.setOnClickListener(this);
         mDownloadLink.setOnClickListener(this);
 
-        if (FeatureManagerHelper.legacyAgendaUnlocked(getActivity())) {
+        if (mFeatureManagerHelper.legacyAgendaUnlocked(getActivity())) {
             mAgendaView.setCompoundDrawablesRelativeWithIntrinsicBounds(
                     R.drawable.ic_lock_open_black_24dp, 0, 0, 0);
         }
-        if (FeatureManagerHelper.legacyCallsUnlocked(getActivity())) {
+        if (mFeatureManagerHelper.legacyCallsUnlocked(getActivity())) {
             mCallsView.setCompoundDrawablesRelativeWithIntrinsicBounds(
                     R.drawable.ic_lock_open_black_24dp, 0, 0, 0);
         }
-        if (FeatureManagerHelper.legacySmsUnlocked(getActivity())) {
+        if (mFeatureManagerHelper.legacySmsUnlocked(getActivity())) {
             mSmsView.setCompoundDrawablesRelativeWithIntrinsicBounds(
                     R.drawable.ic_lock_open_black_24dp, 0, 0, 0);
         }
-        if (FeatureManagerHelper.legacySettingsUnlocked(getActivity())) {
+        if (mFeatureManagerHelper.legacySettingsUnlocked(getActivity())) {
             mSettingsView.setCompoundDrawablesRelativeWithIntrinsicBounds(
                     R.drawable.ic_lock_open_black_24dp, 0, 0, 0);
         }
-        if (FeatureManagerHelper.legacyPeopleUnlocked(getActivity())) {
+        if (mFeatureManagerHelper.legacyPeopleUnlocked(getActivity())) {
             mPeopleView.setCompoundDrawablesRelativeWithIntrinsicBounds(
                     R.drawable.ic_lock_open_black_24dp, 0, 0, 0);
         }
-        if (FeatureManagerHelper.legacyPowerPackUnlocked(getActivity())) {
+        if (mFeatureManagerHelper.legacyPowerPackUnlocked(getActivity())) {
             mPowerPackView.setCompoundDrawablesRelativeWithIntrinsicBounds(
                     R.drawable.ic_lock_open_black_24dp, 0, 0, 0);
         }
@@ -545,14 +557,15 @@ public class PromoUnlockFragment extends DialogFragment implements View.OnClickL
                         "tjZlBxDsqT3WK1L+gyIgAHrwOB/87peoZiLjlM5CNngykHVASx6QN16rf+ew" +
                         "KWZeohypIIu6mCJPPQIDAQAB";
 
-        protected AgendaLicenseCheckerImpl(Activity context) {
+        protected AgendaLicenseCheckerImpl(Activity context,
+                ObfuscatedPreferences obfuscatedPreferences) {
             super(context, "com.appsimobile.appsicalendar",
-                    CALENDAR_KEY, FeatureManager.AGENDA_FEATURE);
+                    CALENDAR_KEY, FeatureManager.AGENDA_FEATURE, obfuscatedPreferences);
         }
 
         @Override
         protected void onCheckComplete(String packageName) {
-            if (FeatureManagerHelper.legacyAgendaUnlocked(mContext)) {
+            if (mFeatureManagerHelper.legacyAgendaUnlocked(mContext)) {
                 PageHelper pageHelper = PageHelper.getInstance(getActivity());
                 pageHelper.enablePageAccess(
                         HomeContract.Pages.PAGE_AGENDA, false /* do not force add */);
@@ -580,14 +593,15 @@ public class PromoUnlockFragment extends DialogFragment implements View.OnClickL
                         "8W/3JvXHxrmX2728Z7l7fsFiCCgbV3IIw9Lxo6AAhAUbwv8MqVSdXqUMqG3dhMHmXyW1" +
                         "/xiPt5BKrGBTTNPkwCC5jFka8tr3yAJQIHsy9QIDAQAB";
 
-        protected PowerPackLicenseCheckerImpl(Activity context) {
+        protected PowerPackLicenseCheckerImpl(Activity context,
+                ObfuscatedPreferences obfuscatedPreferences) {
             super(context, "com.appsimobile.appsipowerpack", POWER_PACK_KEY,
-                    FeatureManager.SETTINGS_AGENDA_FEATURE);
+                    FeatureManager.SETTINGS_AGENDA_FEATURE, obfuscatedPreferences);
         }
 
         @Override
         protected void onCheckComplete(String packageName) {
-            if (FeatureManagerHelper.legacyPowerPackUnlocked(mContext)) {
+            if (mFeatureManagerHelper.legacyPowerPackUnlocked(mContext)) {
                 PageHelper pageHelper = PageHelper.getInstance(getActivity());
 
                 pageHelper.enablePageAccess(HomeContract.Pages.PAGE_AGENDA, false /* force */);
@@ -616,14 +630,15 @@ public class PromoUnlockFragment extends DialogFragment implements View.OnClickL
                         "WX4ZVkqmchZg7tAbWzjxg2eC1EofrmVRIu5eiw/vVBH1cVuQIDAQAB";
 
 
-        protected SettingsLicenseCheckerImpl(Activity context) {
+        protected SettingsLicenseCheckerImpl(Activity context,
+                ObfuscatedPreferences obfuscatedPreferences) {
             super(context, "com.appsimobile.appsisettings", SETTINGS_KEY,
-                    FeatureManager.SETTINGS_FEATURE);
+                    FeatureManager.SETTINGS_FEATURE, obfuscatedPreferences);
         }
 
         @Override
         protected void onCheckComplete(String packageName) {
-            if (FeatureManagerHelper.legacySettingsUnlocked(mContext)) {
+            if (mFeatureManagerHelper.legacySettingsUnlocked(mContext)) {
                 PageHelper pageHelper = PageHelper.getInstance(getActivity());
                 pageHelper.enablePageAccess(HomeContract.Pages.PAGE_SETTINGS, false /* force */);
                 markSettingsUnlocked();
@@ -650,14 +665,15 @@ public class PromoUnlockFragment extends DialogFragment implements View.OnClickL
                         "K7mPvF7IWvNUjNuz1t1jhj7rqzK6NebQKGJYtV0LqUU4ePyn9hnunYWWGwIDAQAB";
 
 
-        protected ContactsLicenseCheckerImpl(Activity context) {
+        protected ContactsLicenseCheckerImpl(Activity context,
+                ObfuscatedPreferences obfuscatedPreferences) {
             super(context, "com.appsimobile.appsicontacts", CONTACTS_KEY,
-                    FeatureManager.PEOPLE_FEATURE);
+                    FeatureManager.PEOPLE_FEATURE, obfuscatedPreferences);
         }
 
         @Override
         protected void onCheckComplete(String packageName) {
-            if (FeatureManagerHelper.legacyPeopleUnlocked(mContext)) {
+            if (mFeatureManagerHelper.legacyPeopleUnlocked(mContext)) {
                 PageHelper pageHelper = PageHelper.getInstance(getActivity());
                 pageHelper.enablePageAccess(HomeContract.Pages.PAGE_PEOPLE, false /* force */);
                 markContactsUnlocked();
@@ -682,13 +698,15 @@ public class PromoUnlockFragment extends DialogFragment implements View.OnClickL
                         "PjMv36MVNOlFR+ohdB1atb7kau89nT/PLSW+suGCMTVsdH0SoeNYjjnrJp2yXJYv" +
                         "kxp7W8zQ5Ix/aso6fjIR9zmX6KPW4HT6Oopb/cqERb56HMSNtFSc7idklwIDAQAB";
 
-        protected CallsLicenseCheckerImpl(Activity context) {
-            super(context, "com.appsimobile.appsicalls", CALLS_KEY, FeatureManager.CALLS_FEATURE);
+        protected CallsLicenseCheckerImpl(Activity context,
+                ObfuscatedPreferences obfuscatedPreferences) {
+            super(context, "com.appsimobile.appsicalls", CALLS_KEY, FeatureManager.CALLS_FEATURE,
+                    obfuscatedPreferences);
         }
 
         @Override
         protected void onCheckComplete(String packageName) {
-            if (FeatureManagerHelper.legacyCallsUnlocked(mContext)) {
+            if (mFeatureManagerHelper.legacyCallsUnlocked(mContext)) {
                 PageHelper pageHelper = PageHelper.getInstance(getActivity());
                 pageHelper.enablePageAccess(HomeContract.Pages.PAGE_CALLS, false /* force */);
                 markCallsUnlocked();
@@ -714,13 +732,15 @@ public class PromoUnlockFragment extends DialogFragment implements View.OnClickL
                         "y0sCjfUbO1yuuXOoCwPRGtDXGTzqfmNww2sYrz8Sc2bjcaJ0hPTYeOHasigb+FqI" +
                         "+InV6DLbGecDklq5lzK3DqSudBh+FiPIPrO05Y1BK5QAYSf9swvjl7pHZQIDAQAB";
 
-        protected SmsLicenseCheckerImpl(Activity context) {
-            super(context, "com.appsimobile.appsisms", SMS_KEY, FeatureManager.SMS_FEATURE);
+        protected SmsLicenseCheckerImpl(Activity context,
+                ObfuscatedPreferences obfuscatedPreferences) {
+            super(context, "com.appsimobile.appsisms", SMS_KEY, FeatureManager.SMS_FEATURE,
+                    obfuscatedPreferences);
         }
 
         @Override
         protected void onCheckComplete(String packageName) {
-            if (FeatureManagerHelper.legacySmsUnlocked(mContext)) {
+            if (mFeatureManagerHelper.legacySmsUnlocked(mContext)) {
                 PageHelper pageHelper = PageHelper.getInstance(getActivity());
 
                 pageHelper.enablePageAccess(HomeContract.Pages.PAGE_SMS, false /* force */);

@@ -24,8 +24,6 @@ import android.view.Display;
 import android.view.Gravity;
 import android.view.WindowManager;
 
-import javax.inject.Inject;
-
 /**
  * Created by nick on 13/02/15.
  */
@@ -33,13 +31,15 @@ public abstract class AbstractHotspotHelper {
 
     final int mDp56;
 
+    final WindowManager mWindowManager;
+
     private final Context mContext;
-    @Inject
-    WindowManager mWindowManager;
+
     private int mHeight;
 
-    public AbstractHotspotHelper(Context context) {
+    public AbstractHotspotHelper(Context context, WindowManager windowManager) {
         mContext = context;
+        mWindowManager = windowManager;
         mDp56 = (int) (context.getResources().getDisplayMetrics().density * 56);
     }
 
@@ -66,6 +66,8 @@ public abstract class AbstractHotspotHelper {
         params.y = y;
         return params;
     }
+
+    public abstract void setCallback(HotspotHelperListener callback);
 
     public abstract void onOrientationChanged();
 

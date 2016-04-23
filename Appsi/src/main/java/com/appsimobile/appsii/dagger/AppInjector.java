@@ -54,6 +54,8 @@ import com.appsimobile.appsii.module.weather.WeatherSyncAdapter;
 import com.appsimobile.appsii.module.weather.WeatherUtils;
 import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.appsimobile.appsii.processmon.ProcessMonitorFragment;
+import com.appsimobile.appsii.promo.PromoActivity;
+import com.appsimobile.appsii.promo.PromoUnlockFragment;
 import com.appsimobile.appsii.theme.CustomThemeActivity;
 import com.appsimobile.view.ParallaxListView;
 
@@ -300,5 +302,13 @@ public class AppInjector {
 
     public static ApplicationComponent getApplicationComponent() {
         return sApplicationComponent;
+    }
+
+    public static void inject(PromoUnlockFragment promoUnlockFragment) {
+        sApplicationComponent.inject(promoUnlockFragment);
+    }
+
+    public static void inject(PromoActivity promoActivity) {
+        sApplicationComponent.inject(promoActivity);
     }
 }

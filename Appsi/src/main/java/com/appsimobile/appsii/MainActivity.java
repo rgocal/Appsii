@@ -33,6 +33,7 @@ import android.view.ViewGroup;
 
 import com.appsimobile.appsii.dagger.AppInjector;
 import com.appsimobile.appsii.firstrun.FirstRunFragment;
+import com.appsimobile.appsii.permissions.PermissionUtils;
 
 import javax.inject.Inject;
 
@@ -50,6 +51,9 @@ public class MainActivity extends AppCompatActivity
 
     @Inject
     SharedPreferences mPreferences;
+
+    @Inject
+    PermissionUtils mPermissionUtils;
 
     @SuppressWarnings("deprecation")
     @Override
@@ -100,7 +104,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        if (!Settings.canDrawOverlays(this)) {
+        if (!mPermissionUtils.canDrawOverlays(this)) {
             showSystemAlertWindowPermissionErrorIfNotFirstRun();
         } else if (!mFirstRun) {
             // when we are in the first run, Appsii is started on
