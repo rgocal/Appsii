@@ -24,28 +24,42 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.appsimobile.BaseActivity;
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppsModule;
+import com.google.android.agera.Receiver;
+import com.google.android.agera.Repository;
+import com.google.android.agera.Result;
+import com.google.android.agera.Updatable;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 /**
  * Created by nick on 24/08/14.
  */
-public class EditTagActivity extends Activity implements View.OnClickListener,
-        AppTagUtils.AppTagListener {
+public class EditTagActivity extends BaseActivity implements View.OnClickListener, Updatable,
+        Receiver<List<AppTag>> {
 
     public static final String EXTRA_TAG = "com.appsimobile.appsii.EXTRA_TAG";
 
     CheckBox mExpandByDefault;
 
     AppTag mAppTag;
+
+    @Inject
+    @Named(AppsModule.NAME_APPS_TAGS)
+    Repository<Result<List<AppTag>>> mTagsRepository;
 
     /**
      * The confirmation button to add the tag
@@ -72,6 +86,8 @@ public class EditTagActivity extends Activity implements View.OnClickListener,
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        component().inject(this);
+
         setContentView(R.layout.dialog_add_apptag);
         TextView title = (TextView) findViewById(R.id.title);
         TextView content = (TextView) findViewById(R.id.content);
@@ -94,8 +110,6 @@ public class EditTagActivity extends Activity implements View.OnClickListener,
         content.setText(getString(R.string.tag_name));
 
         setup(getIntent());
-        AppTagUtils.getInstance(this).registerAppTagListener(this);
-
 
     }
 
@@ -163,12 +177,32 @@ public class EditTagActivity extends Activity implements View.OnClickListener,
     }
 
     @Override
-    public void onTagsChanged(ArrayList<AppTag> appTags) {
-        mAppTags = appTags;
+    protected void onStart() {
+        super.onStart();
+        mTagsRepository.get().ifSucceededSendTo(this);
+        mTagsRepository.addUpdatable(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mTagsRepository.removeUpdatable(this);
     }
 
     void onUpdateComplete() {
-        finish();
+        if (!isFinishing()) {
+            finish();
+        }
+    }
+
+    @Override
+    public void update() {
+        mTagsRepository.get().ifSucceededSendTo(this);
+    }
+
+    @Override
+    public void accept(@NonNull List<AppTag> value) {
+        mAppTags = value;
     }
 
     class QueryHandler extends AsyncQueryHandler {

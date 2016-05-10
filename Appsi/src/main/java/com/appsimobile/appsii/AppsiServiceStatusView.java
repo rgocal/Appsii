@@ -133,7 +133,7 @@ public class AppsiServiceStatusView extends RelativeLayout implements View.OnCli
 
     private void onAppsiDisabled() {
         mStatusView.setText(R.string.appsi_status_stopped);
-        mActionButton.setImageResource(R.drawable.ic_media_play);
+        mActionButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
         mStatus = Appsi.RESULT_RUNNING_STATUS_DISABLED;
     }
 

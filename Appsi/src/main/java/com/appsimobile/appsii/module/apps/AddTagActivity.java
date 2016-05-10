@@ -25,6 +25,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
@@ -32,19 +33,34 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.appsimobile.BaseActivity;
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppsModule;
+import com.google.android.agera.Receiver;
+import com.google.android.agera.Repository;
+import com.google.android.agera.Result;
+import com.google.android.agera.Updatable;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * Created by nick on 24/08/14.
  */
-public class AddTagActivity extends Activity implements View.OnClickListener,
-        AppTagUtils.AppTagListener {
+public class AddTagActivity extends BaseActivity implements View.OnClickListener,
+        Updatable, Receiver<List<AppTag>> {
 
     public static final String EXTRA_APP_ENTRY = "com.appsimobile.appsii.EXTRA_APP_ENTRY";
 
     CheckBox mExpandByDefault;
+
+    @Inject
+    @Named(AppsModule.NAME_APPS_TAGS)
+    Repository<Result<List<AppTag>>> mTagsRepository;
 
     /**
      * The component that needs to be added to the the tag
@@ -77,6 +93,8 @@ public class AddTagActivity extends Activity implements View.OnClickListener,
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        component().inject(this);
+
         setContentView(R.layout.dialog_add_apptag);
         TextView title = (TextView) findViewById(R.id.title);
         TextView content = (TextView) findViewById(R.id.content);
@@ -96,9 +114,19 @@ public class AddTagActivity extends Activity implements View.OnClickListener,
 
         title.setText(R.string.add_tag);
         content.setText(getString(R.string.tag_name));
+    }
 
-        AppTagUtils.getInstance(this).registerAppTagListener(this);
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mTagsRepository.addUpdatable(this);
+        mTagsRepository.get().ifSucceededSendTo(this);
+    }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mTagsRepository.removeUpdatable(this);
     }
 
     @Override
@@ -118,7 +146,7 @@ public class AddTagActivity extends Activity implements View.OnClickListener,
 
             mOkButton.setEnabled(false);
             mCancelButton.setEnabled(false);
-            mQueryHandler = new QueryHandler(getContentResolver());
+            mQueryHandler = new QueryHandler(this, getContentResolver());
             mQueryHandler.insertTag(text, mComponentName, mExpandByDefault.isChecked());
         } else if (id == R.id.cancel) {
             finish();
@@ -135,23 +163,35 @@ public class AddTagActivity extends Activity implements View.OnClickListener,
         return false;
     }
 
-    @Override
-    public void onTagsChanged(ArrayList<AppTag> appTags) {
-        mAppTags = appTags;
+    public void onTagsChanged(List<AppTag> appTags) {
+        mAppTags = new ArrayList<>(appTags);
     }
 
     void onInsertComplete() {
         finish();
     }
 
-    class QueryHandler extends AsyncQueryHandler {
+    @Override
+    public void update() {
+        mTagsRepository.get().ifSucceededSendTo(this);
+    }
+
+    @Override
+    public void accept(@NonNull List<AppTag> value) {
+        onTagsChanged(value);
+    }
+
+    static class QueryHandler extends AsyncQueryHandler {
+
+        final WeakReference<AddTagActivity> mActivityRef;
 
         private final int TOKEN_TAG = 0;
 
         private final int TOKEN_APP = 1;
 
-        public QueryHandler(ContentResolver cr) {
+        public QueryHandler(AddTagActivity activity, ContentResolver cr) {
             super(cr);
+            mActivityRef = new WeakReference<>(activity);
         }
 
         public void insertTag(CharSequence tagName, @Nullable ComponentName componentName,
@@ -168,6 +208,7 @@ public class AddTagActivity extends Activity implements View.OnClickListener,
 
         @Override
         protected void onInsertComplete(int token, Object cookie, Uri uri) {
+            AddTagActivity a = mActivityRef.get();
             if (token == TOKEN_TAG) {
                 long tagId = ContentUris.parseId(uri);
                 ComponentName componentName = (ComponentName) cookie;
@@ -180,10 +221,14 @@ public class AddTagActivity extends Activity implements View.OnClickListener,
                     startInsert(TOKEN_APP, cookie, AppsContract.TaggedAppColumns.CONTENT_URI,
                             values);
                 } else {
-                    AddTagActivity.this.onInsertComplete();
+                    if (a != null) {
+                        a.onInsertComplete();
+                    }
                 }
             } else if (token == TOKEN_APP) {
-                AddTagActivity.this.onInsertComplete();
+                if (a != null) {
+                    a.onInsertComplete();
+                }
             }
         }
     }

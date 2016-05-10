@@ -25,15 +25,15 @@ import android.content.ComponentName;
  */
 public class TaggedApp {
 
-    long mId;
+    public long mId;
 
-    ComponentName mComponentName;
+    public ComponentName mComponentName;
 
-    String mTagName;
+    public String mTagName;
 
-    long mTagId;
+    public long mTagId;
 
-    AppEntry mAppEntry;
+    public AppEntry mAppEntry;
 
     boolean mDeleted;
 }

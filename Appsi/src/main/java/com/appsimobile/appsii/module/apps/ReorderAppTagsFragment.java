@@ -23,6 +23,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,19 +31,27 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppsModule;
 import com.appsimobile.appsii.module.BaseListAdapter;
 import com.appsimobile.appsii.module.ViewHolder;
+import com.google.android.agera.Receiver;
+import com.google.android.agera.Repository;
+import com.google.android.agera.Result;
+import com.google.android.agera.Updatable;
 import com.mobeta.android.dslv.ConditionalRemovableAdapter;
 import com.mobeta.android.dslv.DragSortListView;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 /**
  * Created by nick on 31/08/14.
  */
 public class ReorderAppTagsFragment extends Fragment implements DragSortListView.RemoveListener,
-        AppTagUtils.AppTagListener, DragSortListView.DropListener {
+        DragSortListView.DropListener, Receiver<List<AppTag>>, Updatable {
 
     /**
      * The list-view used to re-order the tags. We register a few listeners on the
@@ -68,14 +77,33 @@ public class ReorderAppTagsFragment extends Fragment implements DragSortListView
     @Nullable
     QueryHandler mQueryHandler;
 
+    @Inject
+    @Named(AppsModule.NAME_APPS_TAGS)
+    Repository<Result<List<AppTag>>> mTagsRepository;
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         // create the adapter here to make sure we can set it's data and register it's listener
         // This ensures the life cycles are the same
         mTagAdapter = new TagAdapter();
-        List<AppTag> appTags = AppTagUtils.getInstance(getActivity()).registerAppTagListener(this);
-        mTagAdapter.setItems(appTags);
+        Result<List<AppTag>> appTags = mTagsRepository.get();
+        appTags.ifSucceededSendTo(this);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mTagsRepository.addUpdatable(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mTagsRepository.removeUpdatable(this);
     }
 
     @Nullable
@@ -95,9 +123,10 @@ public class ReorderAppTagsFragment extends Fragment implements DragSortListView
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        AppTagUtils.getInstance(getActivity()).unregisterAppTagListener(this);
+    public void onDestroyView() {
+        super.onDestroyView();
+        // frees the listener on the adapter
+        mDragSortListView.setAdapter(null);
     }
 
     @Override
@@ -115,13 +144,6 @@ public class ReorderAppTagsFragment extends Fragment implements DragSortListView
             mQueryHandler = new QueryHandler(getActivity().getContentResolver());
         }
         mQueryHandler.removeTag(item);
-    }
-
-    @Override
-    public void onTagsChanged(ArrayList<AppTag> appTags) {
-        if (!mIsChangeInProgress) {
-            mTagAdapter.setItems(appTags);
-        }
     }
 
     @Override
@@ -166,6 +188,18 @@ public class ReorderAppTagsFragment extends Fragment implements DragSortListView
 
     void onUpdateFinished() {
         mIsChangeInProgress = false;
+    }
+
+    @Override
+    public void accept(@NonNull List<AppTag> value) {
+        if (!mIsChangeInProgress) {
+            mTagAdapter.setItems(value);
+        }
+    }
+
+    @Override
+    public void update() {
+        mTagsRepository.get().ifSucceededSendTo(this);
     }
 
     public static class TagViewHolder extends ViewHolder {

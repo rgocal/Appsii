@@ -20,8 +20,6 @@ import android.content.Context;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 
-import com.appsimobile.appsii.iab.Purchase;
-import com.appsimobile.appsii.iab.SkuDetails;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Logger;
@@ -174,26 +172,6 @@ public class AnalyticsManager {
         );
     }
 
-    public void trackPurchase(Purchase page, SkuDetails details) {
-        if (page == null || details == null) return;
-        Tracker tracker = getTracker();
-        Product p = new Product();
-        p.setId(page.getSku()).setPrice(details.getPriceMicros() / 1000000d);
-        p.setName(details.getTitle());
-        p.setQuantity(1);
-
-        ProductAction productAction = new ProductAction(ProductAction.ACTION_PURCHASE);
-        productAction.setTransactionId(page.getOrderId());
-        productAction.setTransactionRevenue(details.getPriceMicros() / 1000000d);
-
-        HitBuilders.ScreenViewBuilder builder = new HitBuilders.ScreenViewBuilder()
-                .addProduct(p)
-                .setProductAction(productAction);
-
-        tracker.set("&cu", details.getPriceCurrencyCode());
-        tracker.setScreenName("transaction");
-        tracker.send(builder.build());
-    }
 
 
 }

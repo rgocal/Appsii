@@ -35,7 +35,6 @@ import com.appsimobile.appsii.PageHelper;
 import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.iab.BaseIabHelper;
 import com.appsimobile.appsii.iab.FeatureManager;
-import com.appsimobile.appsii.iab.FeatureManagerFactory;
 import com.appsimobile.appsii.iab.FeatureManagerHelper;
 import com.appsimobile.appsii.iab.IabPurchaseHelper;
 import com.appsimobile.appsii.iab.ProductPurchaseHelper;

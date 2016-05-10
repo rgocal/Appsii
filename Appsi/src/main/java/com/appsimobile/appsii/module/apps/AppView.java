@@ -22,6 +22,7 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,18 +31,27 @@ import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import com.appsimobile.appsii.AppsiApplication;
 import com.appsimobile.appsii.InterceptingTouchDelegate;
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppsModule;
+import com.google.android.agera.Receiver;
+import com.google.android.agera.Repository;
+import com.google.android.agera.Result;
+import com.google.android.agera.Updatable;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * Represents an app in the list of all apps or a specific folder
  * Created by nick on 03/06/14.
  */
 public class AppView extends FrameLayout implements View.OnClickListener,
-        PopupMenu.OnMenuItemClickListener, AppTagUtils.AppTagListener {
+        PopupMenu.OnMenuItemClickListener, Receiver<List<AppTag>>, Updatable {
 
     /**
      * The id of the menu action to show app info
@@ -79,6 +89,10 @@ public class AppView extends FrameLayout implements View.OnClickListener,
     InterceptingTouchDelegate mTouchDelegate;
 
     boolean mDispatchToDelegate;
+
+    @Inject
+    @Named(AppsModule.NAME_APPS_TAGS)
+    Repository<Result<List<AppTag>>> mTagsRepository;
 
     /**
      * The app entry this App-View is bound to
@@ -133,13 +147,21 @@ public class AppView extends FrameLayout implements View.OnClickListener,
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
+        ((AppsiApplication) getContext().getApplicationContext()).getComponent().inject(this);
+
         mImage = (ImageView) findViewById(R.id.image);
         mText = (TextView) findViewById(R.id.primary_text);
         mOverflow = findViewById(R.id.overflow);
         mOverflow.setOnClickListener(this);
 
-        mAppTags = AppTagUtils.getInstance(getContext()).registerAppTagListener(this);
+        mTagsRepository.get().ifSucceededSendTo(this);
         setWillNotDraw(false);
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        mTagsRepository.addUpdatable(this);
     }
 
     @Override
@@ -197,6 +219,7 @@ public class AppView extends FrameLayout implements View.OnClickListener,
         if (mActiveAppIconLoaderTask != null) {
             mActiveAppIconLoaderTask.cancel(true);
         }
+        mTagsRepository.removeUpdatable(this);
     }
 
     @Override
@@ -266,11 +289,6 @@ public class AppView extends FrameLayout implements View.OnClickListener,
         return mAppEntry;
     }
 
-    @Override
-    public void onTagsChanged(ArrayList<AppTag> appTags) {
-        mAppTags = appTags;
-    }
-
     void onIconLoaded(Drawable drawable) {
         if (drawable == null) {
             drawable = getContext().getResources().getDrawable(
@@ -282,6 +300,16 @@ public class AppView extends FrameLayout implements View.OnClickListener,
 
     public void setAppActionListener(AppActionListener appActionListener) {
         mAppActionListener = appActionListener;
+    }
+
+    @Override
+    public void accept(@NonNull List<AppTag> value) {
+        mAppTags = value;
+    }
+
+    @Override
+    public void update() {
+        mTagsRepository.get().ifSucceededSendTo(this);
     }
 
     public interface AppActionListener {

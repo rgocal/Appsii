@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        if (!Settings.canDrawOverlays(this)) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
             showSystemAlertWindowPermissionErrorIfNotFirstRun();
         } else if (!mFirstRun) {
             // when we are in the first run, Appsii is started on

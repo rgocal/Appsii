@@ -65,7 +65,6 @@ import com.appsimobile.appsii.module.home.provider.HomeContract;
 import com.appsimobile.appsii.plugins.IconCache;
 import com.appsimobile.appsii.preference.PreferenceHelper;
 import com.appsimobile.appsii.preference.PreferencesFactory;
-import com.appsimobile.appsii.tinting.AppsiLayoutInflater;
 
 import java.lang.ref.WeakReference;
 
@@ -317,9 +316,9 @@ public class Appsi extends Service
         Context context = ThemingUtils.createContextThemeWrapper(this, prefs);
 
         LayoutInflater layoutInflater = LayoutInflater.from(context);
-        if (layoutInflater.getFactory() == null) {
-            layoutInflater.setFactory(new AppsiLayoutInflater.FactoryImpl());
-        }
+//        if (layoutInflater.getFactory() == null) {
+//            layoutInflater.setFactory(new AppsiLayoutInflater.FactoryImpl());
+//        }
 
         mLoaderManager = new LoaderManagerImpl("Appsi", this, false);
         mNotificationLikeOpener = new NotificationLikeOpener(this);

@@ -18,6 +18,7 @@ package com.appsimobile.appsii.module.apps;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,19 +26,28 @@ import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.appsimobile.BaseActivity;
 import com.appsimobile.appsii.BuildConfig;
 import com.appsimobile.appsii.R;
+import com.appsimobile.appsii.dagger.AppsModule;
 import com.appsimobile.appsii.module.BaseListAdapter;
 import com.appsimobile.appsii.module.ViewHolder;
+import com.google.android.agera.Receiver;
+import com.google.android.agera.Repository;
+import com.google.android.agera.Result;
+import com.google.android.agera.Updatable;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 /**
  * Created by nick on 19/09/14.
  */
-public class ReorderAppsActivity extends Activity implements AppTagUtils.AppTagListener,
-        AdapterView.OnItemSelectedListener {
+public class ReorderAppsActivity extends BaseActivity implements AdapterView.OnItemSelectedListener,
+        Receiver<List<AppTag>>, Updatable {
 
     public static final String EXTRA_PRESELECT_TAG_ID =
             BuildConfig.APPLICATION_ID + ".preselect_tag_id";
@@ -55,9 +65,15 @@ public class ReorderAppsActivity extends Activity implements AppTagUtils.AppTagL
 
     boolean mPreselected;
 
+    @Inject
+    @Named(AppsModule.NAME_APPS_TAGS)
+    Repository<Result<List<AppTag>>> mTagsRepository;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        component().inject(this);
+
         // register the app-tag listener, and update the list in the actionbar.
         setContentView(R.layout.activity_reorder_apps);
 
@@ -81,9 +97,8 @@ public class ReorderAppsActivity extends Activity implements AppTagUtils.AppTagL
     @Override
     protected void onStart() {
         super.onStart();
-        List<AppTag> tags = AppTagUtils.getInstance(this).registerAppTagListener(this);
-        mSpinnerAdapter.setItems(tags);
-        preselectSelection(tags);
+        mTagsRepository.get().ifSucceededSendTo(this);
+        mTagsRepository.addUpdatable(this);
     }
 
     @Override
@@ -95,7 +110,7 @@ public class ReorderAppsActivity extends Activity implements AppTagUtils.AppTagL
     @Override
     public void onStop() {
         super.onStop();
-        AppTagUtils.getInstance(this).unregisterAppTagListener(this);
+        mTagsRepository.removeUpdatable(this);
     }
 
     private void preselectSelection(List<AppTag> appTags) {
@@ -116,12 +131,6 @@ public class ReorderAppsActivity extends Activity implements AppTagUtils.AppTagL
     }
 
     @Override
-    public void onTagsChanged(ArrayList<AppTag> appTags) {
-        mSpinnerAdapter.setItems(appTags);
-        preselectSelection(appTags);
-    }
-
-    @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         AppTag appTag = mSpinnerAdapter.getItem(position);
         mReorderAppsFragment.setAppTag(appTag);
@@ -130,6 +139,17 @@ public class ReorderAppsActivity extends Activity implements AppTagUtils.AppTagL
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
+    }
+
+    @Override
+    public void accept(@NonNull List<AppTag> tags) {
+        mSpinnerAdapter.setItems(tags);
+        preselectSelection(tags);
+    }
+
+    @Override
+    public void update() {
+        mTagsRepository.get().ifSucceededSendTo(this);
     }
 
 

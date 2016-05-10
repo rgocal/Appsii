@@ -30,10 +30,9 @@ import android.os.StrictMode;
 import android.util.Log;
 import android.view.ViewConfiguration;
 
-import com.appsimobile.appsii.iab.FeatureManager;
-import com.appsimobile.appsii.iab.FeatureManagerFactory;
-import com.appsimobile.appsii.iab.FeatureManagerHelper;
-import com.appsimobile.appsii.module.home.provider.HomeContract;
+import com.appsimobile.appsii.dagger.AppComponent;
+import com.appsimobile.appsii.dagger.DaggerAppComponent;
+import com.appsimobile.appsii.dagger.MainModule;
 import com.crashlytics.android.Crashlytics;
 
 import java.lang.reflect.Field;
@@ -54,6 +53,7 @@ public class AppsiApplication extends Application {
     private static Bitmap mDefaultAppIcon;
 
 
+    AppComponent mAppComponent;
 
     public static float getDensity(Context context) {
         if (density == -1) {
@@ -95,32 +95,12 @@ public class AppsiApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
+        mAppComponent = DaggerAppComponent.builder().mainModule(new MainModule(this)).build();
+
         AnalyticsManager.getInstance(this);
         Fabric.with(this, new Crashlytics.Builder().disabled(BuildConfig.DEBUG).build());
 
-        verifyPurchases();
-
         unlockOverflowButton();
-    }
-
-    public void verifyPurchases() {
-        final FeatureManager featureManager = FeatureManagerFactory.getFeatureManager(this);
-        featureManager.registerFeatureManagerListener(new FeatureManager.FeatureManagerListener() {
-            @Override
-            public void onIabSetupFailed() {
-                Log.wtf("Appsii", "Iab setup failed :-(");
-                featureManager.unregisterFeatureManagerListener(this);
-            }
-
-            @Override
-            public void onInventoryReady() {
-                updateInventory(featureManager);
-                featureManager.unregisterFeatureManagerListener(this);
-
-            }
-        });
-        featureManager.load(true);
-
     }
 
     private void unlockOverflowButton() {
@@ -149,40 +129,6 @@ public class AppsiApplication extends Application {
         }
     }
 
-    void updateInventory(FeatureManager featureManager) {
-        {
-            boolean agendaAccess = FeatureManagerHelper.hasAgendaAccess(this, featureManager);
-            updatePageEnabledState(HomeContract.Pages.PAGE_AGENDA, agendaAccess);
-        }
-
-        {
-            boolean peopleAccess = FeatureManagerHelper.hasPeopleAccess(this, featureManager);
-            updatePageEnabledState(HomeContract.Pages.PAGE_PEOPLE, peopleAccess);
-        }
-
-        {
-            boolean callsAccess = FeatureManagerHelper.hasCallsAccess(this, featureManager);
-            updatePageEnabledState(HomeContract.Pages.PAGE_CALLS, callsAccess);
-        }
-
-        {
-            boolean settingsAccess = FeatureManagerHelper.hasSettingsAccess(this, featureManager);
-            updatePageEnabledState(HomeContract.Pages.PAGE_SETTINGS, settingsAccess);
-        }
-
-        {
-            boolean smsAccess = FeatureManagerHelper.hasSmsAccess(this, featureManager);
-            updatePageEnabledState(HomeContract.Pages.PAGE_SMS, smsAccess);
-        }
-    }
-
-    private void updatePageEnabledState(int pageType, boolean enabled) {
-        if (enabled) {
-            PageHelper pageHelper = PageHelper.getInstance(this);
-            pageHelper.enablePageAccess(pageType, false /* force */);
-        }
-    }
-
     @Override
     public void startIntentSender(IntentSender intent, Intent fillInIntent, int flagsMask,
             int flagsValues, int extraFlags, Bundle options)
@@ -200,5 +146,7 @@ public class AppsiApplication extends Application {
     }
 
 
-
+    public AppComponent getComponent() {
+        return mAppComponent;
+    }
 }

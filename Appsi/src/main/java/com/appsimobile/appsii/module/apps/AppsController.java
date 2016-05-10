@@ -23,12 +23,12 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -40,15 +40,22 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.appsimobile.appsii.AnalyticsManager;
-import com.appsimobile.appsii.LoaderManager;
 import com.appsimobile.appsii.PageController;
 import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.annotation.VisibleForTesting;
 import com.appsimobile.appsii.compat.LauncherAppsCompat;
 import com.appsimobile.appsii.compat.UserHandleCompat;
+import com.appsimobile.appsii.dagger.AppsModule;
 import com.appsimobile.appsii.module.ToolbarScrollListener;
+import com.google.android.agera.Receiver;
+import com.google.android.agera.Repository;
+import com.google.android.agera.Result;
+import com.google.android.agera.Updatable;
 
 import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * The controller for the apps page. Shows the app from the different folders
@@ -56,10 +63,9 @@ import java.util.List;
  * Created by nick on 25/05/14.
  */
 public class AppsController extends PageController
-        implements LoaderManager.LoaderCallbacks<AppPageData>,
-        View.OnClickListener,
-        AppView.AppActionListener,
-        Toolbar.OnMenuItemClickListener, AppView.TagActionListener {
+        implements View.OnClickListener, AppView.AppActionListener,
+        Toolbar.OnMenuItemClickListener, AppView.TagActionListener, Receiver<AppPageData>,
+        Updatable {
 
 
     /**
@@ -92,6 +98,10 @@ public class AppsController extends PageController
     QueryHandler mQueryHandler;
 
     int mColumnCount;
+
+    @Inject
+    @Named(AppsModule.NAME_APPS)
+    Repository<Result<AppPageData>> mAppPageRepository;
 
     /**
      * A handler for the content observer to post the event into
@@ -187,6 +197,7 @@ public class AppsController extends PageController
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        component().inject(this);
         mBottomSheetHelper = new BottomSheetHelper(getContext(), this /* appController */);
         mAppsAdapter = new AppsAdapter(this /* appActionListener */, this /* tagActionListener */);
 
@@ -195,8 +206,9 @@ public class AppsController extends PageController
         ContentResolver contentResolver = getContext().getContentResolver();
         mQueryHandler = new QueryHandler(contentResolver);
 
-        getLoaderManager().initLoader(APPS_LOADER_ID, null, this);
+        mAppPageRepository.get().ifSucceededSendTo(this);
     }
+
 
     @Override
     protected void onDetach() {
@@ -248,32 +260,15 @@ public class AppsController extends PageController
     }
 
     @Override
-    public Loader<AppPageData> onCreateLoader(int id, Bundle args) {
-        if (id == APPS_LOADER_ID) {
-            return new AppPageLoader(getContext());
-        }
-        return null;
+    protected void onStart() {
+        super.onStart();
+        mAppPageRepository.addUpdatable(this);
     }
 
     @Override
-    public void onLoadFinished(Loader<AppPageData> loader, AppPageData data) {
-        int id = loader.getId();
-        // TODO: should we notify the user somehow?
-        if (data == null) return;
-        if (id == APPS_LOADER_ID) {
-            mAppsAdapter.setAppPageData(data);
-        }
-        AppEntry entry = mBottomSheetHelper.getBoundAppEntry();
-        if (entry != null) {
-            List<TaggedApp> appliedTags = data.mTagsPerComponent.get(entry.getComponentName());
-            mBottomSheetHelper.updateAppliedTags(appliedTags);
-        }
-        mBottomSheetHelper.setAppTags(data.mAppTags);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<AppPageData> loader) {
-
+    protected void onStop() {
+        super.onStop();
+        mAppPageRepository.removeUpdatable(this);
     }
 
     @Override
@@ -401,6 +396,23 @@ public class AppsController extends PageController
     @Override
     public void onToggleSingleRow(AppTag entry) {
         mQueryHandler.toggleDisplayAsList(entry);
+    }
+
+    @Override
+    public void accept(@NonNull AppPageData value) {
+        mAppsAdapter.setAppPageData(value);
+        AppEntry entry = mBottomSheetHelper.getBoundAppEntry();
+        if (entry != null) {
+            List<TaggedApp> appliedTags = value.mTagsPerComponent.get(entry.getComponentName());
+            mBottomSheetHelper.updateAppliedTags(appliedTags);
+        }
+        mBottomSheetHelper.setAppTags(value.mAppTags);
+
+    }
+
+    @Override
+    public void update() {
+        mAppPageRepository.get().ifSucceededSendTo(this);
     }
 
     static abstract class AbstractAppViewHolder extends RecyclerView.ViewHolder {

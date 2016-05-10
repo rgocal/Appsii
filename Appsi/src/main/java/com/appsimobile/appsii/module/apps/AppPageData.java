@@ -27,15 +27,15 @@ import java.util.List;
 /**
  * Created by nick on 12/02/15.
  */
-class AppPageData {
+public class AppPageData {
 
     // contains a mapping of tag-id to a list of apps in the tag
-    final LongSparseArray<List<AppEntry>> mAppsPerTag =
+    public final LongSparseArray<List<AppEntry>> mAppsPerTag =
             new LongSparseArray<>();
 
     // contains a mapping of components to app-tags. To quickly identify
     // the tags a component has.
-    final SimpleArrayMap<ComponentName, List<TaggedApp>> mTagsPerComponent =
+    public final SimpleArrayMap<ComponentName, List<TaggedApp>> mTagsPerComponent =
             new SimpleArrayMap<>();
 
     @Nullable
@@ -45,8 +45,7 @@ class AppPageData {
 
     final List<AppTag> mAppTags;
 
-
-    AppPageData(@Nullable List<? extends AppEntry> allApps, List<HistoryItem> recentApps,
+    private AppPageData(@Nullable List<? extends AppEntry> allApps, List<HistoryItem> recentApps,
             List<AppTag> tags) {
         mAllApps = new ArrayList<>();
         if (allApps != null) {
@@ -103,6 +102,41 @@ class AppPageData {
             }
         }
         return 0;
+    }
+
+    public static class Builder {
+
+        @Nullable
+        List<ResolveInfoAppEntry> allApps;
+
+        List<HistoryItem> recentApps;
+
+        List<AppTag> tags;
+
+        public Builder allApps(List<ResolveInfoAppEntry> apps) {
+            allApps = apps;
+            return this;
+        }
+
+        @Nullable
+        public List<ResolveInfoAppEntry> getAllApps() {
+            return allApps;
+        }
+
+        public Builder recentApps(List<HistoryItem> recentApps) {
+            this.recentApps = recentApps;
+            return this;
+        }
+
+        public Builder tags(List<AppTag> tags) {
+            this.tags = tags;
+            return this;
+        }
+
+        public AppPageData buid() {
+            return new AppPageData(allApps, recentApps, tags);
+        }
+
     }
 
 }

@@ -35,6 +35,7 @@ import android.view.ViewTreeObserver;
 
 import com.appsimobile.annotation.KeepName;
 import com.appsimobile.appsii.annotation.VisibleForTesting;
+import com.appsimobile.appsii.dagger.AppComponent;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
@@ -99,6 +100,10 @@ public abstract class PageController implements ViewTreeObserver.OnGlobalLayoutL
         mDefaultTintColor = a.getColor(1, Color.BLACK);
         mAccentColor = a.getColor(2, Color.BLUE);
         a.recycle();
+    }
+
+    public AppComponent component() {
+        return ((AppsiApplication) mContext.getApplicationContext()).getComponent();
     }
 
     public HotspotPageEntry getPage() {

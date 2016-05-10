@@ -27,7 +27,6 @@ import android.net.Uri;
 import android.os.Looper;
 import android.util.Log;
 
-import com.appsimobile.appsii.iab.FeatureManager;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
 import com.crashlytics.android.Crashlytics;
 
@@ -64,15 +63,6 @@ public class PageHelper {
         mQueryHandler.ensurePageEnabled(pageType, forceAddToHotspots);
     }
 
-    public void enablePageAccess(String sku, boolean forceAddToHotspots) {
-        Log.d("Appsii", "enable sku: " + sku + " force: " + forceAddToHotspots);
-        mQueryHandler.ensurePageEnabled(sku, forceAddToHotspots);
-    }
-
-    public void disablePageAccess(int pageType) {
-        Log.d("Appsii", "disable page: " + pageType);
-        mQueryHandler.disablePage(pageType);
-    }
 
     public void removePageFromHotspots(int pageType) {
         Log.d("Appsii", "disable page: " + pageType);
@@ -100,39 +90,6 @@ public class PageHelper {
             mContext = context.getApplicationContext();
         }
 
-        public void ensurePageEnabled(String sku, boolean forceOnHotspots) {
-            switch (sku) {
-                case FeatureManager.AGENDA_FEATURE:
-                    ensurePageEnabled(HomeContract.Pages.PAGE_AGENDA, forceOnHotspots);
-                    break;
-                case FeatureManager.SETTINGS_AGENDA_FEATURE:
-                    ensurePageEnabled(HomeContract.Pages.PAGE_AGENDA, forceOnHotspots);
-                    ensurePageEnabled(HomeContract.Pages.PAGE_SETTINGS, forceOnHotspots);
-                    break;
-                case FeatureManager.SMS_CALLS_PEOPLE_FEATURE:
-                    ensurePageEnabled(HomeContract.Pages.PAGE_SMS, forceOnHotspots);
-                    ensurePageEnabled(HomeContract.Pages.PAGE_CALLS, forceOnHotspots);
-                    ensurePageEnabled(HomeContract.Pages.PAGE_PEOPLE, forceOnHotspots);
-                    break;
-                case FeatureManager.SETTINGS_FEATURE:
-                    ensurePageEnabled(HomeContract.Pages.PAGE_SETTINGS, forceOnHotspots);
-                    break;
-                case FeatureManager.ALL_FEATURE:
-                    ensurePageEnabled(HomeContract.Pages.PAGE_AGENDA, forceOnHotspots);
-                    ensurePageEnabled(HomeContract.Pages.PAGE_CALLS, forceOnHotspots);
-                    ensurePageEnabled(HomeContract.Pages.PAGE_PEOPLE, forceOnHotspots);
-                    break;
-                case FeatureManager.CALLS_FEATURE:
-                    ensurePageEnabled(HomeContract.Pages.PAGE_CALLS, forceOnHotspots);
-                    break;
-                case FeatureManager.PEOPLE_FEATURE:
-                    ensurePageEnabled(HomeContract.Pages.PAGE_PEOPLE, forceOnHotspots);
-                    break;
-                case FeatureManager.SMS_FEATURE:
-                    ensurePageEnabled(HomeContract.Pages.PAGE_SMS, forceOnHotspots);
-                    break;
-            }
-        }
 
         /**
          * Enables a page type.
