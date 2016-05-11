@@ -35,6 +35,7 @@ import static org.mockito.Matchers.eq;
 /**
  * Created by nmartens on 06/08/15.
  */
+@SuppressWarnings("MissingPermission")
 @RunWith(MockitoJUnitRunner.class)
 public class WeatherLoadingServiceTest {
 
@@ -116,21 +117,21 @@ public class WeatherLoadingServiceTest {
     public void testLocation_available() throws InterruptedException {
         initLocationManagerMocks(true, LocationManager.NETWORK_PROVIDER);
         WeatherLoadingService weatherLoadingService = new WeatherLoadingService(mContext);
-        Location result = weatherLoadingService.requestLocationInfoBlocking(null);
+        Location result = weatherLoadingService.requestLocationInfoBlocking();
         Assert.assertEquals(mLocationResult, result);
     }
     @Test
     public void testLocation_providerDisabled() throws InterruptedException {
         initLocationManagerMocks(false, LocationManager.NETWORK_PROVIDER);
         WeatherLoadingService weatherLoadingService = new WeatherLoadingService(mContext);
-        Location result = weatherLoadingService.requestLocationInfoBlocking(null);
+        Location result = weatherLoadingService.requestLocationInfoBlocking();
         Assert.assertNull(result);
     }
     @Test
     public void testLocation_noNetworkProvider() throws InterruptedException {
         initLocationManagerMocks(true, LocationManager.PASSIVE_PROVIDER);
         WeatherLoadingService weatherLoadingService = new WeatherLoadingService(mContext);
-        Location result = weatherLoadingService.requestLocationInfoBlocking(null);
+        Location result = weatherLoadingService.requestLocationInfoBlocking();
         Assert.assertNull(result);
     }
 }

@@ -1,12 +1,12 @@
 package com.appsimobile.appsii.dagger;
 
 import com.appsimobile.appsii.dagger.agera.ContentProviderObservable;
-import com.appsimobile.appsii.dagger.repository.AppsRepository;
 import com.appsimobile.appsii.module.apps.AddTagActivity;
 import com.appsimobile.appsii.module.apps.AppView;
 import com.appsimobile.appsii.module.apps.AppsController;
 import com.appsimobile.appsii.module.apps.EditTagActivity;
 import com.appsimobile.appsii.module.apps.ReorderAppsActivity;
+import com.appsimobile.appsii.module.appsiagenda.AgendaController;
 
 import javax.inject.Singleton;
 
@@ -19,8 +19,6 @@ import dagger.Component;
 @Component(modules = {AppsModule.class, CalendarModule.class, MainModule.class})
 public interface AppComponent {
 
-
-    void inject(AppsRepository appsRepository);
 
     void inject(ContentProviderObservable contentProviderObservable);
 
@@ -43,4 +41,6 @@ public interface AppComponent {
     void inject(ReorderAppsActivity reorderAppsActivity);
 
     void inject(AppsController appsController);
+
+    void inject(AgendaController agendaController);
 }

@@ -32,8 +32,6 @@ import com.appsimobile.appsii.LoaderManager;
 import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.SidebarContext;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -128,12 +126,12 @@ public class AppsControllerTest extends InstrumentationTestCase {
                 AppTag recentAppsTag = new AppTag(
                         1, "recent", 1, false, true, 3, AppsContract.TagColumns.TAG_TYPE_RECENT);
 
-                AppPageData data = new AppPageData(null, new ArrayList<HistoryItem>(),
-                        Arrays.asList(allAppsTag, recentAppsTag));
-
-                AppPageLoader loader = new AppPageLoader(mContext);
-                loader.registerListener(AppsController.APPS_LOADER_ID, null);
-                mAppsController.onLoadFinished(loader, data);
+//                AppPageData data = new AppPageData(null, new ArrayList<HistoryItem>(),
+//                        Arrays.asList(allAppsTag, recentAppsTag));
+//
+//                AppPageLoader loader = new AppPageLoader(mContext);
+//                loader.registerListener(AppsController.APPS_LOADER_ID, null);
+//                mAppsController.onLoadFinished(loader, data);
                 adapterRef.set(mAppsController.mAppsAdapter);
                 latch.countDown();
             }

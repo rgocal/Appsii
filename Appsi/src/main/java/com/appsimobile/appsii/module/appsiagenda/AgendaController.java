@@ -23,7 +23,6 @@ import android.content.ActivityNotFoundException;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -54,7 +53,6 @@ import com.appsimobile.appsii.AnalyticsManager;
 import com.appsimobile.appsii.AnimatorAdapter;
 import com.appsimobile.appsii.DrawableCompat;
 import com.appsimobile.appsii.ExpandCollapseDrawable;
-import com.appsimobile.appsii.LoaderManager;
 import com.appsimobile.appsii.PageController;
 import com.appsimobile.appsii.PermissionDeniedException;
 import com.appsimobile.appsii.R;
@@ -66,6 +64,9 @@ import com.appsimobile.appsii.preference.PreferencesFactory;
 import com.appsimobile.util.CollectionUtils;
 import com.appsimobile.util.TimeUtils;
 import com.crashlytics.android.Crashlytics;
+import com.google.android.agera.Repository;
+import com.google.android.agera.Result;
+import com.google.android.agera.Updatable;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -74,6 +75,8 @@ import java.util.Formatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+
+import javax.inject.Inject;
 
 /**
  * Created by nick on 25/05/14.
@@ -189,6 +192,16 @@ public class AgendaController extends PageController
             updateToolbarTitleAndMonthPosition();
         }
     };
+
+    @Inject
+    Repository<Result<AgendaDaysResult>> mAgendaDaysRepository;
+
+    @Inject
+    Repository<Result<AgendaEventsResult>> mAgendaEventsRepository;
+
+    AgendaEventsUpdatable mAgendaEventsUpdatable;
+
+    AgendaDaysUpdatable mAgendaDaysUpdatable;
 
     int mAppsiBackgroundColor;
 
@@ -377,6 +390,8 @@ public class AgendaController extends PageController
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        component().inject(this);
+
         mPreferences = PreferencesFactory.getPreferences(getContext());
         mUseExpandableAdapter = mPreferences.getBoolean(PREF_USE_EXPANDED_ADAPTER, false);
 
@@ -400,10 +415,20 @@ public class AgendaController extends PageController
         mWeekNumberDecoration.setAgendaAdapter(mAgendaAdapter);
 
         mAgendaAdapter.setOnAgendaItemClickListener(mOnClickListener);
+    }
 
-        getLoaderManager().initLoader(AGENDA_LOADER_ID, null, new AgendaEventsLoaderManager());
-        getLoaderManager().initLoader(AGENDA_EVENT_DAYS_LOADER_ID, null,
-                new AgendaDaysLoaderManager());
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAgendaEventsRepository.addUpdatable(mAgendaEventsUpdatable);
+        mAgendaDaysRepository.addUpdatable(mAgendaDaysUpdatable);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mAgendaEventsRepository.removeUpdatable(mAgendaEventsUpdatable);
+        mAgendaDaysRepository.removeUpdatable(mAgendaDaysUpdatable);
     }
 
     @Override
@@ -1202,46 +1227,26 @@ public class AgendaController extends PageController
         }
     }
 
-    class AgendaEventsLoaderManager implements LoaderManager.LoaderCallbacks<AgendaEventsResult> {
+    class AgendaEventsUpdatable implements Updatable {
 
         @Override
-        public Loader<AgendaEventsResult> onCreateLoader(int id, Bundle args) {
-            return new AgendaLoader(getContext(), mDatePickerController);
+        public void update() {
+            Result<AgendaEventsResult> res = mAgendaEventsRepository.get();
+            if (res.succeeded()) {
+                onAgendaEventsResult(res.get());
+            }
         }
-
-        @Override
-        public void onLoadFinished(Loader<AgendaEventsResult> loader, AgendaEventsResult data) {
-            onAgendaEventsResult(data);
-        }
-
-        @Override
-        public void onLoaderReset(Loader<AgendaEventsResult> loader) {
-            // This is called when the last Cursor provided to onLoadFinished()
-            // above is about to be closed.  We need to make sure we are no
-            // longer using it.
-            mAgendaAdapter.clear();
-        }
-
 
     }
 
-    class AgendaDaysLoaderManager implements LoaderManager.LoaderCallbacks<AgendaDaysResult> {
+    class AgendaDaysUpdatable implements Updatable {
 
         @Override
-        public Loader<AgendaDaysResult> onCreateLoader(int id, Bundle args) {
-            return new AgendaDaysLoader(getContext(), mDatePickerController);
-        }
-
-        @Override
-        public void onLoadFinished(Loader<AgendaDaysResult> loader, AgendaDaysResult data) {
-            onAgendaDaysResult(data);
-        }
-
-        @Override
-        public void onLoaderReset(Loader<AgendaDaysResult> loader) {
-            // This is called when the last Cursor provided to onLoadFinished()
-            // above is about to be closed.  We need to make sure we are no
-            // longer using it.
+        public void update() {
+            Result<AgendaDaysResult> res = mAgendaDaysRepository.get();
+            if (res.succeeded()) {
+                onAgendaDaysResult(res.get());
+            }
         }
 
     }
