@@ -25,13 +25,15 @@ import android.support.annotation.XmlRes;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
+import com.appsimobile.BaseActivity;
+
+import javax.inject.Inject;
+
 
 /**
  * Created by Nick Martens on 6/21/13.
  */
 public class AboutActivity extends AppCompatActivity {
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +58,8 @@ public class AboutActivity extends AppCompatActivity {
             extends PreferenceFragmentImpl
             implements Preference.OnPreferenceClickListener {
 
-        final AnalyticsManager mAnalyticsManager = AnalyticsManager.getInstance();
+        @Inject
+        AnalyticsManager mAnalyticsManager;
 
         public static AboutPreferenceFragment createInstance(
                 @XmlRes int preferenceResId) {
@@ -71,6 +74,8 @@ public class AboutActivity extends AppCompatActivity {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
+            BaseActivity.componentFrom(this).inject(this);
+
             Preference pref = findPreference("pref_appsi_version");
             String version = BuildConfig.VERSION_NAME;
             pref.setSummary(version);
@@ -107,8 +112,7 @@ public class AboutActivity extends AppCompatActivity {
                         Toast.makeText(getActivity(), "Unable to start web-browser",
                                 Toast.LENGTH_SHORT)
                                 .show();
-
-                        Crashlytics.logException(e);
+//                        Crashlytics.logException(e);
                     }
                     return true;
                 }

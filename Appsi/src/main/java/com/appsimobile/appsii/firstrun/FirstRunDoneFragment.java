@@ -27,20 +27,32 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.appsimobile.BaseActivity;
 import com.appsimobile.appsii.AccountHelper;
 import com.appsimobile.appsii.AnalyticsManager;
 import com.appsimobile.appsii.R;
+
+import javax.inject.Inject;
 
 /**
  * Created by nick on 10/06/15.
  */
 public final class FirstRunDoneFragment extends Fragment implements View.OnClickListener {
 
-    private OnDoneCompletedListener mOnDoneCompletedListener;
-
     Button mNextButton;
 
     Button mJoinButton;
+
+    @Inject
+    AnalyticsManager mAnalyticsManager;
+
+    private OnDoneCompletedListener mOnDoneCompletedListener;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        BaseActivity.componentFrom(this).inject(this);
+    }
 
     @Nullable
     @Override
@@ -86,8 +98,7 @@ public final class FirstRunDoneFragment extends Fragment implements View.OnClick
         Uri uri = Uri.parse("https://plus.google.com/communities/111374377186674137148");
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
         startActivity(intent);
-        AnalyticsManager analyticsManager = AnalyticsManager.getInstance();
-        analyticsManager.trackAppsiEvent(AnalyticsManager.ACTION_OPEN_GOOGLE_COMMUNITY,
+        mAnalyticsManager.trackAppsiEvent(AnalyticsManager.ACTION_OPEN_GOOGLE_COMMUNITY,
                 AnalyticsManager.CATEGORY_WELCOME);
 
     }

@@ -28,6 +28,10 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.appsimobile.BaseActivity;
+
+import javax.inject.Inject;
+
 /**
  * A simple view that displays the running status of Appsii.
  * <p/>
@@ -35,7 +39,8 @@ import android.widget.TextView;
  */
 public class AppsiServiceStatusView extends RelativeLayout implements View.OnClickListener {
 
-    final AnalyticsManager mAnalyticsManager = AnalyticsManager.getInstance();
+    @Inject
+    AnalyticsManager mAnalyticsManager;
 
     TextView mStatusView;
 
@@ -65,6 +70,8 @@ public class AppsiServiceStatusView extends RelativeLayout implements View.OnCli
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
+        BaseActivity.componentFrom(getContext()).inject(this);
+
         mResultReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {

@@ -19,14 +19,19 @@ package com.appsimobile.appsii;
 import android.content.Context;
 import android.content.ContextWrapper;
 
+import com.appsimobile.BaseActivity;
+
+import javax.inject.Inject;
+
 /**
  * Created by nick on 11/03/15.
  */
 public class SidebarContext extends ContextWrapper {
 
-    final AnalyticsManager mAnalyticsManager = AnalyticsManager.getInstance();
-
     public boolean mIsFullScreen;
+
+    @Inject
+    AnalyticsManager mAnalyticsManager;
 
     private LoaderManager mLoaderManager;
 
@@ -34,18 +39,19 @@ public class SidebarContext extends ContextWrapper {
 
     public SidebarContext(Context base) {
         super(base);
+        BaseActivity.componentFrom(base).inject(this);
     }
 
     public static void track(Context context, String action, String category, String label) {
         ((SidebarContext) context).track(action, category, label);
     }
 
-    public void track(String action, String category, String label) {
-        mAnalyticsManager.trackAppsiEvent(action, category, label);
-    }
-
     public static void track(Context context, String action, String category) {
         ((SidebarContext) context).track(action, category);
+    }
+
+    public void track(String action, String category, String label) {
+        mAnalyticsManager.trackAppsiEvent(action, category, label);
     }
 
     public void track(String action, String category) {

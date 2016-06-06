@@ -34,7 +34,7 @@ import android.view.WindowManager;
 
 import com.appsimobile.appsii.SidebarHotspot.SidebarGestureCallback;
 import com.appsimobile.appsii.permissions.PermissionUtils;
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crash.FirebaseCrash;
 
 public class HotspotHelperImpl extends AbstractHotspotHelper
         implements OnClickListener, View.OnLongClickListener, SidebarGestureCallback,
@@ -165,7 +165,7 @@ public class HotspotHelperImpl extends AbstractHotspotHelper
                             throw e;
                         } catch (Exception e) {
                             Log.w("HotspotHelperImpl", "error adding hotspot", e);
-                            Crashlytics.logException(e);
+                            FirebaseCrash.report(e);
                         }
                     }
                 }

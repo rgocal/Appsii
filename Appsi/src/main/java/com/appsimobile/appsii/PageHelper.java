@@ -28,7 +28,7 @@ import android.os.Looper;
 import android.util.Log;
 
 import com.appsimobile.appsii.module.home.provider.HomeContract;
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crash.FirebaseCrash;
 
 /**
  * Created by nick on 16/06/15.
@@ -141,7 +141,7 @@ public class PageHelper {
 
             if (cursor == null) {
                 Log.e("PageHelper", "cursor == null");
-                Crashlytics.logException(new NullPointerException("cursor == null"));
+                FirebaseCrash.report(new NullPointerException("cursor == null"));
             }
 
             switch (token) {

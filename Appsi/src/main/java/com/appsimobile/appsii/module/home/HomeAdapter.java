@@ -64,6 +64,7 @@ import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import com.appsimobile.BaseActivity;
 import com.appsimobile.appsii.AnalyticsManager;
 import com.appsimobile.appsii.AppsiApplication;
 import com.appsimobile.appsii.BitmapUtils;
@@ -84,12 +85,14 @@ import com.appsimobile.appsii.module.weather.loader.WeatherData;
 import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.appsimobile.paintjob.PaintJob;
 import com.appsimobile.paintjob.ViewPainters;
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crash.FirebaseCrash;
 
 import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.List;
 import java.util.TimeZone;
+
+import javax.inject.Inject;
 
 /**
  * The adapter used on the Home-Page and in the HomeEditorActivity.
@@ -183,6 +186,9 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
 
     PermissionErrorListener mPermissionErrorListener;
 
+    @Inject
+    AnalyticsManager mAnalyticsManager;
+
     public HomeAdapter(Context context, long homeId) {
         this(context, new DefaultViewWrapperFactory(), homeId, true);
     }
@@ -190,6 +196,9 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
     public HomeAdapter(Context context, ViewWrapperFactory viewWrapperFactory, long homeId,
             boolean appWidgetsEnabled) {
         mContext = context;
+
+        BaseActivity.componentFrom(context).inject(this);
+
         mHomeId = homeId;
         mAppWidgetsEnabled = appWidgetsEnabled;
 
@@ -207,6 +216,7 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
             mAppWidgetHost = null;
         }
         mAppWidgetManager = AppWidgetManager.getInstance(context);
+
     }
 
     long nextUnsetId() {
@@ -1133,12 +1143,21 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
             mTouchSlop = ViewConfiguration.get(view.getContext()).getScaledTouchSlop();
         }
 
+        static void updateWidgetSizeRanges(AppWidgetHostView widgetView, int w, int h) {
+            Context context = widgetView.getContext();
+            float density = context.getResources().getDisplayMetrics().density;
+            widgetView.updateAppWidgetSize(null,
+                    (int) (w / density),
+                    (int) (h / density),
+                    (int) (w / density),
+                    (int) (h / density));
+        }
+
         public void postCreate() {
             mAppWidgetHost.registerHostStatusListener(this);
             mChooseWidgetButton.setOnClickListener(this);
             mErrorLoadingWidgetButton.setOnClickListener(this);
         }
-
 
         @Override
         public void onStartedListening() {
@@ -1180,16 +1199,6 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
                 mContainer.animate().alpha(1).withEndAction(null);
             }
             return true;
-        }
-
-        static void updateWidgetSizeRanges(AppWidgetHostView widgetView, int w, int h) {
-            Context context = widgetView.getContext();
-            float density = context.getResources().getDisplayMetrics().density;
-            widgetView.updateAppWidgetSize(null,
-                    (int) (w / density),
-                    (int) (h / density),
-                    (int) (w / density),
-                    (int) (h / density));
         }
 
         private AppWidgetHostView safelyCreateView(
@@ -1516,6 +1525,31 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
             setIsRecyclable(false);
         }
 
+        @Override
+        protected void configurePaintJob(PaintJob.Builder paintJob) {
+            paintJob.paintWithSwatch(PaintJob.SWATCH_DARK_VIBRANT,
+                    ViewPainters.argb(128, R.id.primary_text),
+                    ViewPainters.text(R.id.primary_text, R.id.sunset, R.id.sunrise),
+                    new DrawablePainter(R.id.weather_sun)
+            );
+        }
+
+        @Override
+        void applyWeatherData(Context context, long cellId, int minuteNow,
+                int sunriseMinuteOfDay, int sunsetMinuteOfDay, WeatherData weatherData) {
+            setupTitle(mTextView, weatherData, cellId);
+
+            // set the values on the drawable
+            mSunriseDrawable.setTime(sunriseMinuteOfDay, sunsetMinuteOfDay, minuteNow);
+
+            String time = formatAsTime(context, sunriseMinuteOfDay);
+            mSunriseView.setText(time);
+
+            time = formatAsTime(context, sunsetMinuteOfDay);
+            mSunsetView.setText(time);
+
+        }
+
         static class DrawablePainter extends PaintJob.BaseViewPainter {
 
             protected DrawablePainter(int... viewIds) {
@@ -1548,32 +1582,6 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
             protected int getCurrentColorFromView(View view) {
                 return 0;
             }
-        }
-
-        @Override
-        protected void configurePaintJob(PaintJob.Builder paintJob) {
-            paintJob.paintWithSwatch(PaintJob.SWATCH_DARK_VIBRANT,
-                    ViewPainters.argb(128, R.id.primary_text),
-                    ViewPainters.text(R.id.primary_text, R.id.sunset, R.id.sunrise),
-                    new DrawablePainter(R.id.weather_sun)
-            );
-        }
-
-
-        @Override
-        void applyWeatherData(Context context, long cellId, int minuteNow,
-                int sunriseMinuteOfDay, int sunsetMinuteOfDay, WeatherData weatherData) {
-            setupTitle(mTextView, weatherData, cellId);
-
-            // set the values on the drawable
-            mSunriseDrawable.setTime(sunriseMinuteOfDay, sunsetMinuteOfDay, minuteNow);
-
-            String time = formatAsTime(context, sunriseMinuteOfDay);
-            mSunriseView.setText(time);
-
-            time = formatAsTime(context, sunsetMinuteOfDay);
-            mSunsetView.setText(time);
-
         }
     }
 
@@ -1931,78 +1939,6 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
 
         }
 
-        class ContactBitmapLoader extends AsyncTask<Context, Void, Bitmap> {
-
-            private final String mLookupKey;
-
-            private final String mContactId;
-
-            public ContactBitmapLoader(String lookupKey, String contactId) {
-                mLookupKey = lookupKey;
-                mContactId = contactId;
-            }
-
-            @Override
-            protected Bitmap doInBackground(Context... params) {
-                Context context = params[0];
-                if (mLookupKey != null && mContactId != null) {
-                    long id = Long.parseLong(mContactId);
-                    Contact contact = RawContactsLoader.
-                            loadContact(context, id, mLookupKey);
-
-                    if (contact != null && contact.mBitmap != null) {
-                        int w = contact.mBitmap.getWidth();
-                        int h = contact.mBitmap.getWidth();
-
-                        float wscale = mViewWidth / (float) w;
-                        float hscale = mViewWidth / (float) h;
-
-                        float scale = Math.max(wscale, hscale);
-
-                        int destH = (int) (h * scale);
-                        int destW = (int) (w * scale);
-
-                        // can happen when the view was detached earlier
-                        if (destH == 0 || destW == 0) return null;
-
-                        try {
-                            return Bitmap.createScaledBitmap(contact.mBitmap, destW, destH, true);
-                        } catch (OutOfMemoryError e) {
-                            Crashlytics.logException(e);
-                            return contact.mBitmap;
-                        }
-                    }
-                }
-
-                Bitmap result;
-                try {
-                    Uri contactUri = ContactsContract.Profile.CONTENT_URI;
-                    result = BitmapUtils.
-                            decodeContactImage(mContext, contactUri, mViewWidth, mViewHeight);
-
-                    if (result == null) {
-                        Uri lookupUri = getProfileContactUri();
-                        if (lookupUri != null) {
-                            result = BitmapUtils.decodeContactImage(
-                                    mContext, lookupUri, mViewWidth, mViewHeight);
-                        }
-                    }
-                } catch (PermissionDeniedException e) {
-                    // this is already checked before we actually
-                    // start and create the loader. So if it happens
-                    // just return null.
-                    return null;
-                }
-
-                return result;
-            }
-
-            @Override
-            protected void onPostExecute(Bitmap bitmap) {
-                applyUserImage(bitmap);
-            }
-        }
-
         @Override
         void updateConfiguration() {
             loadUserImageIfNeeded();
@@ -2093,8 +2029,7 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
                     Long cid = Long.parseLong(contactId);
                     Uri contactLookupUri = ContactsContract.Contacts.getLookupUri(cid, lookupKey);
                     Intent intent = new Intent(Intent.ACTION_VIEW, contactLookupUri);
-                    AnalyticsManager analyticsManager = AnalyticsManager.getInstance(context);
-                    analyticsManager.trackAppsiEvent(AnalyticsManager.ACTION_OPEN_HOME_ITEM,
+                    mAnalyticsManager.trackAppsiEvent(AnalyticsManager.ACTION_OPEN_HOME_ITEM,
                             AnalyticsManager.CATEGORY_PEOPLE);
                     context.startActivity(intent);
 
@@ -2114,6 +2049,79 @@ public class HomeAdapter extends RecyclerView.Adapter<AbsHomeViewHolder> {
                 return true;
             }
             return false;
+        }
+
+        class ContactBitmapLoader extends AsyncTask<Context, Void, Bitmap> {
+
+            private final String mLookupKey;
+
+            private final String mContactId;
+
+            public ContactBitmapLoader(String lookupKey, String contactId) {
+                mLookupKey = lookupKey;
+                mContactId = contactId;
+            }
+
+            @Override
+            protected Bitmap doInBackground(Context... params) {
+                Context context = params[0];
+                if (mLookupKey != null && mContactId != null) {
+                    long id = Long.parseLong(mContactId);
+                    Contact contact = RawContactsLoader.
+                            loadContact(context, id, mLookupKey);
+
+                    if (contact != null && contact.mBitmap != null) {
+                        int w = contact.mBitmap.getWidth();
+                        int h = contact.mBitmap.getWidth();
+
+                        float wscale = mViewWidth / (float) w;
+                        float hscale = mViewWidth / (float) h;
+
+                        float scale = Math.max(wscale, hscale);
+
+                        int destH = (int) (h * scale);
+                        int destW = (int) (w * scale);
+
+                        // can happen when the view was detached earlier
+                        if (destH == 0 || destW == 0) return null;
+
+                        try {
+                            return Bitmap.createScaledBitmap(contact.mBitmap, destW, destH, true);
+                        } catch (OutOfMemoryError e) {
+                            FirebaseCrash.report(e);
+                            return contact.mBitmap;
+                        }
+                    }
+                }
+
+                Bitmap result;
+                try {
+                    Uri contactUri = ContactsContract.Profile.CONTENT_URI;
+                    result = BitmapUtils.
+                            decodeContactImage(mContext, contactUri, mViewWidth, mViewHeight);
+
+                    if (result == null) {
+                        Uri lookupUri = getProfileContactUri();
+                        if (lookupUri != null) {
+                            result = BitmapUtils.decodeContactImage(
+                                    mContext, lookupUri, mViewWidth, mViewHeight);
+                        }
+                    }
+                } catch (PermissionDeniedException e) {
+                    // this is already checked before we actually
+                    // start and create the loader. So if it happens
+                    // just return null.
+                    return null;
+                }
+
+                return result;
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap bitmap) {
+                applyUserImage(bitmap);
+            }
+
         }
 
 

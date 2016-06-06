@@ -55,7 +55,7 @@ import com.appsimobile.appsii.module.ToolbarScrollListener;
 import com.appsimobile.appsii.module.home.config.HomeItemConfiguration;
 import com.appsimobile.appsii.module.home.config.HomeItemConfigurationHelper;
 import com.appsimobile.appsii.permissions.PermissionUtils;
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crash.FirebaseCrash;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,13 +92,13 @@ public class HomePageController extends PageController implements Toolbar.OnMenu
 
     RecyclerViewTouchListener mRecyclerViewTouchListener;
 
-    private Rect mRect;
-
     ViewGroup mPermissionOverlay;
 
     ArrayList<String> mDismissedPermissions;
 
     PendingPermissionError mPendingPermissionError;
+
+    private Rect mRect;
 
     public HomePageController(Context context, long pageId, String title) {
         super(context, title);
@@ -377,7 +377,7 @@ public class HomePageController extends PageController implements Toolbar.OnMenu
             mPermissionOverlay.removeAllViews();
         }
         if (mHomeAdapter == null) {
-            Crashlytics.logException(new NullPointerException("adapter not initialized?!?"));
+            FirebaseCrash.report(new NullPointerException("adapter not initialized?!?"));
             return;
         }
         mHomeAdapter.setHomeItems(data);
@@ -498,6 +498,22 @@ public class HomePageController extends PageController implements Toolbar.OnMenu
 
     }
 
+    static class PendingPermissionError {
+
+        final String mPermission;
+
+        final String mId;
+
+        @StringRes
+        final int mTextResId;
+
+        PendingPermissionError(String permission, String id, int textResId) {
+            mPermission = permission;
+            mId = id;
+            mTextResId = textResId;
+        }
+    }
+
     class HomeLoaderCallbacks implements LoaderManager.LoaderCallbacks<List<HomeItem>> {
 
         @Override
@@ -616,7 +632,7 @@ public class HomePageController extends PageController implements Toolbar.OnMenu
                     mEventQueue = null;
                 } else {
                     // This can't really be null at this point
-                    Crashlytics.logException(new NullPointerException("Should not happen"));
+                    FirebaseCrash.report(new NullPointerException("Should not happen"));
                 }
             }
         }
@@ -644,22 +660,6 @@ public class HomePageController extends PageController implements Toolbar.OnMenu
             copy.setLocation(x, y);
             mEventQueue.dispatchTouchEvent(copy);
 
-        }
-    }
-
-    static class PendingPermissionError {
-
-        final String mPermission;
-
-        final String mId;
-
-        @StringRes
-        final int mTextResId;
-
-        PendingPermissionError(String permission, String id, int textResId) {
-            mPermission = permission;
-            mId = id;
-            mTextResId = textResId;
         }
     }
 

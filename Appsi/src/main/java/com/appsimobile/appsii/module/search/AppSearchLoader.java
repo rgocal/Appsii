@@ -32,7 +32,7 @@ import com.appsimobile.appsii.module.apps.InterestingConfigChanges;
 import com.appsimobile.appsii.module.apps.PackageIntentReceiver;
 import com.appsimobile.appsii.module.apps.ResolveInfoAppEntry;
 import com.appsimobile.appsii.module.apps.ShortcutNameComparator;
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crash.FirebaseCrash;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -164,7 +164,7 @@ public class AppSearchLoader extends AsyncTaskLoader<List<AppEntry>> {
 
             // we want these exceptions logged.
             if (exception != null) {
-                Crashlytics.logException(new RuntimeException("count=" + counter, exception));
+                FirebaseCrash.report(new RuntimeException("count=" + counter, exception));
             }
 
             return activityList;
@@ -187,7 +187,7 @@ public class AppSearchLoader extends AsyncTaskLoader<List<AppEntry>> {
                 // Log this case. We need to know if 6 is sufficient. Otherwise we may need
                 // to increase the repeat count
                 Log.e("Apps", "error loading apps, for " + counter + " times. Giving up");
-                Crashlytics.logException(new RuntimeException(
+                FirebaseCrash.report(new RuntimeException(
                         "Still failed after " + counter + " retries. Giving up", e));
             }
         }

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "419249841101",
+    "firebase_url": "https://round-carver-826.firebaseio.com",
+    "project_id": "round-carver-826",
+    "storage_bucket": "round-carver-826.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:419249841101:android:c5312d228b552bdf",
+        "android_client_info": {
+          "package_name": "com.appsimobile.appsii"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "419249841101-23erck6gdkrv0a1edj83j72ppa4uo3dt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.appsimobile.appsii",
+            "certificate_hash": "B61205083C534A448431D9335F234AA12DB510AE"
+          }
+        },
+        {
+          "client_id": "419249841101-79fqffcc3viakginbeg28qflfv5c6ms8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC9Fnylb451elpQBg7pCDFbHo5Nxa9jUa4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "419249841101-79fqffcc3viakginbeg28qflfv5c6ms8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

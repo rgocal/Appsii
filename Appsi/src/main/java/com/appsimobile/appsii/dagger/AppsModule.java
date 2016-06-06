@@ -484,8 +484,8 @@ public class AppsModule {
 
         @NonNull
         @Override
-        public Result<AppPageData> merge(@
-                NonNull AppPageData.Builder builder, @NonNull Result<Cursor> cursorResult) {
+        public Result<AppPageData> merge(@NonNull AppPageData.Builder builder,
+                @NonNull Result<Cursor> cursorResult) {
 
             Cursor cursor = cursorResult.get();
 

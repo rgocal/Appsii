@@ -29,7 +29,7 @@ import android.os.UserHandle;
 import android.support.v4.util.SimpleArrayMap;
 
 import com.appsimobile.appsii.AppsiiUtils;
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crash.FirebaseCrash;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -85,7 +85,7 @@ public class LauncherAppsCompatVL extends LauncherAppsCompat {
         } catch (RuntimeException e) {
             // for some reason a report with an NPE here occurred. This may indicate that
             // the app was uninstalled and the list was not updated. This is strange
-            Crashlytics.logException(e);
+            FirebaseCrash.report(e);
         }
         AppsiiUtils.closeSidebar(mContext);
     }

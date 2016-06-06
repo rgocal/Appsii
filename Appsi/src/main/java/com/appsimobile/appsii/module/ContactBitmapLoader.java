@@ -28,7 +28,7 @@ import android.os.RemoteException;
 import android.provider.ContactsContract;
 import android.util.Log;
 
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crash.FirebaseCrash;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -147,7 +147,7 @@ public class ContactBitmapLoader extends AsyncTask<Void, Void, Bitmap> {
             try {
                 return BitmapFactory.decodeStream(in);
             } catch (OutOfMemoryError e) {
-                Crashlytics.logException(e);
+                FirebaseCrash.report(e);
                 return null;
             } finally {
                 try {
@@ -166,7 +166,7 @@ public class ContactBitmapLoader extends AsyncTask<Void, Void, Bitmap> {
                     .openContactPhotoInputStream(context.getContentResolver(), lookupUri, true);
             // There was a bug report #152 in crashlytics a crash in the method called
         } catch (NullPointerException e) {
-            Crashlytics.logException(e);
+            FirebaseCrash.report(e);
             return null;
         }
     }

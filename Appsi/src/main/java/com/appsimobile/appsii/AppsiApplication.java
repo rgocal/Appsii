@@ -33,11 +33,9 @@ import android.view.ViewConfiguration;
 import com.appsimobile.appsii.dagger.AppComponent;
 import com.appsimobile.appsii.dagger.DaggerAppComponent;
 import com.appsimobile.appsii.dagger.MainModule;
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crash.FirebaseCrash;
 
 import java.lang.reflect.Field;
-
-import io.fabric.sdk.android.Fabric;
 
 public class AppsiApplication extends Application {
 
@@ -72,12 +70,10 @@ public class AppsiApplication extends Application {
         return mDefaultAppIcon;
     }
 
-    public static void initializeStrictMode(Context context) {
+    public static void initializeStrictMode() {
 
         if (BuildConfig.DEBUG) {
-            if (BuildConfig.DEBUG) {
-                Log.i("LauncherApplication", "Application is debuggable, enabling strictmode");
-            }
+            Log.i("LauncherApplication", "Application is debuggable, enabling strictmode");
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                     .detectAll()
                     .penaltyLog()
@@ -96,9 +92,10 @@ public class AppsiApplication extends Application {
         super.onCreate();
 
         mAppComponent = DaggerAppComponent.builder().mainModule(new MainModule(this)).build();
+        initializeStrictMode();
 
-        AnalyticsManager.getInstance(this);
-        Fabric.with(this, new Crashlytics.Builder().disabled(BuildConfig.DEBUG).build());
+//        AnalyticsManager.getInstance(this);
+//        Fabric.with(this, new Crashlytics.Builder().disabled(BuildConfig.DEBUG).build());
 
         unlockOverflowButton();
     }
@@ -124,6 +121,7 @@ public class AppsiApplication extends Application {
                 Log.i("Appsii", "patching menu key success!");
             } catch (Exception ex) {
                 Log.i("Appsii", "error patching menu key", ex);
+                FirebaseCrash.report(ex);
                 // Ignore can't really do anything if this fails.
             }
         }
@@ -142,6 +140,7 @@ public class AppsiApplication extends Application {
             super.unregisterReceiver(receiver);
         } catch (Exception e) {
             Log.w("AppsiiApplication", "error unregistering receiver", e);
+            FirebaseCrash.report(e);
         }
     }
 

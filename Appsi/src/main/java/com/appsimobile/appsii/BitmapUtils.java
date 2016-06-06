@@ -29,7 +29,7 @@ import android.support.annotation.DrawableRes;
 import android.util.Log;
 
 import com.appsimobile.appsii.permissions.PermissionUtils;
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crash.FirebaseCrash;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -60,7 +60,7 @@ public class BitmapUtils {
             Bitmap bitmap = BitmapFactory.decodeResource(res, resId, options);
             return ThumbnailUtils.extractThumbnail(bitmap, reqWidth, reqHeight);
         } catch (OutOfMemoryError e) {
-            Crashlytics.logException(e);
+            FirebaseCrash.report(e);
             Log.w("Helper", "Out of memory while loading parallax image");
             return null;
         }
@@ -113,7 +113,7 @@ public class BitmapUtils {
             if (bitmap == null) return null;
             return ThumbnailUtils.extractThumbnail(bitmap, reqWidth, reqHeight);
         } catch (OutOfMemoryError e) {
-            Crashlytics.logException(e);
+            FirebaseCrash.report(e);
             Log.w("Helper", "Out of memory loading custom image");
             return null;
         } catch (FileNotFoundException e) {
@@ -160,7 +160,7 @@ public class BitmapUtils {
 //            return Bitmap.createScaledBitmap(bitmap, reqWidth, reqHeight, true);
         } catch (OutOfMemoryError e) {
             Log.wtf("Helper", "Out of memory while loading contact image; returning null", e);
-            Crashlytics.logException(e);
+            FirebaseCrash.report(e);
             return null;
         } catch (SecurityException e) {
             throw new PermissionDeniedException(e);

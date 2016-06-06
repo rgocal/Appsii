@@ -17,15 +17,13 @@
 package com.appsimobile.appsii;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.os.Looper;
-import android.support.annotation.NonNull;
 
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Logger;
-import com.google.android.gms.analytics.Tracker;
-import com.google.android.gms.analytics.ecommerce.Product;
-import com.google.android.gms.analytics.ecommerce.ProductAction;
+import com.appsimobile.BaseActivity;
+import com.google.firebase.analytics.FirebaseAnalytics;
+
+import javax.inject.Inject;
 
 /**
  * Created by nick on 05/04/15.
@@ -99,77 +97,54 @@ public class AnalyticsManager {
 
     public static final String CATEGORY_WELCOME = "welcome";
 
-    static AnalyticsManager sInstance;
-
     final Context mContext;
 
-    Tracker mTracker;
+    @Inject
+    FirebaseAnalytics mAnalytics;
 
     public AnalyticsManager(Context context) {
+        if (Looper.getMainLooper() != Looper.myLooper()) {
+            throw new IllegalStateException("Bad thread!");
+        }
         mContext = context.getApplicationContext();
-        getTracker();
+        BaseActivity.componentFrom(context).inject(this);
     }
 
-    @NonNull
-    public static AnalyticsManager getInstance() {
-        if (Looper.getMainLooper() != Looper.myLooper()) {
-            throw new IllegalStateException("Bad thread!");
-        }
-        return sInstance;
-    }
-
-    public static AnalyticsManager getInstance(Context context) {
-        if (Looper.getMainLooper() != Looper.myLooper()) {
-            throw new IllegalStateException("Bad thread!");
-        }
-        if (sInstance == null) {
-            sInstance = new AnalyticsManager(context);
-        }
-        return sInstance;
-    }
-
-    public Tracker getTracker() {
-        GoogleAnalytics analytics = GoogleAnalytics.getInstance(mContext);
-        if (BuildConfig.DEBUG) {
-            analytics.getLogger().setLogLevel(Logger.LogLevel.VERBOSE);
-            analytics.setDryRun(true);
-        }
-        Tracker tracker;
-        synchronized (this) {
-            if (mTracker == null) {
-                mTracker = analytics.newTracker(R.xml.ga_tracker);
-                mTracker.enableAdvertisingIdCollection(true);
-            }
-            tracker = mTracker;
-        }
-        return tracker;
-    }
+//    public Tracker getTracker() {
+//        GoogleAnalytics analytics = GoogleAnalytics.getInstance(mContext);
+//        if (BuildConfig.DEBUG) {
+//            analytics.getLogger().setLogLevel(Logger.LogLevel.VERBOSE);
+//            analytics.setDryRun(true);
+//        }
+//        Tracker tracker;
+//        synchronized (this) {
+//            if (mTracker == null) {
+//                mTracker = analytics.newTracker(R.xml.ga_tracker);
+//                mTracker.enableAdvertisingIdCollection(true);
+//            }
+//            tracker = mTracker;
+//        }
+//        return tracker;
+//    }
 
     public void trackAppsiEvent(String action, String category) {
-        Tracker tracker = getTracker();
-
-        tracker.send(new HitBuilders.EventBuilder().
-                setAction(action).
-                setCategory(category).build());
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.ITEM_CATEGORY, category);
+        mAnalytics.logEvent(action, bundle);
     }
 
     public void trackAppsiEvent(String action, String category,
             String label) {
-        Tracker tracker = getTracker();
-
-        tracker.send(new HitBuilders.EventBuilder().
-                setAction(action).
-                setCategory(category).
-                setLabel(label).build());
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.ITEM_CATEGORY, category);
+        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, label);
+        mAnalytics.logEvent(action, bundle);
     }
 
     public void trackPageView(String page) {
-        Tracker tracker = getTracker();
-        tracker.setScreenName("pages/" + page);
-        tracker.send(new HitBuilders
-                        .AppViewBuilder()
-                        .build()
-        );
+        Bundle bundle = new Bundle();
+        bundle.putString("page", "pages/" + page);
+        mAnalytics.logEvent("page_view", bundle);
     }
 
 

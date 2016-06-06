@@ -19,11 +19,11 @@ package com.appsimobile.appsii.module.people;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -32,7 +32,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.appsimobile.appsii.AnalyticsManager;
-import com.appsimobile.appsii.LoaderManager;
 import com.appsimobile.appsii.PageController;
 import com.appsimobile.appsii.PermissionDeniedException;
 import com.appsimobile.appsii.R;
@@ -42,19 +41,27 @@ import com.appsimobile.appsii.module.PeopleCache;
 import com.appsimobile.appsii.module.PermissionHelper;
 import com.appsimobile.appsii.module.ToolbarScrollListener;
 import com.appsimobile.appsii.permissions.PermissionUtils;
+import com.google.android.agera.Receiver;
+import com.google.android.agera.Repository;
+import com.google.android.agera.Result;
+import com.google.android.agera.Updatable;
 import com.google.android.gms.common.annotation.KeepName;
+
+import javax.inject.Inject;
 
 /**
  * Created by nick on 25/05/14.
  */
 public class PeopleController extends PageController
-        implements LoaderManager.LoaderCallbacks<PeopleLoaderResult>,
-        PeopleViewHolder.OnItemClickListener, ContactView.PeopleActionListener,
-        PermissionHelper.PermissionListener {
+        implements PeopleViewHolder.OnItemClickListener, ContactView.PeopleActionListener,
+        PermissionHelper.PermissionListener, Updatable, Receiver<PeopleLoaderResult> {
 
-    private static final int PEOPLE_LOADER = 7001;
+    boolean mPendingPermissionError;
 
-    String mCurFilter;
+    @Inject
+    Repository<Result<PeopleLoaderResult>> mPeopleRepository;
+
+    ViewGroup mPermissionOverlay;
 
     private RecyclerView mPeopleGrid;
 
@@ -66,13 +73,9 @@ public class PeopleController extends PageController
 
     private LetterItemDecoration mLetterItemDecoration;
 
-    boolean mPendingPermissionError;
-
     public PeopleController(Context context, String title) {
         super(context, title);
     }
-
-    ViewGroup mPermissionOverlay;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -118,6 +121,14 @@ public class PeopleController extends PageController
     @Override
     protected void onResume() {
         super.onResume();
+        mPeopleRepository.get().ifSucceededSendTo(this);
+        mPeopleRepository.addUpdatable(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mPeopleRepository.removeUpdatable(this);
     }
 
     @Override
@@ -132,7 +143,6 @@ public class PeopleController extends PageController
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         mPeopleAdapter = new PeopleAdapter(this, getContext());
         mPeopleAdapter.setOnItemClickListener(this);
-        getLoaderManager().initLoader(PEOPLE_LOADER, null, this);
     }
 
     @Override
@@ -184,23 +194,6 @@ public class PeopleController extends PageController
         mLetterItemDecoration.setOffset(offset + mToolbar.getPaddingTop());
     }
 
-    @Override
-    public Loader<PeopleLoaderResult> onCreateLoader(int id, Bundle args) {
-        return new PeopleLoader(getContext());
-    }
-    @Override
-    public void onLoadFinished(Loader<PeopleLoaderResult> loader, PeopleLoaderResult data) {
-        if (data.mPermissionDeniedException != null) {
-            onPermissionDenied(data.mPermissionDeniedException);
-        } else {
-            mPeopleAdapter.setData(data.mResult);
-            if (mPermissionOverlay != null) {
-                mPermissionOverlay.removeAllViews();
-            }
-        }
-        updateToolbarAlpha();
-    }
-
 
     @Override
     public void onAccepted(PermissionHelper permissionHelper) {
@@ -237,17 +230,6 @@ public class PeopleController extends PageController
         permissionHelper.show(mPermissionOverlay);
     }
 
-
-    @Override
-    public void onLoaderReset(Loader<PeopleLoaderResult> loader) {
-        // This is called when the last Cursor provided to onLoadFinished()
-        // above is about to be closed.  We need to make sure we are no
-        // longer using it.
-        mPeopleAdapter.clear();
-
-    }
-
-
     @Override
     public void onItemClick(AbstractPeopleViewHolder viewHolder) {
         PeopleViewHolder holder = (PeopleViewHolder) viewHolder;
@@ -266,5 +248,23 @@ public class PeopleController extends PageController
         Intent intent = new Intent(Intent.ACTION_EDIT, uri);
         track(AnalyticsManager.ACTION_EDIT_ITEM, AnalyticsManager.CATEGORY_PEOPLE);
         getContext().startActivity(intent);
+    }
+
+    @Override
+    public void update() {
+        mPeopleRepository.get().ifSucceededSendTo(this);
+    }
+
+    @Override
+    public void accept(@NonNull PeopleLoaderResult data) {
+        if (data.mPermissionDeniedException != null) {
+            onPermissionDenied(data.mPermissionDeniedException);
+        } else {
+            mPeopleAdapter.setData(data.mResult);
+            if (mPermissionOverlay != null) {
+                mPermissionOverlay.removeAllViews();
+            }
+        }
+        updateToolbarAlpha();
     }
 }

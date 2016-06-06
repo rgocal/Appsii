@@ -114,6 +114,7 @@ public abstract class PageController implements ViewTreeObserver.OnGlobalLayoutL
         mPage = page;
     }
 
+    @Deprecated
     public LoaderManager getLoaderManager() {
         if (mLoaderManager == null) {
             mLoaderManager = new LoaderManagerWrapper(mContext.getLoaderManager());

@@ -31,7 +31,7 @@ import com.appsimobile.appsii.AccountHelper;
 import com.appsimobile.appsii.AppsiiUtils;
 import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.permissions.PermissionUtils;
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crash.FirebaseCrash;
 
 /**
  * Base class for the settings fragment. The list of checkboxes is different in
@@ -101,7 +101,7 @@ public abstract class AbstractFirstRunSettingsFragment
                         Toast.LENGTH_SHORT).show();
 
                 // Log this in crashlytics as well
-                Crashlytics.logException(e);
+                FirebaseCrash.report(e);
                 mOnSettingsCompletedListener.onSettingsFatalError();
             }
         }

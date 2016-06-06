@@ -33,6 +33,7 @@ import android.view.ViewGroup;
 
 import com.appsimobile.appsii.firstrun.FirstRunFragment;
 import com.appsimobile.appsii.preference.PreferencesFactory;
+import com.google.firebase.crash.FirebaseCrash;
 
 
 public class MainActivity extends AppCompatActivity
@@ -52,6 +53,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        FirebaseCrash.report(new Exception("New test Exception"));
 
         ActivityUtils.setContentView(this, R.layout.activity_main);
         ActivityUtils.setupToolbar(this, R.id.toolbar);

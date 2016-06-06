@@ -63,10 +63,10 @@ import com.appsimobile.appsii.permissions.PermissionUtils;
 import com.appsimobile.appsii.preference.PreferencesFactory;
 import com.appsimobile.util.CollectionUtils;
 import com.appsimobile.util.TimeUtils;
-import com.crashlytics.android.Crashlytics;
 import com.google.android.agera.Repository;
 import com.google.android.agera.Result;
 import com.google.android.agera.Updatable;
+import com.google.firebase.crash.FirebaseCrash;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -677,7 +677,7 @@ public class AgendaController extends PageController
 
     void onAgendaDaysResult(AgendaDaysResult data) {
         if (data == null) {
-            Crashlytics.logException(
+            FirebaseCrash.report(
                     new NullPointerException("null data received in agenda controller"));
 
             data = new AgendaDaysResult(new SparseBooleanArray(0));
@@ -708,7 +708,7 @@ public class AgendaController extends PageController
     void onAgendaEventsResult(AgendaEventsResult data) {
         if (data == null) {
             data = new AgendaEventsResult(CollectionUtils.<AgendaEvent>emptyList());
-            Crashlytics.logException(
+            FirebaseCrash.report(
                     new NullPointerException("data == null; this should not happen"));
         }
         if (data.mPermissionDeniedException != null) {
@@ -805,7 +805,7 @@ public class AgendaController extends PageController
                 try {
                     getContext().startActivity(intent);
                 } catch (ActivityNotFoundException e) {
-                    Crashlytics.logException(e);
+                    FirebaseCrash.report(e);
                     Toast.makeText(getContext(),
                             R.string.no_compatible_calendar_app, Toast.LENGTH_SHORT).show();
                 }

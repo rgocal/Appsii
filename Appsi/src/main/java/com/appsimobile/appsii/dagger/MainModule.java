@@ -3,7 +3,9 @@ package com.appsimobile.appsii.dagger;
 import android.content.ContentResolver;
 import android.content.Context;
 
+import com.appsimobile.appsii.AnalyticsManager;
 import com.appsimobile.appsii.AppsiApplication;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import javax.inject.Singleton;
 
@@ -15,7 +17,7 @@ import dagger.Provides;
  */
 @Singleton
 @Module
-public class MainModule {
+public final class MainModule {
 
     AppsiApplication mApplication;
 
@@ -40,5 +42,16 @@ public class MainModule {
         return mApplication.getContentResolver();
     }
 
+    @Provides
+    @Singleton
+    public FirebaseAnalytics provideFirebaseAnalytics(Context context) {
+        return FirebaseAnalytics.getInstance(context);
+    }
 
+
+    @Provides
+    @Singleton
+    public AnalyticsManager provideAnalyticsManager(Context context) {
+        return new AnalyticsManager(context);
+    }
 }
