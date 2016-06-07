@@ -140,6 +140,7 @@ public class PeopleController extends PageController
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        component().inject(this);
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         mPeopleAdapter = new PeopleAdapter(this, getContext());
         mPeopleAdapter.setOnItemClickListener(this);

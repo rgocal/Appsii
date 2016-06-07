@@ -22,9 +22,9 @@ package com.appsimobile.appsii.module.home.homepagesmanager;
  */
 public class HomePageItem {
 
-    String mTitle;
+    public String mTitle;
 
-    long mId;
+    public long mId;
 
 
 }

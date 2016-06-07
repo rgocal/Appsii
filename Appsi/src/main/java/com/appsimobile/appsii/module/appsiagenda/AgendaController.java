@@ -199,9 +199,9 @@ public class AgendaController extends PageController
     @Inject
     Repository<Result<AgendaEventsResult>> mAgendaEventsRepository;
 
-    AgendaEventsUpdatable mAgendaEventsUpdatable;
+    AgendaEventsUpdatable mAgendaEventsUpdatable = new AgendaEventsUpdatable();
 
-    AgendaDaysUpdatable mAgendaDaysUpdatable;
+    AgendaDaysUpdatable mAgendaDaysUpdatable = new AgendaDaysUpdatable();
 
     int mAppsiBackgroundColor;
 

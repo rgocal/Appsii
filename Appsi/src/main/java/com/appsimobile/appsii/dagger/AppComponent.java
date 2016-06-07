@@ -13,6 +13,10 @@ import com.appsimobile.appsii.module.apps.EditTagActivity;
 import com.appsimobile.appsii.module.apps.ReorderAppsActivity;
 import com.appsimobile.appsii.module.appsiagenda.AgendaController;
 import com.appsimobile.appsii.module.home.HomeAdapter;
+import com.appsimobile.appsii.module.home.HomeEditorActivity;
+import com.appsimobile.appsii.module.home.HomePageController;
+import com.appsimobile.appsii.module.home.homepagesmanager.ManageHomePagesActivity;
+import com.appsimobile.appsii.module.people.PeopleController;
 
 import javax.inject.Singleton;
 
@@ -22,9 +26,9 @@ import dagger.Component;
  * Created by nmartens on 23/04/16.
  */
 @Singleton
-@Component(modules = {AppsModule.class, CalendarModule.class, MainModule.class})
+@Component(modules = {AppsModule.class, CalendarModule.class, MainModule.class,
+        PeopleModule.class, HomeModule.class})
 public interface AppComponent {
-
 
     void inject(ContentProviderObservable contentProviderObservable);
 
@@ -61,4 +65,12 @@ public interface AppComponent {
     void inject(FirstRunDoneFragment firstRunDoneFragment);
 
     void inject(HomeAdapter homeAdapter);
+
+    void inject(HomeEditorActivity homeEditorActivity);
+
+    void inject(HomePageController homePageController);
+
+    void inject(ManageHomePagesActivity manageHomePagesActivity);
+
+    void inject(PeopleController peopleController);
 }

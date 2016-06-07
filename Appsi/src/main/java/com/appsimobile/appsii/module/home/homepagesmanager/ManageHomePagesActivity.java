@@ -16,18 +16,17 @@
 
 package com.appsimobile.appsii.module.home.homepagesmanager;
 
-import android.app.LoaderManager;
 import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -35,6 +34,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.appsimobile.BaseActivity;
 import com.appsimobile.appsii.ActivityUtils;
 import com.appsimobile.appsii.GotItDismissListener;
 import com.appsimobile.appsii.R;
@@ -42,9 +42,15 @@ import com.appsimobile.appsii.module.home.HomeEditorActivity;
 import com.appsimobile.appsii.module.home.HomeItemTitleEditDialog;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
 import com.appsimobile.appsii.preference.PreferencesFactory;
+import com.google.android.agera.Receiver;
+import com.google.android.agera.Repository;
+import com.google.android.agera.Result;
+import com.google.android.agera.Updatable;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * An activity showing a list of home pages that can be managed through
@@ -53,8 +59,8 @@ import java.util.List;
  * Created by nick on 01/02/15.
  */
 public class ManageHomePagesActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<List<HomePageItem>>,
-        HomeViewHolder.HomeViewActionListener, HomeItemTitleEditDialog.EditTitleDialogListener {
+        implements HomeViewHolder.HomeViewActionListener,
+        HomeItemTitleEditDialog.EditTitleDialogListener, Updatable, Receiver<List<HomePageItem>> {
 
     /**
      * The recycler view.
@@ -71,14 +77,18 @@ public class ManageHomePagesActivity extends AppCompatActivity
      */
     AsyncQueryHandlerImpl mAsyncQueryHandler;
 
+    @Inject
+    Repository<Result<List<HomePageItem>>> mHomePagesRepository;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        BaseActivity.componentFrom(this).inject(this);
+
         ActivityUtils.setContentViewWithFab(this, R.layout.activity_manage_home_pages);
         ActivityUtils.setupToolbar(this, R.id.toolbar);
 
         mHomeAdapter = new HomeAdapter(this, this);
-        getLoaderManager().initLoader(0, null, this);
         mAsyncQueryHandler = new AsyncQueryHandlerImpl(this, getContentResolver());
         HomeItemTitleEditDialog dialog =
                 (HomeItemTitleEditDialog) getFragmentManager().findFragmentByTag("edit_title");
@@ -106,18 +116,16 @@ public class ManageHomePagesActivity extends AppCompatActivity
     }
 
     @Override
-    public Loader<List<HomePageItem>> onCreateLoader(int id, Bundle args) {
-        return new HomesLoader(this);
+    protected void onStart() {
+        super.onStart();
+        mHomePagesRepository.addUpdatable(this);
+        mHomePagesRepository.get().ifSucceededSendTo(this);
     }
 
     @Override
-    public void onLoadFinished(Loader<List<HomePageItem>> loader, List<HomePageItem> data) {
-        mHomeAdapter.setItems(data);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<List<HomePageItem>> loader) {
-
+    protected void onStop() {
+        super.onStop();
+        mHomePagesRepository.removeUpdatable(this);
     }
 
     @Override
@@ -144,6 +152,17 @@ public class ManageHomePagesActivity extends AppCompatActivity
     @Override
     public void onFinishEditDialog(long pageId, String title) {
         mAsyncQueryHandler.updatePageTitle(pageId, title);
+    }
+
+    @Override
+    public void update() {
+        mHomePagesRepository.get().ifSucceededSendTo(this);
+
+    }
+
+    @Override
+    public void accept(@NonNull List<HomePageItem> value) {
+        mHomeAdapter.setItems(value);
     }
 
     /**

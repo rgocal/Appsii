@@ -21,11 +21,11 @@ import android.appwidget.AppWidgetProviderInfo;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v7.widget.GridLayoutManager;
@@ -44,7 +44,6 @@ import android.widget.ListView;
 import android.widget.StackView;
 
 import com.appsimobile.appsii.AnalyticsManager;
-import com.appsimobile.appsii.LoaderManager;
 import com.appsimobile.appsii.PageController;
 import com.appsimobile.appsii.R;
 import com.appsimobile.appsii.SidebarContext;
@@ -55,23 +54,23 @@ import com.appsimobile.appsii.module.ToolbarScrollListener;
 import com.appsimobile.appsii.module.home.config.HomeItemConfiguration;
 import com.appsimobile.appsii.module.home.config.HomeItemConfigurationHelper;
 import com.appsimobile.appsii.permissions.PermissionUtils;
+import com.google.android.agera.Receiver;
+import com.google.android.agera.Repository;
+import com.google.android.agera.Result;
+import com.google.android.agera.Updatable;
 import com.google.firebase.crash.FirebaseCrash;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 /**
  * Created by nick on 10/08/14.
  */
 public class HomePageController extends PageController implements Toolbar.OnMenuItemClickListener,
-        HomeAdapter.PermissionErrorListener, PermissionHelper.PermissionListener {
-
-    // TODO implement start/stop on primary item switch
-
-    private static final int HOME_LOADER_ID = 441001;
-
-    final LoaderManager.LoaderCallbacks<List<HomeItem>> mHomeLoaderCallbacks =
-            new HomeLoaderCallbacks();
+        HomeAdapter.PermissionErrorListener, PermissionHelper.PermissionListener, Updatable,
+        Receiver<List<HomeItem>> {
 
     final long mPageId;
 
@@ -98,7 +97,11 @@ public class HomePageController extends PageController implements Toolbar.OnMenu
 
     PendingPermissionError mPendingPermissionError;
 
+    @Inject
+    Repository<Result<List<HomeItem>>> mHomeItemRepository;
+
     private Rect mRect;
+
 
     public HomePageController(Context context, long pageId, String title) {
         super(context, title);
@@ -166,16 +169,30 @@ public class HomePageController extends PageController implements Toolbar.OnMenu
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        component().inject(this);
+
         mHomeAdapter = new HomeAdapter(getContext(), mPageId);
         mHomeAdapter.setPermissionErrorListener(this);
         mLayoutManager = new GridLayoutManager(getContext(), 12);
         HomeAdapter.HomeSpanSizeLookup spanSizeLookup = mHomeAdapter.getHomeSpanSizeLookup();
         mLayoutManager.setSpanSizeLookup(spanSizeLookup);
-        getLoaderManager().initLoader(HOME_LOADER_ID, null, mHomeLoaderCallbacks);
         if (savedInstanceState != null) {
             mDismissedPermissions =
                     savedInstanceState.getStringArrayList("dismissed_permission_errors");
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mHomeItemRepository.get().ifSucceededSendTo(this);
+        mHomeItemRepository.addUpdatable(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mHomeItemRepository.removeUpdatable(this);
     }
 
     @Override
@@ -498,6 +515,16 @@ public class HomePageController extends PageController implements Toolbar.OnMenu
 
     }
 
+    @Override
+    public void update() {
+        mHomeItemRepository.get().ifSucceededSendTo(this);
+    }
+
+    @Override
+    public void accept(@NonNull List<HomeItem> value) {
+        onHomeItemsLoaded(value);
+    }
+
     static class PendingPermissionError {
 
         final String mPermission;
@@ -514,23 +541,6 @@ public class HomePageController extends PageController implements Toolbar.OnMenu
         }
     }
 
-    class HomeLoaderCallbacks implements LoaderManager.LoaderCallbacks<List<HomeItem>> {
-
-        @Override
-        public Loader<List<HomeItem>> onCreateLoader(int id, Bundle args) {
-            return new HomeLoader(getContext());
-        }
-
-        @Override
-        public void onLoadFinished(Loader<List<HomeItem>> loader, List<HomeItem> data) {
-            onHomeItemsLoaded(data);
-        }
-
-        @Override
-        public void onLoaderReset(Loader<List<HomeItem>> loader) {
-
-        }
-    }
 
     private class RecyclerViewTouchListener implements RecyclerView.OnItemTouchListener {
 

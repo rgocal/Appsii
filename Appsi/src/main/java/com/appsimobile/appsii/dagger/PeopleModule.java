@@ -119,10 +119,15 @@ public final class PeopleModule {
                             public Result<PeopleLoaderResult> apply(
                                     @NonNull Cursor input) {
 
-                                List<? extends BaseContactInfo> contactInfos =
-                                        PeopleQuery.cursorToContactInfos(input);
-                                PeopleLoaderResult result = new PeopleLoaderResult(contactInfos);
-                                return Result.success(result);
+                                try {
+                                    List<? extends BaseContactInfo> contactInfos =
+                                            PeopleQuery.cursorToContactInfos(input);
+                                    PeopleLoaderResult result =
+                                            new PeopleLoaderResult(contactInfos);
+                                    return Result.success(result);
+                                } finally {
+                                    input.close();
+                                }
                             }
                         })
                 .onDeactivation(RepositoryConfig.SEND_INTERRUPT)

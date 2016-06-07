@@ -21,26 +21,26 @@ package com.appsimobile.appsii.module.home;
  */
 public class HomeItem {
 
-    long mId;
+    public long mId;
 
-    long mPageId;
+    public long mPageId;
 
-    long mRowId;
+    public long mRowId;
 
-    int mDisplayType;
+    public int mDisplayType;
 
-    int mColspan;
+    public int mColspan;
 
-    int mRowHeight;
+    public int mRowHeight;
 
-    int mPosition;
+    public int mPosition;
 
-    int mRowPosition;
+    public int mRowPosition;
 
-    int mEffectColor;
+    public int mEffectColor;
 
 
-    String mPageName;
+    public String mPageName;
 
     public HomeItem() {
     }

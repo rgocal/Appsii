@@ -95,6 +95,7 @@ public class CalendarModule {
     }
 
 
+    @Singleton
     @Provides
     final public Repository<Result<AgendaEventsResult>> provideAgendaEventsRepository(
             final AppsiApplication app,
@@ -183,6 +184,7 @@ public class CalendarModule {
     }
 
 
+    @Singleton
     @Provides
     final public Repository<Result<AgendaDaysResult>> provideAgendaDayRepository(
             final AppsiApplication app,

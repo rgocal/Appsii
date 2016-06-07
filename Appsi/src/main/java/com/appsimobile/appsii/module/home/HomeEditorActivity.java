@@ -17,12 +17,10 @@
 package com.appsimobile.appsii.module.home;
 
 import android.annotation.SuppressLint;
-import android.app.LoaderManager;
 import android.appwidget.AppWidgetHost;
 import android.content.ContentProviderOperation;
 import android.content.Context;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.OperationApplicationException;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
@@ -37,6 +35,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.os.RemoteException;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.GridLayoutManager;
@@ -55,6 +54,7 @@ import android.widget.Toast;
 
 import com.android.colorpicker.ColorPickerDialog;
 import com.android.colorpicker.ColorPickerSwatch;
+import com.appsimobile.BaseActivity;
 import com.appsimobile.appsii.AppsiApplication;
 import com.appsimobile.appsii.BuildConfig;
 import com.appsimobile.appsii.R;
@@ -64,16 +64,22 @@ import com.appsimobile.appsii.module.home.config.HomeItemConfiguration;
 import com.appsimobile.appsii.module.home.config.HomeItemConfigurationHelper;
 import com.appsimobile.appsii.module.home.provider.HomeContract;
 import com.appsimobile.appsii.preference.PreferencesFactory;
+import com.google.android.agera.Receiver;
+import com.google.android.agera.Repository;
+import com.google.android.agera.Result;
+import com.google.android.agera.Updatable;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * Editor for the home screen
  * Created by nick on 24/01/15.
  */
-public class HomeEditorActivity extends AppCompatActivity implements
-        LoaderManager.LoaderCallbacks<List<HomeItem>>, OnWrapperClickedListener {
+public class HomeEditorActivity extends AppCompatActivity implements OnWrapperClickedListener,
+        Updatable, Receiver<List<HomeItem>> {
 
 
     /**
@@ -91,22 +97,22 @@ public class HomeEditorActivity extends AppCompatActivity implements
     };
 
     /**
-     * The handler thread to which the operations to be performed on the db are executed
-     * The {@link #mSaveHandler} uses this thread
-     */
-    final HandlerThread mHandlerThread;
-
-    /**
      * A rect to recycle when calculating cell positions
      */
     final Rect mPositionRect = new Rect();
+
+    /**
+     * The handler thread to which the operations to be performed on the db are executed
+     * The {@link #mSaveHandler} uses this thread
+     */
+    HandlerThread mHandlerThread;
 
     /**
      * The handler used to post position updates to after the content has been loaded.
      * This is executed with a minor delay to ensure the structural change has been
      * completely executed and the proper locations can be calculated
      */
-    final Handler mHandler;
+    Handler mHandler;
 
     /**
      * The recycler-view showing the items
@@ -204,20 +210,14 @@ public class HomeEditorActivity extends AppCompatActivity implements
      */
     HomeAdapter.HomeAdapterEditor mHomeAdapterEditor;
 
+    @Inject
+    Repository<Result<List<HomeItem>>> mHomeItemRepository;
+
     boolean mApplyingNewData;
 
     ViewGroup mRootView;
 
     public HomeEditorActivity() {
-        mHandlerThread = new HandlerThread("db-thread");
-        mHandlerThread.start();
-
-        mHandler = new Handler(new Handler.Callback() {
-            @Override
-            public boolean handleMessage(Message msg) {
-                return doHandleMessage(msg);
-            }
-        });
     }
 
     private static void ensureInvisible(View view) {
@@ -421,8 +421,33 @@ public class HomeEditorActivity extends AppCompatActivity implements
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        mHomeItemRepository.addUpdatable(this);
+        mHomeItemRepository.get().ifSucceededSendTo(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mHomeItemRepository.removeUpdatable(this);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        BaseActivity.componentFrom(this).inject(this);
+
+        mHandlerThread = new HandlerThread("db-thread");
+        mHandlerThread.start();
+
+        mHandler = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(Message msg) {
+                return doHandleMessage(msg);
+            }
+        });
 
         SharedPreferences preferences = PreferencesFactory.getPreferences(this);
         Context context = ThemingUtils.createContextThemeWrapper(this, preferences);
@@ -491,7 +516,6 @@ public class HomeEditorActivity extends AppCompatActivity implements
 
         });
 
-        getLoaderManager().initLoader(0, null, this);
         mCallback = new Handler.Callback() {
             @Override
             public boolean handleMessage(Message msg) {
@@ -552,50 +576,9 @@ public class HomeEditorActivity extends AppCompatActivity implements
         view.setTranslationY(view.getTranslationY() - dy);
     }
 
-    @Override
-    public Loader<List<HomeItem>> onCreateLoader(int id, Bundle args) {
-        return new HomeLoader(this);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<List<HomeItem>> loader, List<HomeItem> data) {
-        mApplyingNewData = true;
-        int lastPosition = mSingleSelectionDecoration.mSelectedPosition;
-        long lastId;
-        boolean restored;
-        if (lastPosition == -1) {
-            lastId = -1;
-            restored = false;
-        } else {
-            lastId = mHomeAdapter.getItemId(lastPosition);
-            // we have just been restored and want to
-            // restore the selection.
-            restored = mHomeAdapter.getItemCount() == 0;
-        }
-
-        mHomeAdapter.setHomeItems(data);
-
-        int newPosition = mHomeAdapter.getPositionOfId(lastId);
-        if (!restored) {
-            mSingleSelectionDecoration.setSelectedPosition(newPosition);
-        }
-        if (newPosition == -1) {
-            if (mActionMode != null) {
-                mActionMode.finish();
-            }
-        }
-        postUpdatePositions();
-        mApplyingNewData = false;
-    }
-
     void postUpdatePositions() {
         Message message = mHandler.obtainMessage(0);
         mHandler.sendMessageDelayed(message, 10);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<List<HomeItem>> loader) {
-
     }
 
     @Override
@@ -663,6 +646,42 @@ public class HomeEditorActivity extends AppCompatActivity implements
 
     private void performSwitchPositions(int positionFrom, int positionTo) {
         mActionModeCallback.confirmSwitchItemPositions(positionFrom, positionTo);
+    }
+
+    @Override
+    public void update() {
+        mHomeItemRepository.get().ifSucceededSendTo(this);
+    }
+
+    @Override
+    public void accept(@NonNull List<HomeItem> data) {
+        mApplyingNewData = true;
+        int lastPosition = mSingleSelectionDecoration.mSelectedPosition;
+        long lastId;
+        boolean restored;
+        if (lastPosition == -1) {
+            lastId = -1;
+            restored = false;
+        } else {
+            lastId = mHomeAdapter.getItemId(lastPosition);
+            // we have just been restored and want to
+            // restore the selection.
+            restored = mHomeAdapter.getItemCount() == 0;
+        }
+
+        mHomeAdapter.setHomeItems(data);
+
+        int newPosition = mHomeAdapter.getPositionOfId(lastId);
+        if (!restored) {
+            mSingleSelectionDecoration.setSelectedPosition(newPosition);
+        }
+        if (newPosition == -1) {
+            if (mActionMode != null) {
+                mActionMode.finish();
+            }
+        }
+        postUpdatePositions();
+        mApplyingNewData = false;
     }
 
     class InterceptClicksViewWrapperFactory extends HomeAdapter.DefaultViewWrapperFactory
